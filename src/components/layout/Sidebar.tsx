@@ -1,11 +1,35 @@
-import { Box, Drawer, List, ListItemButton, ListItemIcon, ListItemText, Stack } from '@mui/material';
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import logoFlugo from '../../assets/flugo_logo.png'; 
+import { Drawer } from '@mui/material';
+import { SidebarContent } from './SidebarContent';
 
 const DRAWER_WIDTH = 280;
 
-export const Sidebar = () => {
+interface SidebarProps {
+  isMobile: boolean;
+  drawerOpen: boolean;
+  onDrawerClose: () => void;
+}
+
+export const Sidebar = ({ isMobile, drawerOpen, onDrawerClose }: SidebarProps) => {
+
+  if (isMobile) {
+    return (
+      <Drawer
+        anchor="left"
+        open={drawerOpen}
+        onClose={onDrawerClose}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: DRAWER_WIDTH,
+            boxSizing: 'border-box',
+          },
+        }}
+      >
+        <SidebarContent />
+      </Drawer>
+    );
+  }
+
   return (
     <Drawer
       variant="permanent"
@@ -21,58 +45,7 @@ export const Sidebar = () => {
         },
       }}
     >
-      <Stack spacing={0}>
-        
-        {/* 1. Stack da Logo */}
-        <Box 
-          sx={{ 
-            height: 60, 
-            display: 'flex', 
-            alignItems: 'center',
-            pl: 4, 
-            pt: 3, 
-            pb: 1, 
-          }}
-        >
-          <img 
-              src={logoFlugo} 
-              alt="Flugo Logo" 
-              style={{ height: 28 }} 
-              onError={(e) => { e.currentTarget.style.display = 'none'; }} 
-          />
-        </Box>
-
-        {/* 2. Lista de Navegação */}
-        <List disablePadding>
-          <ListItemButton
-            sx={{
-              height: 44,
-              mx: 2, 
-              borderRadius: 1,
-              color: 'text.secondary', 
-              bgcolor: 'transparent',
-              '&:hover': { 
-                  bgcolor: 'rgba(145, 158, 171, 0.08)',
-                  color: 'text.primary',
-              },
-            }}
-          >
-            <ListItemIcon sx={{ minWidth: 40, color: 'inherit' }}>
-              <PeopleAltIcon sx={{ fontSize: 24 }} />
-            </ListItemIcon>
-            
-            <ListItemText 
-              primary="Colaboradores" 
-              slotProps={{ 
-                primary: { variant: 'body2', fontWeight: 600 } 
-              }} 
-            />
-
-            <KeyboardArrowRightIcon sx={{ fontSize: 16, opacity: 0.5 }} />
-            
-          </ListItemButton>
-        </List>
-      </Stack>
+      <SidebarContent />
     </Drawer>
   );
 };

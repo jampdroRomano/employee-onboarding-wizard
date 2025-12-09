@@ -1,6 +1,12 @@
-import { AppBar, Avatar, Box, Stack, Toolbar } from '@mui/material';
+import { AppBar, Avatar, Box, IconButton, Stack, Toolbar } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
 
-export const Header = () => {
+interface HeaderProps {
+  isMobile: boolean;
+  onMenuClick: () => void;
+}
+
+export const Header = ({ isMobile, onMenuClick }: HeaderProps) => {
   return (
     <AppBar
       position="sticky" 
@@ -16,9 +22,21 @@ export const Header = () => {
         disableGutters 
         sx={{ 
           height: 1, 
-          px: 5 
+          px: { xs: 2, lg: 5 } 
         }}
       > 
+        {isMobile && (
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={onMenuClick}
+            sx={{ mr: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
+        )}
+
         <Box sx={{ flexGrow: 1 }} />
 
         <Stack direction="row" alignItems="center" spacing={2}>

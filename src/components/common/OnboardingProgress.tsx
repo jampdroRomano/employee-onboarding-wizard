@@ -11,7 +11,7 @@ export const OnboardingProgress = ({ progress }: OnboardingProgressProps) => {
       alignItems="center" 
       spacing={2} 
       sx={{
-        width: '98%',
+        width: '100%',
         height: '18px',
       }}
     >
@@ -37,7 +37,6 @@ export const OnboardingProgress = ({ progress }: OnboardingProgressProps) => {
           fontSize: '12px',
           lineHeight: '18px',
           color: '#637381',
-          minWidth: '35px', 
           textAlign: 'left',
         }}
       >
