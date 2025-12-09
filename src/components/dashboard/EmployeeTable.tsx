@@ -13,12 +13,19 @@ import {
 } from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
-const columns = [
-  { id: 'nome', label: 'Nome', width: '25%', align: 'left' },
-  { id: 'email', label: 'Email', width: '25%', align: 'left' },
-  { id: 'cargo', label: 'Departamento', width: undefined, align: 'left' },
-  { id: 'status', label: 'Status', width: '100px', align: 'right' }, 
-] as const;
+interface Column {
+  id: 'nome' | 'email' | 'cargo' | 'status';
+  label: string;
+  width?: string;
+  align?: 'left' | 'right' | 'center';
+}
+
+const columns: readonly Column[] = [
+  { id: 'nome', label: 'Nome', width: '30%' },
+  { id: 'email', label: 'Email', width: '30%' },
+  { id: 'cargo', label: 'Departamento' },
+  { id: 'status', label: 'Status', align: 'right' },
+];
 
 const rows = [
   { id: 1, nome: 'Fernanda Torres', email: 'fernandatorres@flugo.com', cargo: 'Design', status: 'Ativo', img: 'https://i.pravatar.cc/150?img=5' },
@@ -31,7 +38,7 @@ export const EmployeeTable = () => {
   return (
     <Card>
       <TableContainer>
-        <Table sx={{ minWidth: 800, tableLayout: 'fixed' }}>
+        <Table sx={{ minWidth: 800 }}>
           <TableHead sx={{ bgcolor: '#F4F6F8' }}>
             <TableRow>
               {columns.map((col) => (
