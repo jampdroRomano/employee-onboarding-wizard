@@ -47,7 +47,6 @@ export const AppTextField = ({
         }
       }}
       sx={{
-        width: '833px',
         maxWidth: '100%',
         '& .MuiOutlinedInput-root': {
           borderRadius: '8px',

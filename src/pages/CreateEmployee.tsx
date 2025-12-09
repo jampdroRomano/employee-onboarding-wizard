@@ -28,8 +28,7 @@ export const CreateEmployee = () => {
           mt: '39px',         
           display: 'flex',    
           gap: '40px',       
-          width: '1026px',   
-          maxWidth: '100%',  
+          width: '97%',
         }}
       >
         {/* Coluna Esquerda: Frame 2 (Stepper) */}
@@ -38,7 +37,7 @@ export const CreateEmployee = () => {
         </Box>
 
         {/* Coluna Direita: Formulário */}
-        <Box sx={{ width: '833px' }}>
+        <Box sx={{ width: '100%' }}>
           <BasicInfoForm />
         </Box>
       </Box>
