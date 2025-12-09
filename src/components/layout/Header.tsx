@@ -1,21 +1,24 @@
 import { AppBar, Avatar, Box, Stack, Toolbar } from '@mui/material';
 
-const DRAWER_WIDTH = 280;
-
 export const Header = () => {
   return (
     <AppBar
-      position="fixed"
+      position="sticky" 
       sx={{
-        width: `calc(100% - ${DRAWER_WIDTH}px)`,
-        ml: `${DRAWER_WIDTH}px`,
+        top: 0,
         boxShadow: 'none',
         bgcolor: 'background.default',
         height: 80,
-        borderBottom: '1px solid transparent',
+        zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
     >
-      <Toolbar sx={{ height: 1, px: 3 }}> 
+      <Toolbar 
+        disableGutters 
+        sx={{ 
+          height: 1, 
+          px: 5 
+        }}
+      > 
         <Box sx={{ flexGrow: 1 }} />
 
         <Stack direction="row" alignItems="center" spacing={2}>
