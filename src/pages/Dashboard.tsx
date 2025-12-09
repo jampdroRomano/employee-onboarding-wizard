@@ -1,8 +1,12 @@
 import { Box, Stack, Typography } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 import { AppButton } from '../components/common/AppButton';
 import { EmployeeTable } from '../components/dashboard/EmployeeTable';
+import { useNavigate } from 'react-router-dom';
 
 export const Dashboard = () => {
+  const navigate = useNavigate(); 
+
   return (
     <Box>
       <Stack 
@@ -17,6 +21,8 @@ export const Dashboard = () => {
         </Typography>
         
         <AppButton 
+          startIcon={<AddIcon />}
+          onClick={() => navigate('/criar')}
           sx={{
             height: '48px',
             padding: '11px 16px',
