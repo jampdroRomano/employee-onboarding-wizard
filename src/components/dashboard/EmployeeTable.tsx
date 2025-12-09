@@ -21,8 +21,8 @@ interface Column {
 }
 
 const columns: readonly Column[] = [
-  { id: 'nome', label: 'Nome', width: '30%' },
-  { id: 'email', label: 'Email', width: '30%' },
+  { id: 'nome', label: 'Nome', width: '25%' },
+  { id: 'email', label: 'Email', width: '25%' },
   { id: 'cargo', label: 'Departamento' },
   { id: 'status', label: 'Status', align: 'right' },
 ];
