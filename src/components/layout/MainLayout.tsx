@@ -1,4 +1,3 @@
-// src/components/layout/MainLayout.tsx
 import { Box, Toolbar } from '@mui/material';
 import { type ReactNode } from 'react';
 import { Header } from './Header';
@@ -19,18 +18,18 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       {/* 2. Sidebar Fixa na Esquerda */}
       <Sidebar />
 
-      {/* 3. Área de Conteúdo (O Placeholder Cinza) */}
+      {/* 3. Área de Conteúdo */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          bgcolor: '#F4F6F8', // Cor do Background Neutral 
+          bgcolor: 'background.default', 
           minHeight: '100vh',
           p: 3,
           width: `calc(100% - ${DRAWER_WIDTH}px)`,
         }}
       >
-        {/* Esse Toolbar vazio serve para empurrar o conteúdo para baixo do Header fixo */}
+        {/* Espaçador para o Header fixo */}
         <Toolbar sx={{ height: 80 }} /> 
         
         {children}
