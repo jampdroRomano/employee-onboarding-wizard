@@ -3,7 +3,7 @@ import { Box, Stack, Typography } from '@mui/material';
 export const StepperVertical = () => {
   return (
     <Stack 
-      spacing={1} // gap: 8px entre os elementos
+      spacing={1} 
       sx={{ 
         width: '153px', 
         height: '272px' 

@@ -1,7 +1,8 @@
-import { Box, Paper } from '@mui/material';
+import { Box } from '@mui/material';
 import { AppBreadcrumbs } from '../components/common/AppBreadcrumbs';
 import { OnboardingProgress } from '../components/common/OnboardingProgress';
 import { StepperVertical } from '../components/onboarding/StepperVertical';
+import { BasicInfoForm } from '../components/onboarding/BasicInfoForm';
 
 export const CreateEmployee = () => {
   return (
@@ -21,7 +22,7 @@ export const CreateEmployee = () => {
          <OnboardingProgress progress={0} />
       </Box>
 
-      {/* 3. FRAME 4 - Container Principal */}
+      {/* 3. Container Principal (Stepper + Form) */}
       <Box
         sx={{
           mt: '39px',         
@@ -36,21 +37,10 @@ export const CreateEmployee = () => {
           <StepperVertical />
         </Box>
 
-        {/* Coluna Direita: Área do Formulário) */}
-        <Paper
-          sx={{
-            width: '833px',        
-            p: 3,                   
-            borderRadius: '16px',
-            bgcolor: '#FFFFFF',
-            boxShadow: '0px 12px 24px -4px rgba(145, 158, 171, 0.12)', 
-          }}
-        >
-          {/* O conteúdo do formulário (Inputs, Switches) */}
-          <Box sx={{ height: '200px', border: '1px dashed #919EAB', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'text.secondary' }}>
-            Área do Frame 1 (Formulário)
-          </Box>
-        </Paper>
+        {/* Coluna Direita: Formulário */}
+        <Box sx={{ width: '833px' }}>
+          <BasicInfoForm />
+        </Box>
       </Box>
     </Box>
   );
