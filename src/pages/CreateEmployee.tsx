@@ -1,16 +1,39 @@
-import { Box, Typography } from '@mui/material';
-import { AppButton } from '../components/common/AppButton';
+import { Box } from '@mui/material';
+import { AppBreadcrumbs } from '../components/common/AppBreadcrumbs';
 
 export const CreateEmployee = () => {
   return (
-    <Box>
-      <Typography variant="h4" mb={4}>
-        Cadastrar Colaborador
-      </Typography>
+    <Box
+      sx={{
+        width: '1080px',
+        height: '896px',
+        borderRadius: '16px',
+        
+        // --- Estilo Visual ---
+        bgcolor: '#FFFFFF', 
+        opacity: 1,
+        boxShadow: 'none', 
+        position: 'relative', 
+        marginTop: '-27px', 
+      }}
+    >
+      <Box 
+        sx={{ 
+          position: 'absolute', 
+          top: '4px', 
+          left: '0px',
+          width: '880px',
+        }}
+      >
+        <AppBreadcrumbs 
+          items={[
+            { label: 'Colaboradores', path: '/' },
+            { label: 'Cadastrar Colaborador' }
+          ]} 
+        />
+      </Box>
 
-      <AppButton>
-        Próximo
-      </AppButton>
+
     </Box>
   );
 };
