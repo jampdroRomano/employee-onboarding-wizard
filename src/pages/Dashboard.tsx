@@ -5,16 +5,22 @@ import { EmployeeTable } from '../components/dashboard/EmployeeTable';
 export const Dashboard = () => {
   return (
     <Box>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+      <Stack 
+        direction="row" 
+        alignItems="center" 
+        justifyContent="space-between" 
+        mb={'31px'}
+        sx={{ flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}
+      >
         <Typography variant="h4" color="text.primary">
           Colaboradores
         </Typography>
-
-        <AppButton
+        
+        <AppButton 
           sx={{
             height: '48px',
             padding: '11px 16px',
-            width: { xs: '100%', sm: 'auto' }
+            width: { xs: '100%', sm: 'auto' } 
           }}
         >
           Novo Colaborador

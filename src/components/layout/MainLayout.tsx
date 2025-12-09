@@ -13,26 +13,26 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       
-      {/* 1. Sidebar */}
       <Sidebar />
 
-      {/* 2. Coluna da Direita */}
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'column',
           flexGrow: 1,
-          width: `calc(100% - ${DRAWER_WIDTH}px)`, // Ocupa o espaço restante
+          width: `calc(100% - ${DRAWER_WIDTH}px)`,
           bgcolor: 'background.default',
         }}
       >
         <Header />
+
         <Box 
           component="main" 
           sx={{ 
             flexGrow: 1, 
-            px: 5, // 40px Horizontal (alinha com o header)
-            pt: 1, // 8px Topo
+            px: 5, 
+            pt: '35px', 
+            
             pb: 5 
           }}
         >
