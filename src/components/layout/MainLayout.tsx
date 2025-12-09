@@ -31,7 +31,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
           sx={{ 
             flexGrow: 1, 
             px: 5, 
-            pt: '35px', 
+            pt: '12px', 
             
             pb: 5 
           }}

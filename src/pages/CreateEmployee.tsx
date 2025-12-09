@@ -15,7 +15,7 @@ export const CreateEmployee = () => {
         />
       </Box>
 
-      {/* 2. Barra de Progresso (Inserida aqui) */}
+      {/* 2. Barra de Progresso */}
       <Box sx={{ mb: 4 }}> 
          <OnboardingProgress progress={0} />
       </Box>
@@ -30,7 +30,7 @@ export const CreateEmployee = () => {
           boxShadow: 'none', 
         }}
       >
-        {/* Conteúdo do formulário virá aqui */}
+        {/* Conteúdo do formulário */}
         
       </Paper>
     </Box>

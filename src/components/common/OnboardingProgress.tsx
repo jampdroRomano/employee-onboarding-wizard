@@ -1,7 +1,7 @@
 import { LinearProgress, Stack, Typography, linearProgressClasses } from '@mui/material';
 
 interface OnboardingProgressProps {
-  progress: number; // 0 a 100
+  progress: number; 
 }
 
 export const OnboardingProgress = ({ progress }: OnboardingProgressProps) => {
@@ -9,9 +9,9 @@ export const OnboardingProgress = ({ progress }: OnboardingProgressProps) => {
     <Stack 
       direction="row" 
       alignItems="center" 
-      spacing={2} // Espaçamento entre a barra e o texto
+      spacing={2} 
       sx={{
-        width: '100%', // CORREÇÃO: Ocupa a largura total do pai (fluido)
+        width: '98%',
         height: '18px',
       }}
     >
@@ -19,13 +19,13 @@ export const OnboardingProgress = ({ progress }: OnboardingProgressProps) => {
         variant="determinate"
         value={progress}
         sx={{
-          flexGrow: 1, // CORREÇÃO: Faz a barra esticar para preencher o espaço restante
+          flexGrow: 1, 
           height: '4px',
           borderRadius: '4px',
-          backgroundColor: '#22C55E3D', // Sua cor de fundo (verde transparente)
+          backgroundColor: '#22C55E3D', 
           [`& .${linearProgressClasses.bar}`]: {
             borderRadius: '50px',
-            backgroundColor: '#22C55E', // Sua cor principal (verde)
+            backgroundColor: '#22C55E', 
           },
         }}
       />
@@ -37,8 +37,8 @@ export const OnboardingProgress = ({ progress }: OnboardingProgressProps) => {
           fontSize: '12px',
           lineHeight: '18px',
           color: '#637381',
-          minWidth: '35px', // Garante que o texto "100%" caiba sem empurrar o layout
-          textAlign: 'right',
+          minWidth: '35px', 
+          textAlign: 'left',
         }}
       >
         {Math.round(progress)}%
