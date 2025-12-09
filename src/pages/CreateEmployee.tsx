@@ -1,6 +1,7 @@
 import { Box, Paper } from '@mui/material';
 import { AppBreadcrumbs } from '../components/common/AppBreadcrumbs';
-import { OnboardingProgress } from '../components/common/OnboardingProgress'; // Importe o componente
+import { OnboardingProgress } from '../components/common/OnboardingProgress';
+import { StepperVertical } from '../components/onboarding/StepperVertical';
 
 export const CreateEmployee = () => {
   return (
@@ -16,23 +17,41 @@ export const CreateEmployee = () => {
       </Box>
 
       {/* 2. Barra de Progresso */}
-      <Box sx={{ mb: 4 }}> 
+      <Box> 
          <OnboardingProgress progress={0} />
       </Box>
 
-      {/* 3. Área do Formulário */}
-      <Paper
+      {/* 3. FRAME 4 - Container Principal */}
+      <Box
         sx={{
-          width: '100%', 
-          p: 3, 
-          borderRadius: '16px',
-          bgcolor: '#FFFFFF',
-          boxShadow: 'none', 
+          mt: '39px',         
+          display: 'flex',    
+          gap: '40px',       
+          width: '1026px',   
+          maxWidth: '100%',  
         }}
       >
-        {/* Conteúdo do formulário */}
-        
-      </Paper>
+        {/* Coluna Esquerda: Frame 2 (Stepper) */}
+        <Box sx={{ width: '153px', flexShrink: 0 }}>
+          <StepperVertical />
+        </Box>
+
+        {/* Coluna Direita: Área do Formulário) */}
+        <Paper
+          sx={{
+            width: '833px',        
+            p: 3,                   
+            borderRadius: '16px',
+            bgcolor: '#FFFFFF',
+            boxShadow: '0px 12px 24px -4px rgba(145, 158, 171, 0.12)', 
+          }}
+        >
+          {/* O conteúdo do formulário (Inputs, Switches) */}
+          <Box sx={{ height: '200px', border: '1px dashed #919EAB', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'text.secondary' }}>
+            Área do Frame 1 (Formulário)
+          </Box>
+        </Paper>
+      </Box>
     </Box>
   );
 };
