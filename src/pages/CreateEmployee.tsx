@@ -1,30 +1,12 @@
-import { Box } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 import { AppBreadcrumbs } from '../components/common/AppBreadcrumbs';
+import { OnboardingProgress } from '../components/common/OnboardingProgress'; // Importe o componente
 
 export const CreateEmployee = () => {
   return (
-    <Box
-      sx={{
-        width: '1080px',
-        height: '896px',
-        borderRadius: '16px',
-        
-        // --- Estilo Visual ---
-        bgcolor: '#FFFFFF', 
-        opacity: 1,
-        boxShadow: 'none', 
-        position: 'relative', 
-        marginTop: '-27px', 
-      }}
-    >
-      <Box 
-        sx={{ 
-          position: 'absolute', 
-          top: '4px', 
-          left: '0px',
-          width: '880px',
-        }}
-      >
+    <Box>
+      {/* 1. Cabeçalho com Breadcrumbs */}
+      <Box sx={{ mb: 2 }}>
         <AppBreadcrumbs 
           items={[
             { label: 'Colaboradores', path: '/' },
@@ -33,7 +15,24 @@ export const CreateEmployee = () => {
         />
       </Box>
 
+      {/* 2. Barra de Progresso (Inserida aqui) */}
+      <Box sx={{ mb: 4 }}> 
+         <OnboardingProgress progress={0} />
+      </Box>
 
+      {/* 3. Área do Formulário */}
+      <Paper
+        sx={{
+          width: '100%', 
+          p: 3, 
+          borderRadius: '16px',
+          bgcolor: '#FFFFFF',
+          boxShadow: 'none', 
+        }}
+      >
+        {/* Conteúdo do formulário virá aqui */}
+        
+      </Paper>
     </Box>
   );
 };
