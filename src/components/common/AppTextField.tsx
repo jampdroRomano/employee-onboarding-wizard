@@ -1,4 +1,3 @@
-// src/components/common/AppTextField.tsx
 import { TextField } from '@mui/material';
 import type { TextFieldProps, InputLabelProps } from '@mui/material';
 
@@ -19,9 +18,11 @@ export const AppTextField = ({
   ...props 
 }: AppTextFieldProps) => {
 
-  const baseColor = fixedActiveColor || '#dcdedf';
-  const interactionColor = fixedActiveColor || focusColor;
+  // Cores
+  const interactionColor = fixedActiveColor || focusColor; 
   const errorColor = '#d32f2f'; 
+  const labelDefaultColor = '#212B36'; 
+  const borderDefaultColor = 'rgba(145, 158, 171, 0.32)'; 
 
   return (
     <TextField
@@ -34,7 +35,10 @@ export const AppTextField = ({
             sx: {
                 ...fontInter,
                 fontSize: '16px',
-                color: error ? errorColor : (fixedActiveColor ? fixedActiveColor : 'rgba(38, 50, 56, 0.6)'),
+                // 1. Cor padrão (sem foco) = Preto
+                color: error ? errorColor : labelDefaultColor,
+                
+                // 2. Cor no foco = Verde (interactionColor)
                 '&.Mui-focused': {
                   color: error ? errorColor : interactionColor, 
                   fontWeight: 500,
@@ -46,7 +50,7 @@ export const AppTextField = ({
                 ...fontInter,
                 height: '56px',
                 boxSizing: 'border-box',
-                color: '#263238',
+                color: labelDefaultColor, 
             }
         }
       }}
@@ -56,18 +60,18 @@ export const AppTextField = ({
           borderRadius: '8px',
           backgroundColor: 'transparent',
           
-          // Borda Base
+          // Borda Inativa (Cinza)
           '& fieldset': {
-            borderColor: error ? errorColor : baseColor, 
+            borderColor: error ? errorColor : borderDefaultColor, 
             borderWidth: fixedActiveColor ? '2px' : '1px',
           },
           
-          // Hover
+          // Hover (Verde)
           '&:hover fieldset': {
             borderColor: error ? errorColor : interactionColor, 
           },
           
-          // Focus
+          // Foco (Verde)
           '&.Mui-focused fieldset': {
             borderColor: error ? errorColor : interactionColor, 
           },

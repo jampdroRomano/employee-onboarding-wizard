@@ -1,10 +1,15 @@
 import { Box, Typography, MenuItem } from '@mui/material';
 import { AppTextField } from '../common/AppTextField';
 
-// Opções estáticas por enquanto
+interface ProfessionalInfoFormProps {
+  department: string;
+  error: string;
+  handleChange: (value: string) => void;
+}
+
 const departments = ['Design', 'TI', 'Marketing', 'Produto'];
 
-export const ProfessionalInfoForm = () => {
+export const ProfessionalInfoForm = ({ department, error, handleChange }: ProfessionalInfoFormProps) => {
   return (
     <Box sx={{ width: '100%' }}>
       <Typography 
@@ -14,7 +19,7 @@ export const ProfessionalInfoForm = () => {
             fontFamily: '"Public Sans", sans-serif',
             fontWeight: 700,
             fontSize: '24px', 
-            color: '#637381'
+            color: '#212B36'
         }}
       >
         Informações Profissionais
@@ -22,24 +27,31 @@ export const ProfessionalInfoForm = () => {
 
       <Box sx={{ width: '100%' }}> 
         <AppTextField 
-            select 
-            fullWidth 
-            label="Departamento"
+            select
+            fullWidth
             placeholder="Selecione um departamento"
             focusColor="#22C55E"
+            
+            value={department}
+            onChange={(e) => handleChange(e.target.value)}
+            
+            error={!!error}
+            helperText={error}
+
             sx={{
               '& .MuiInputBase-root': {
                 height: '54px', 
               },
               '& .MuiOutlinedInput-notchedOutline': {
                 borderWidth: '1px',
-                borderColor: 'rgba(220, 222, 223)', 
+                borderColor: error ? '#d32f2f' : 'rgba(145, 158, 171, 0.20)', 
               }
             }}
             SelectProps={{
                displayEmpty: true,
                renderValue: (selected: any) => {
                   if (!selected) {
+                    // Mantemos o placeholder visual interno
                     return <span style={{ color: '#919EAB' }}>Selecione um departamento</span>;
                   }
                   return selected;

@@ -8,18 +8,29 @@ import { BasicInfoForm } from '../components/onboarding/BasicInfoForm';
 import { ProfessionalInfoForm } from '../components/onboarding/ProfessionalInfoForm';
 import { AppButton } from '../components/common/AppButton';
 import { useBasicInfo } from '../hooks/useBasicInfo'; 
+import { useProfessionalInfo } from '../hooks/useProfessionalInfo'; 
 
 export const CreateEmployee = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
-  const { formData, errors, handleChange, validateStep } = useBasicInfo();
+
+  const basicInfo = useBasicInfo();
+  const profInfo = useProfessionalInfo(); 
 
   const handleNext = () => {
     if (currentStep === 1) {
-      const isValid = validateStep();
+      const isValid = basicInfo.validateStep();
       if (isValid) setCurrentStep(2);
     } else {
-      console.log('Finalizar Cadastro', formData);
+      const isValid = profInfo.validateStep();
+      
+      if (isValid) {
+        const payload = {
+            ...basicInfo.formData, 
+            departamento: profInfo.department
+        };
+        console.log('Dados prontos para enviar ao Firebase:', payload);
+      }
     }
   };
 
@@ -47,7 +58,6 @@ export const CreateEmployee = () => {
       <Box sx={{ pr: { xs: 0, md: '94px' } }}>
         <OnboardingProgress progress={progressValue} />
 
-        {/* CONTAINER PRINCIPAL  */}
         <Box
           sx={{
             mt: '39px',
@@ -57,29 +67,31 @@ export const CreateEmployee = () => {
             alignItems: 'flex-start', 
           }}
         >
-          {/* 1. COLUNA ESQUERDA: Stepper (Fixo) */}
           <Box sx={{ width: { xs: '100%', md: '153px' }, flexShrink: 0 }}>
             <StepperVertical currentStep={currentStep} />
           </Box>
 
-          {/* 2. COLUNA DIREITA: Formulário + Botões */}
           <Box sx={{ width: '100%' }}> 
+            
             <Box sx={{ minHeight: '272px' }}>
                 {currentStep === 1 ? (
                   <BasicInfoForm 
-                    formData={formData}
-                    errors={errors}
-                    handleChange={handleChange}
+                    formData={basicInfo.formData}
+                    errors={basicInfo.errors}
+                    handleChange={basicInfo.handleChange}
                   />
                 ) : (
-                  <ProfessionalInfoForm />
+                  <ProfessionalInfoForm 
+                    department={profInfo.department}
+                    error={profInfo.error}
+                    handleChange={profInfo.handleChange}
+                  />
                 )}
             </Box>
 
-            {/* B. ÁREA DOS BOTÕES*/}
             <Box
               sx={{
-                mt: '120px',
+                mt: '120px', 
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',

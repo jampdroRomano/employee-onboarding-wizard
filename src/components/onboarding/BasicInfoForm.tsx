@@ -24,7 +24,7 @@ export const BasicInfoForm = ({ formData, errors, handleChange }: BasicInfoFormP
             fontFamily: '"Public Sans", sans-serif',
             fontWeight: 700,
             fontSize: '24px', 
-            color: '#637381'
+            color: '#212B36'
         }}
       >
         Informações Básicas
@@ -33,7 +33,7 @@ export const BasicInfoForm = ({ formData, errors, handleChange }: BasicInfoFormP
       <Stack spacing={3}>
 
         <AppTextField 
-            label="Nome"
+            label="Título" 
             placeholder="João da Silva"
             focusColor="#22C55E" 
 
