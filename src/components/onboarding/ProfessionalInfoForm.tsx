@@ -14,7 +14,7 @@ export const ProfessionalInfoForm = () => {
             fontFamily: '"Public Sans", sans-serif',
             fontWeight: 700,
             fontSize: '24px', 
-            color: '#212B36'
+            color: '#637381'
         }}
       >
         Informações Profissionais
@@ -33,7 +33,7 @@ export const ProfessionalInfoForm = () => {
               },
               '& .MuiOutlinedInput-notchedOutline': {
                 borderWidth: '1px',
-                borderColor: 'rgba(145, 158, 171, 0.20)', 
+                borderColor: 'rgba(220, 222, 223)', 
               }
             }}
             SelectProps={{

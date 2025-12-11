@@ -19,7 +19,7 @@ export const AppTextField = ({
   ...props 
 }: AppTextFieldProps) => {
 
-  const baseColor = fixedActiveColor || '#263238';
+  const baseColor = fixedActiveColor || '#dcdedf';
   const interactionColor = fixedActiveColor || focusColor;
   const errorColor = '#d32f2f'; 
 

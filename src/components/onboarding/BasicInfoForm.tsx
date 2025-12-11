@@ -24,7 +24,7 @@ export const BasicInfoForm = ({ formData, errors, handleChange }: BasicInfoFormP
             fontFamily: '"Public Sans", sans-serif',
             fontWeight: 700,
             fontSize: '24px', 
-            color: '#212B36'
+            color: '#637381'
         }}
       >
         Informações Básicas
