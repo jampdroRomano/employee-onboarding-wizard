@@ -50,9 +50,7 @@ export const CreateEmployee = () => {
   const handleBack = () => {
     if (currentStep === 2) {
       setCurrentStep(1);
-    } else {
-      navigate('/');
-    }
+    } 
   };
 
   const progressValue = currentStep === 1 ? 0 : 50;
@@ -115,19 +113,22 @@ export const CreateEmployee = () => {
             >
               <AppButton
                 onClick={handleBack}
-                variant="text"
+                variant="text" 
                 disableRipple
-                disabled={isSaving}
+                disabled={currentStep === 1 || isSaving}
                 sx={{
                   width: '64px', height: '48px', minWidth: '64px',
                   boxShadow: 'none',
                   pl: 0, 
                   justifyContent: 'flex-start',
-                  color: (theme) => alpha(theme.palette.grey[500], 0.8),
+                  color: 'text.primary',
                   '&:hover': { 
                       backgroundColor: 'transparent', 
                       boxShadow: 'none', 
-                      color: 'grey.500' 
+                      color: 'text.secondary',
+                  },
+                  '&.Mui-disabled': {
+                    color: (theme) => alpha(theme.palette.grey[500], 0.8),
                   },
                   '&:focus': { backgroundColor: 'transparent' },
                   '&:active': { backgroundColor: 'transparent' }
