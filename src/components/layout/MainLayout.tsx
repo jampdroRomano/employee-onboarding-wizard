@@ -14,13 +14,8 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
   const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const handleDrawerOpen = () => {
-    setDrawerOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setDrawerOpen(false);
-  };
+  const handleDrawerOpen = () => setDrawerOpen(true);
+  const handleDrawerClose = () => setDrawerOpen(false);
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
@@ -29,6 +24,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         isMobile={isMobile}
         drawerOpen={drawerOpen}
         onDrawerClose={handleDrawerClose}
+        drawerWidth={DRAWER_WIDTH}
       />
 
       <Box
@@ -38,9 +34,16 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
           flexGrow: 1,
           width: isMobile ? '100%' : `calc(100% - ${DRAWER_WIDTH}px)`,
           bgcolor: 'background.default',
+          transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
         }}
       >
-        <Header isMobile={isMobile} onMenuClick={handleDrawerOpen} />
+        <Header 
+            isMobile={isMobile} 
+            onMenuClick={handleDrawerOpen} 
+        />
 
         <Box 
           component="main" 

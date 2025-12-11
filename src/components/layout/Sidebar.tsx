@@ -1,27 +1,33 @@
 import { Drawer } from '@mui/material';
 import { SidebarContent } from './SidebarContent';
 
-const DRAWER_WIDTH = 280;
-
 interface SidebarProps {
   isMobile: boolean;
   drawerOpen: boolean;
   onDrawerClose: () => void;
+  drawerWidth?: number; 
 }
 
-export const Sidebar = ({ isMobile, drawerOpen, onDrawerClose }: SidebarProps) => {
+export const Sidebar = ({ 
+  isMobile, 
+  drawerOpen, 
+  onDrawerClose, 
+  drawerWidth = 280 
+}: SidebarProps) => {
 
   if (isMobile) {
     return (
       <Drawer
+        variant="temporary" 
         anchor="left"
         open={drawerOpen}
         onClose={onDrawerClose}
-        ModalProps={{ keepMounted: true }}
+        ModalProps={{ keepMounted: true }} 
         sx={{
           '& .MuiDrawer-paper': {
-            width: DRAWER_WIDTH,
+            width: drawerWidth,
             boxSizing: 'border-box',
+            borderRight: '1px dashed rgba(145, 158, 171, 0.24)',
           },
         }}
       >
@@ -35,10 +41,10 @@ export const Sidebar = ({ isMobile, drawerOpen, onDrawerClose }: SidebarProps) =
       variant="permanent"
       anchor="left"
       sx={{
-        width: DRAWER_WIDTH,
+        width: drawerWidth,
         flexShrink: 0,
         '& .MuiDrawer-paper': {
-          width: DRAWER_WIDTH,
+          width: drawerWidth,
           boxSizing: 'border-box',
           borderRight: '1px dashed rgba(145, 158, 171, 0.24)', 
           backgroundColor: 'background.default',

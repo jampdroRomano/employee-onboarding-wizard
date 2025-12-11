@@ -12,11 +12,9 @@ export const Header = ({ isMobile, onMenuClick }: HeaderProps) => {
     <AppBar
       position="static" 
       sx={{
-        top: 0,
         boxShadow: 'none',
         bgcolor: 'background.default',
         height: 80,
-        zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
     >
       <Toolbar 
@@ -29,10 +27,10 @@ export const Header = ({ isMobile, onMenuClick }: HeaderProps) => {
         {isMobile && (
           <IconButton
             color="inherit"
-            aria-label="open drawer"
+            aria-label="abrir menu"
             edge="start"
             onClick={onMenuClick}
-            sx={{ mr: 2 }}
+            sx={{ mr: 2, color: 'text.primary' }}
           >
             <MenuIcon />
           </IconButton>
