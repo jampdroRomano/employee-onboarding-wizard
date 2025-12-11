@@ -89,3 +89,8 @@ npm install
 npm run dev
 ```
 A aplicação está disponível em `http://localhost:5173` (ou outra porta, se a 5173 estiver em uso).
+
+> **Nota:** Se houver algum problema com o vite, pode ser necessário reinstalá-lo como uma dependência de desenvolvimento, com o seguinte comando:
+> ```bash
+> npm install --save-dev vite
+> ```
