@@ -10,7 +10,7 @@ interface HeaderProps {
 export const Header = ({ isMobile, onMenuClick }: HeaderProps) => {
   return (
     <AppBar
-      position="sticky" 
+      position="static" 
       sx={{
         top: 0,
         boxShadow: 'none',

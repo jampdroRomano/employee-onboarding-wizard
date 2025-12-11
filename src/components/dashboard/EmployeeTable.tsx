@@ -24,7 +24,7 @@ interface Employee {
   id: string;
   nome: string;
   email: string;
-  cargo: string; // ou departamento
+  cargo: string; 
   status: string;
   img: string;
 }
@@ -44,8 +44,6 @@ export const EmployeeTable = () => {
     // Cria a query ordenando por data de criação (mais novos primeiro)
     const q = query(collection(db, "employees"), orderBy("createdAt", "desc"));
 
-    // onSnapshot escuta o banco em TEMPO REAL. 
-    // Se alguém cadastrar, a tabela atualiza sozinha sem F5.
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const employees = snapshot.docs.map(doc => ({
         id: doc.id,
@@ -91,7 +89,6 @@ export const EmployeeTable = () => {
                     justifyContent={col.align === 'right' ? 'flex-end' : 'flex-start'}
                   >
                     <span>{col.label}</span>
-                    {/* Ícone apenas decorativo por enquanto */}
                     <ArrowDownwardIcon sx={{ fontSize: 16, opacity: 0.5 }} />
                   </Stack>
                 </TableCell>
@@ -135,7 +132,6 @@ export const EmployeeTable = () => {
                         sx={{
                         fontWeight: 700,
                         borderRadius: '6px',
-                        // Lógica de cor baseada no status texto
                         bgcolor: row.status === 'Ativo' ? 'rgba(34, 197, 94, 0.16)' : 'rgba(255, 86, 48, 0.16)',
                         color: row.status === 'Ativo' ? '#118D57' : '#B71D18',
                         }}
