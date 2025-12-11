@@ -1,4 +1,5 @@
 import { Box } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react'; 
 import { AppBreadcrumbs } from '../components/common/AppBreadcrumbs';
@@ -9,15 +10,17 @@ import { ProfessionalInfoForm } from '../components/onboarding/ProfessionalInfoF
 import { AppButton } from '../components/common/AppButton';
 import { useBasicInfo } from '../hooks/useBasicInfo'; 
 import { useProfessionalInfo } from '../hooks/useProfessionalInfo'; 
+import { createEmployee } from '../services/employeeService'; 
 
 export const CreateEmployee = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSaving, setIsSaving] = useState(false);
 
   const basicInfo = useBasicInfo();
   const profInfo = useProfessionalInfo(); 
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep === 1) {
       const isValid = basicInfo.validateStep();
       if (isValid) setCurrentStep(2);
@@ -25,11 +28,21 @@ export const CreateEmployee = () => {
       const isValid = profInfo.validateStep();
       
       if (isValid) {
+        setIsSaving(true);
         const payload = {
             ...basicInfo.formData, 
             departamento: profInfo.department
         };
-        console.log('Dados prontos para enviar ao Firebase:', payload);
+
+        try {
+          await createEmployee(payload);
+          navigate('/');
+        } catch (error) {
+          console.error("Erro ao salvar funcionário:", error);
+          alert("Ocorreu um erro ao salvar.");
+        } finally {
+          setIsSaving(false);
+        }
       }
     }
   };
@@ -79,7 +92,7 @@ export const CreateEmployee = () => {
                     formData={basicInfo.formData}
                     errors={basicInfo.errors}
                     handleChange={basicInfo.handleChange}
-                    handleStatusChange={basicInfo.handleStatusChange} // Nova prop
+                    handleStatusChange={basicInfo.handleStatusChange} 
                   />
                 ) : (
                   <ProfessionalInfoForm 
@@ -102,13 +115,22 @@ export const CreateEmployee = () => {
             >
               <AppButton
                 onClick={handleBack}
+                variant="text"
+                disableRipple
+                disabled={isSaving}
                 sx={{
                   width: '64px', height: '48px', minWidth: '64px',
-                  backgroundColor: 'transparent', boxShadow: 'none',
-                  color: '#919EABCC',
+                  boxShadow: 'none',
                   pl: 0, 
-                  justifyContent: 'flex-start', 
-                  '&:hover': { backgroundColor: 'transparent', boxShadow: 'none', color: '#919EAB' }
+                  justifyContent: 'flex-start',
+                  color: (theme) => alpha(theme.palette.grey[500], 0.8),
+                  '&:hover': { 
+                      backgroundColor: 'transparent', 
+                      boxShadow: 'none', 
+                      color: 'grey.500' 
+                  },
+                  '&:focus': { backgroundColor: 'transparent' },
+                  '&:active': { backgroundColor: 'transparent' }
                 }}
               >
                 Voltar
@@ -116,12 +138,13 @@ export const CreateEmployee = () => {
 
               <AppButton
                 onClick={handleNext}
+                disabled={isSaving}
                 sx={{
                   width: '91px', height: '48px', minWidth: '64px',
                   fontWeight: 700, borderRadius: '8px',
                 }}
               >
-                {currentStep === 2 ? 'Concluir' : 'Próximo'}
+                {isSaving ? '...' : (currentStep === 2 ? 'Concluir' : 'Próximo')}
               </AppButton>
             </Box>
 

@@ -1,5 +1,6 @@
 import { AppBar, Avatar, Box, IconButton, Stack, Toolbar } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import userAvatar from '../../assets/avatar5.png';
 
 interface HeaderProps {
   isMobile: boolean;
@@ -53,7 +54,7 @@ export const Header = ({ isMobile, onMenuClick }: HeaderProps) => {
             }}
           >
             <Avatar 
-                src="https://i.pravatar.cc/150?img=12" 
+                src={userAvatar} 
                 alt="User" 
                 sx={{ width: 32, height: 32 }} 
             />
