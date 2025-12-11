@@ -1,6 +1,12 @@
 import { Box, Switch, Typography } from '@mui/material';
 
-export const AppSwitchLabel = () => {
+// 1. Adicionamos a interface para receber dados
+interface AppSwitchLabelProps {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}
+
+export const AppSwitchLabel = ({ checked, onChange }: AppSwitchLabelProps) => {
   return (
     <Box
       sx={{
@@ -12,7 +18,9 @@ export const AppSwitchLabel = () => {
       }}
     >
       <Switch 
-        defaultChecked 
+        // 2. Ligamos o Switch ao estado real
+        checked={checked} 
+        onChange={(e) => onChange(e.target.checked)}
         sx={{
             '& .MuiSwitch-switchBase.Mui-checked': {
                 color: 'primary.main', 
@@ -36,7 +44,8 @@ export const AppSwitchLabel = () => {
             whiteSpace: 'nowrap',
         }}
       >
-        Ativar ao criar
+        {/* Muda o texto visualmente para dar feedback */}
+        {checked ? 'Ativo' : 'Inativo'}
       </Typography>
     </Box>
   );

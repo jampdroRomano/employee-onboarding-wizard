@@ -79,6 +79,7 @@ export const CreateEmployee = () => {
                     formData={basicInfo.formData}
                     errors={basicInfo.errors}
                     handleChange={basicInfo.handleChange}
+                    handleStatusChange={basicInfo.handleStatusChange} // Nova prop
                   />
                 ) : (
                   <ProfessionalInfoForm 

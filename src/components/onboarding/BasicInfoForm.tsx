@@ -6,15 +6,17 @@ interface BasicInfoFormProps {
   formData: {
     nome: string;
     email: string;
+    status: boolean; 
   };
   errors: {
     nome: string;
     email: string;
   };
   handleChange: (field: string, value: string) => void;
+  handleStatusChange: (checked: boolean) => void; 
 }
 
-export const BasicInfoForm = ({ formData, errors, handleChange }: BasicInfoFormProps) => {
+export const BasicInfoForm = ({ formData, errors, handleChange, handleStatusChange }: BasicInfoFormProps) => {
   return (
     <Box sx={{ width: '100%' }}>
       <Typography 
@@ -33,7 +35,6 @@ export const BasicInfoForm = ({ formData, errors, handleChange }: BasicInfoFormP
         <AppTextField 
             label="Título" 
             placeholder="João da Silva"
-            
             value={formData.nome}
             onChange={(e) => handleChange('nome', e.target.value)}
             error={!!errors.nome}
@@ -43,14 +44,17 @@ export const BasicInfoForm = ({ formData, errors, handleChange }: BasicInfoFormP
         <AppTextField 
             label="E-mail"
             placeholder="e.g. john@gmail.com"
-            
             value={formData.email}
             onChange={(e) => handleChange('email', e.target.value)}
             error={!!errors.email}
             helperText={errors.email}
         />
 
-        <AppSwitchLabel />
+        {/* Conectando o Switch */}
+        <AppSwitchLabel 
+            checked={formData.status}
+            onChange={handleStatusChange}
+        />
         
       </Stack>
     </Box>

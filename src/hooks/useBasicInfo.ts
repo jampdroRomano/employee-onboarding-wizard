@@ -1,10 +1,10 @@
 import { useState } from 'react';
 
 export const useBasicInfo = () => {
-  // 1. Estados (Dados e Erros)
   const [formData, setFormData] = useState({
     nome: '',
-    email: ''
+    email: '',
+    status: true, 
   });
 
   const [errors, setErrors] = useState({
@@ -12,22 +12,25 @@ export const useBasicInfo = () => {
     email: ''
   });
 
-  // 2. Ações (Handlers)
+  // Handler para texto
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Limpa o erro ao digitar
     if (errors[field as keyof typeof errors]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
 
-  // 3. Validação
+  // Handler específico para o Switch
+  const handleStatusChange = (checked: boolean) => {
+    setFormData(prev => ({ ...prev, status: checked }));
+  };
+
   const validateStep = (): boolean => {
     let isValid = true;
     const newErrors = { nome: '', email: '' };
 
     if (!formData.nome.trim()) {
-      newErrors.nome = 'O nome é obrigatório.';
+      newErrors.nome = 'O título é obrigatório.';
       isValid = false;
     }
 
@@ -48,6 +51,7 @@ export const useBasicInfo = () => {
     formData,
     errors,
     handleChange,
+    handleStatusChange, 
     validateStep
   };
 };
