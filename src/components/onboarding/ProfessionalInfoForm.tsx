@@ -14,12 +14,10 @@ export const ProfessionalInfoForm = ({ department, error, handleChange }: Profes
     <Box sx={{ width: '100%' }}>
       <Typography 
         component="h2"
+        variant="h4"
         sx={{ 
-            mb: '31px', 
-            fontFamily: '"Public Sans", sans-serif',
-            fontWeight: 700,
-            fontSize: '24px', 
-            color: '#212B36'
+            mb: '31px',
+            color: 'text.secondary' 
         }}
       >
         Informações Profissionais
@@ -30,7 +28,6 @@ export const ProfessionalInfoForm = ({ department, error, handleChange }: Profes
             select
             fullWidth
             placeholder="Selecione um departamento"
-            focusColor="#22C55E"
             
             value={department}
             onChange={(e) => handleChange(e.target.value)}
@@ -42,16 +39,11 @@ export const ProfessionalInfoForm = ({ department, error, handleChange }: Profes
               '& .MuiInputBase-root': {
                 height: '54px', 
               },
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderWidth: '1px',
-                borderColor: error ? '#d32f2f' : 'rgba(145, 158, 171, 0.20)', 
-              }
             }}
             SelectProps={{
                displayEmpty: true,
                renderValue: (selected: any) => {
                   if (!selected) {
-                    // Mantemos o placeholder visual interno
                     return <span style={{ color: '#919EAB' }}>Selecione um departamento</span>;
                   }
                   return selected;

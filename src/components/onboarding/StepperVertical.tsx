@@ -13,9 +13,10 @@ export const StepperVertical = ({ currentStep }: StepperVerticalProps) => {
     const isActive = currentStep === stepNumber;
     const isCompleted = currentStep > stepNumber;
 
-    const bgColor = (isActive || isCompleted) ? 'primary.main' : '#DFE3E8';
-    const textColor = (isActive || isCompleted) ? '#FFFFFF' : '#637381';
-    const labelColor = isActive ? 'text.primary' : '#919EAB';
+    // Cores baseadas no mainTheme.ts
+    const bgColor = (isActive || isCompleted) ? 'primary.main' : 'grey.300'; // #22C55E ou #DFE3E8
+    const textColor = (isActive || isCompleted) ? 'primary.contrastText' : 'text.secondary'; // Branco ou #637381
+    const labelColor = isActive ? 'text.primary' : 'text.disabled'; // #212B36 ou #919EAB
     const fontWeight = isActive ? 600 : 400;
 
     return (
@@ -55,24 +56,14 @@ export const StepperVertical = ({ currentStep }: StepperVerticalProps) => {
   };
 
   return (
-    <Stack 
-      spacing={1} // Isso garante os 8px de distância entre (Bolinha) e (Linha)
-      sx={{ 
-        width: '153px', 
-        // Removemos a altura fixa do container pai para ele se adaptar ao conteúdo
-      }}
-    >
-      {/* Passo 1 */}
+    <Stack spacing={1} sx={{ width: '153px' }}>
       {renderCircle(1, "Infos Básicas")}
 
-      {/* Linha Conectora Dinâmica */}
       <Box 
         sx={{ 
           display: 'flex',
           justifyContent: 'center', 
-          // A altura da linha é controlada aqui
           height: connectorHeight,
-          // Garante a largura do container da linha para alinhar com o centro da bolinha (24px)
           width: '24px',
           transition: 'height 0.3s ease', 
         }} 
@@ -81,13 +72,12 @@ export const StepperVertical = ({ currentStep }: StepperVerticalProps) => {
             sx={{
                 width: '1px',  
                 height: '100%', 
-                bgcolor: '#919EAB',
+                bgcolor: 'grey.500', // #919EAB
                 opacity: 0.24,
             }}
         />
       </Box>
 
-      {/* Passo 2 */}
       {renderCircle(2, "Infos Profissionais")}
     </Stack>
   );

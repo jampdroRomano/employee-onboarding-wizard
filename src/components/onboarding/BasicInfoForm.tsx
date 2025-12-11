@@ -19,12 +19,10 @@ export const BasicInfoForm = ({ formData, errors, handleChange }: BasicInfoFormP
     <Box sx={{ width: '100%' }}>
       <Typography 
         component="h2"
+        variant="h4" 
         sx={{ 
-            mb: '31px', 
-            fontFamily: '"Public Sans", sans-serif',
-            fontWeight: 700,
-            fontSize: '24px', 
-            color: '#212B36'
+          mb: '31px',
+          color: 'text.secondary' 
         }}
       >
         Informações Básicas
@@ -35,8 +33,7 @@ export const BasicInfoForm = ({ formData, errors, handleChange }: BasicInfoFormP
         <AppTextField 
             label="Título" 
             placeholder="João da Silva"
-            focusColor="#22C55E" 
-
+            
             value={formData.nome}
             onChange={(e) => handleChange('nome', e.target.value)}
             error={!!errors.nome}
@@ -46,7 +43,7 @@ export const BasicInfoForm = ({ formData, errors, handleChange }: BasicInfoFormP
         <AppTextField 
             label="E-mail"
             placeholder="e.g. john@gmail.com"
-            focusColor="#22C55E" 
+            
             value={formData.email}
             onChange={(e) => handleChange('email', e.target.value)}
             error={!!errors.email}

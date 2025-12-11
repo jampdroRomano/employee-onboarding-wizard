@@ -1,19 +1,18 @@
-import { LinearProgress, Stack, Typography, linearProgressClasses } from '@mui/material';
+import { LinearProgress, Stack, Typography, linearProgressClasses, useTheme, alpha } from '@mui/material';
 
 interface OnboardingProgressProps {
   progress: number; 
 }
 
 export const OnboardingProgress = ({ progress }: OnboardingProgressProps) => {
+  const theme = useTheme();
+
   return (
     <Stack 
       direction="row" 
       alignItems="center" 
       spacing={2} 
-      sx={{
-        width: '100%',
-        height: '18px',
-      }}
+      sx={{ width: '100%', height: '18px' }}
     >
       <LinearProgress
         variant="determinate"
@@ -22,10 +21,11 @@ export const OnboardingProgress = ({ progress }: OnboardingProgressProps) => {
           flexGrow: 1, 
           height: '4px',
           borderRadius: '4px',
-          backgroundColor: '#22C55E3D', 
+          backgroundColor: alpha(theme.palette.primary.main, 0.24),
+          
           [`& .${linearProgressClasses.bar}`]: {
             borderRadius: '50px',
-            backgroundColor: '#22C55E', 
+            backgroundColor: 'primary.main', 
           },
         }}
       />
@@ -36,7 +36,7 @@ export const OnboardingProgress = ({ progress }: OnboardingProgressProps) => {
           fontWeight: 400,
           fontSize: '12px',
           lineHeight: '18px',
-          color: '#637381',
+          color: 'text.secondary',
           textAlign: 'left',
         }}
       >

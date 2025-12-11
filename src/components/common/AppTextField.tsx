@@ -5,24 +5,13 @@ const fontInter = {
   fontFamily: '"Inter", sans-serif',
 };
 
-type AppTextFieldProps = TextFieldProps & {
-  focusColor?: string;     
-  fixedActiveColor?: string; 
-};
+type AppTextFieldProps = TextFieldProps;
 
 export const AppTextField = ({ 
-  focusColor = '#22C55E', 
-  fixedActiveColor, 
   sx, 
   error,
   ...props 
 }: AppTextFieldProps) => {
-
-  // Cores
-  const interactionColor = fixedActiveColor || focusColor; 
-  const errorColor = '#d32f2f'; 
-  const labelDefaultColor = '#212B36'; 
-  const borderDefaultColor = 'rgba(145, 158, 171, 0.32)'; 
 
   return (
     <TextField
@@ -35,12 +24,11 @@ export const AppTextField = ({
             sx: {
                 ...fontInter,
                 fontSize: '16px',
-                // 1. Cor padrão (sem foco) = Preto
-                color: error ? errorColor : labelDefaultColor,
+                color: error ? 'error.main' : 'text.primary',
                 
-                // 2. Cor no foco = Verde (interactionColor)
                 '&.Mui-focused': {
-                  color: error ? errorColor : interactionColor, 
+                  // Cor Focado: Verde do Tema (Primary Main)
+                  color: error ? 'error.main' : 'primary.main',
                   fontWeight: 500,
                 },
             } as InputLabelProps['sx']
@@ -50,7 +38,7 @@ export const AppTextField = ({
                 ...fontInter,
                 height: '56px',
                 boxSizing: 'border-box',
-                color: labelDefaultColor, 
+                color: 'text.primary', // Texto digitado
             }
         }
       }}
@@ -60,20 +48,20 @@ export const AppTextField = ({
           borderRadius: '8px',
           backgroundColor: 'transparent',
           
-          // Borda Inativa (Cinza)
+          // Borda Inativa
           '& fieldset': {
-            borderColor: error ? errorColor : borderDefaultColor, 
-            borderWidth: fixedActiveColor ? '2px' : '1px',
+            borderColor: error ? 'error.main' : 'grey.300', // #DFE3E8
+            borderWidth: '1px',
           },
           
-          // Hover (Verde)
+          // Hover
           '&:hover fieldset': {
-            borderColor: error ? errorColor : interactionColor, 
+            borderColor: error ? 'error.main' : 'primary.main', 
           },
           
-          // Foco (Verde)
+          // Foco
           '&.Mui-focused fieldset': {
-            borderColor: error ? errorColor : interactionColor, 
+            borderColor: error ? 'error.main' : 'primary.main', 
           },
         },
         ...sx,

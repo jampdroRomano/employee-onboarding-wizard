@@ -28,6 +28,7 @@ export const SidebarContent = () => (
     {/* 2. Lista de Navegação */}
     <List disablePadding>
       <ListItemButton
+        disableRipple 
         sx={{
           height: 44,
           mx: 2, 
@@ -35,8 +36,12 @@ export const SidebarContent = () => (
           color: 'text.secondary', 
           bgcolor: 'transparent',
           '&:hover': { 
-              bgcolor: 'rgba(145, 158, 171, 0.08)',
-              color: 'text.primary',
+              backgroundColor: 'transparent', 
+              color: 'text.primary', 
+              '& .MuiSvgIcon-root': {
+                  opacity: 1,
+                  color: 'text.primary',
+              }
           },
         }}
       >

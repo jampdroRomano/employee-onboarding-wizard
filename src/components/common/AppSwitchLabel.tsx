@@ -7,7 +7,7 @@ export const AppSwitchLabel = () => {
         display: 'flex',
         alignItems: 'center',
         gap: '9px', 
-        width: '833px', 
+        width: '100%', 
         mt: '24px',
       }}
     >
@@ -15,13 +15,13 @@ export const AppSwitchLabel = () => {
         defaultChecked 
         sx={{
             '& .MuiSwitch-switchBase.Mui-checked': {
-                color: '#22C55E', 
+                color: 'primary.main', 
                 '&:hover': {
-                    backgroundColor: 'rgba(34, 197, 94, 0.08)',
+                    backgroundColor: (theme) => `rgba(${theme.palette.primary.main}, 0.08)`, 
                 },
             },
             '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                backgroundColor: '#22C55E',
+                backgroundColor: 'primary.main', 
             },
         }}
       />
@@ -32,7 +32,7 @@ export const AppSwitchLabel = () => {
             fontWeight: 400,
             fontSize: '14px',
             lineHeight: '22px',
-            color: '#212B36',
+            color: 'text.primary', 
             whiteSpace: 'nowrap',
         }}
       >
