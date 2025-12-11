@@ -2,7 +2,19 @@ import { Box, Typography, Stack } from '@mui/material';
 import { AppTextField } from '../common/AppTextField';
 import { AppSwitchLabel } from '../common/AppSwitchLabel';
 
-export const BasicInfoForm = () => {
+interface BasicInfoFormProps {
+  formData: {
+    nome: string;
+    email: string;
+  };
+  errors: {
+    nome: string;
+    email: string;
+  };
+  handleChange: (field: string, value: string) => void;
+}
+
+export const BasicInfoForm = ({ formData, errors, handleChange }: BasicInfoFormProps) => {
   return (
     <Box sx={{ width: '100%' }}>
       <Typography 
@@ -21,15 +33,24 @@ export const BasicInfoForm = () => {
       <Stack spacing={3}>
 
         <AppTextField 
-            label="Título"
+            label="Nome"
             placeholder="João da Silva"
             focusColor="#22C55E" 
+
+            value={formData.nome}
+            onChange={(e) => handleChange('nome', e.target.value)}
+            error={!!errors.nome}
+            helperText={errors.nome}
         />
 
         <AppTextField 
             label="E-mail"
             placeholder="e.g. john@gmail.com"
             focusColor="#22C55E" 
+            value={formData.email}
+            onChange={(e) => handleChange('email', e.target.value)}
+            error={!!errors.email}
+            helperText={errors.email}
         />
 
         <AppSwitchLabel />

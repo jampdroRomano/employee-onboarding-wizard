@@ -1,3 +1,4 @@
+// src/components/common/AppTextField.tsx
 import { TextField } from '@mui/material';
 import type { TextFieldProps, InputLabelProps } from '@mui/material';
 
@@ -14,25 +15,28 @@ export const AppTextField = ({
   focusColor = '#22C55E', 
   fixedActiveColor, 
   sx, 
+  error,
   ...props 
 }: AppTextFieldProps) => {
 
   const baseColor = fixedActiveColor || '#263238';
   const interactionColor = fixedActiveColor || focusColor;
+  const errorColor = '#d32f2f'; 
 
   return (
     <TextField
       variant="outlined"
       fullWidth
+      error={error} 
       slotProps={{
         inputLabel: {
             shrink: true,
             sx: {
                 ...fontInter,
                 fontSize: '16px',
-                color: fixedActiveColor ? fixedActiveColor : 'rgba(38, 50, 56, 0.6)',
+                color: error ? errorColor : (fixedActiveColor ? fixedActiveColor : 'rgba(38, 50, 56, 0.6)'),
                 '&.Mui-focused': {
-                  color: interactionColor,
+                  color: error ? errorColor : interactionColor, 
                   fontWeight: 500,
                 },
             } as InputLabelProps['sx']
@@ -54,19 +58,18 @@ export const AppTextField = ({
           
           // Borda Base
           '& fieldset': {
-            borderColor: baseColor,
+            borderColor: error ? errorColor : baseColor, 
             borderWidth: fixedActiveColor ? '2px' : '1px',
           },
           
           // Hover
           '&:hover fieldset': {
-            borderColor: interactionColor, 
+            borderColor: error ? errorColor : interactionColor, 
           },
           
           // Focus
           '&.Mui-focused fieldset': {
-            borderColor: interactionColor,
-            borderWidth: '2px',
+            borderColor: error ? errorColor : interactionColor, 
           },
         },
         ...sx,

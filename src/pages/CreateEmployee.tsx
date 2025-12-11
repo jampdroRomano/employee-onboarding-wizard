@@ -1,11 +1,23 @@
 import { Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { AppBreadcrumbs } from '../components/common/AppBreadcrumbs';
 import { OnboardingProgress } from '../components/common/OnboardingProgress';
 import { StepperVertical } from '../components/onboarding/StepperVertical';
-import { BasicInfoForm } from '../components/onboarding/BasicInfoForm';
-import { AppButton } from '../components/common/AppButton'; //
+import { BasicInfoForm } from '../components/onboarding/BasicInfoForm'; //
+import { AppButton } from '../components/common/AppButton';
+import { useBasicInfo } from '../hooks/useBasicInfo'; 
 
 export const CreateEmployee = () => {
+  const navigate = useNavigate();
+  const { formData, errors, handleChange, validateStep } = useBasicInfo();
+  const handleNext = () => {
+    const isValid = validateStep();
+    
+    if (isValid) {
+      console.log('Dados Válidos:', formData);
+    }
+  };
+
   return (
     <Box>
       {/* 1. Cabeçalho com Breadcrumbs */}
@@ -20,9 +32,7 @@ export const CreateEmployee = () => {
 
       <Box sx={{ pr: { xs: 0, md: '94px' } }}>
         {/* 2. Barra de Progresso */}
-        <Box>
-          <OnboardingProgress progress={0} />
-        </Box>
+        <OnboardingProgress progress={0} />
 
         {/* 3. Container Principal (Stepper + Form) */}
         <Box
@@ -31,18 +41,20 @@ export const CreateEmployee = () => {
             display: 'flex',
             flexDirection: { xs: 'column', md: 'row' },
             gap: '40px',
-            // O container total tem 1026px (153 + 40 + 833)
           }}
         >
-          {/* Coluna Esquerda: Frame 2 (Stepper) */}
           <Box sx={{ width: { xs: '100%', md: '153px' }, flexShrink: 0 }}>
             <StepperVertical />
           </Box>
 
-          {/* Coluna Direita: Formulário + Botões */}
-          <Box sx={{ width: '100%' }}> {/* Ocupa o restante (aprox 833px) */}
-
-            <BasicInfoForm />
+          <Box sx={{ width: '100%' }}> 
+            
+            {/* A View apenas passa os dados recebidos do Hook para o componente de form */}
+            <BasicInfoForm 
+              formData={formData}
+              errors={errors}
+              handleChange={handleChange}
+            />
 
             {/* 4. Container dos Botões (Frame 4 - Botões) */}
             <Box
@@ -56,49 +68,27 @@ export const CreateEmployee = () => {
               }}
             >
               <AppButton
+                onClick={() => navigate('/')}
                 sx={{
-                  width: '64px',
-                  height: '48px',
-                  minWidth: '64px',
-                  backgroundColor: 'transparent',
-                  boxShadow: 'none',
+                  width: '64px', height: '48px', minWidth: '64px',
+                  backgroundColor: 'transparent', boxShadow: 'none',
                   color: '#919EABCC',
-                  fontFamily: '"Public Sans", sans-serif',
-                  fontWeight: 700,
-                  fontSize: '15px',
-                  lineHeight: '26px',
-                  textTransform: 'none',
-                  borderRadius: '8px',
-                  paddingLeft: 0,
-                  paddingRight: 0,
-                  '&:hover': {
-                    backgroundColor: 'transparent',
-                    boxShadow: 'none',
-                    color: '#919EAB',
-                  }
+                  '&:hover': { backgroundColor: 'transparent', boxShadow: 'none', color: '#919EAB' }
                 }}
               >
                 Voltar
               </AppButton>
 
-              {/* Botão PRÓXIMO */}
               <AppButton
+                onClick={handleNext}
                 sx={{
-                  width: '91px',
-                  height: '48px',
-                  minWidth: '64px',
-                  fontFamily: '"Public Sans", sans-serif',
-                  fontWeight: 700,
-                  fontSize: '15px',
-                  lineHeight: '26px',
-                  textTransform: 'none',
-                  borderRadius: '8px',
+                  width: '91px', height: '48px', minWidth: '64px',
+                  fontWeight: 700, borderRadius: '8px',
                 }}
               >
                 Próximo
               </AppButton>
             </Box>
-
           </Box>
         </Box>
       </Box>
