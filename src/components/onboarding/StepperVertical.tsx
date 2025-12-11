@@ -1,59 +1,80 @@
 import { Box, Stack, Typography } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
 
-export const StepperVertical = () => {
-  return (
-    <Stack 
-      spacing={1} 
-      sx={{ 
-        width: '153px', 
-        height: '272px' 
-      }}
-    >
-      {/* --- STEP 1: ATIVO --- */}
+interface StepperVerticalProps {
+  currentStep: number;
+}
+
+export const StepperVertical = ({ currentStep }: StepperVerticalProps) => {
+  
+  const connectorHeight = currentStep === 1 ? '104px' : '24px';
+
+  const renderCircle = (stepNumber: number, label: string) => {
+    const isActive = currentStep === stepNumber;
+    const isCompleted = currentStep > stepNumber;
+
+    const bgColor = (isActive || isCompleted) ? 'primary.main' : '#DFE3E8';
+    const textColor = (isActive || isCompleted) ? '#FFFFFF' : '#637381';
+    const labelColor = isActive ? 'text.primary' : '#919EAB';
+    const fontWeight = isActive ? 600 : 400;
+
+    return (
       <Stack direction="row" spacing={1} alignItems="center" sx={{ height: '24px' }}>
-        {/* Ícone Ativo */}
         <Box
           sx={{
             width: 24,
             height: 24,
             borderRadius: '50%',
-            bgcolor: 'primary.main', // #22C55E
+            bgcolor: bgColor,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#FFFFFF',
+            color: textColor,
             fontFamily: '"Public Sans", sans-serif',
             fontWeight: 600,
             fontSize: '14px',
             lineHeight: '22px',
           }}
         >
-          1
+          {isCompleted ? <CheckIcon sx={{ fontSize: 16 }} /> : stepNumber}
         </Box>
         
-        {/* Texto Ativo */}
         <Typography
           sx={{
             fontFamily: '"Public Sans", sans-serif',
-            fontWeight: 600,
+            fontWeight: fontWeight,
             fontSize: '14px',
-            color: 'text.primary', // #212B36
+            color: labelColor,
             lineHeight: '22px',
           }}
         >
-          Infos Básicas
+          {label}
         </Typography>
       </Stack>
+    );
+  };
 
-      {/* --- CONECTOR VERTICAL   */}
+  return (
+    <Stack 
+      spacing={1} // Isso garante os 8px de distância entre (Bolinha) e (Linha)
+      sx={{ 
+        width: '153px', 
+        // Removemos a altura fixa do container pai para ele se adaptar ao conteúdo
+      }}
+    >
+      {/* Passo 1 */}
+      {renderCircle(1, "Infos Básicas")}
+
+      {/* Linha Conectora Dinâmica */}
       <Box 
         sx={{ 
-          width: '24px',      
-          height: '104px',   
-          minWidth: '24px',
           display: 'flex',
           justifyContent: 'center', 
-          alignItems: 'center',
+          // A altura da linha é controlada aqui
+          height: connectorHeight,
+          // Garante a largura do container da linha para alinhar com o centro da bolinha (24px)
+          width: '24px',
+          transition: 'height 0.3s ease', 
         }} 
       >
         <Box 
@@ -66,41 +87,8 @@ export const StepperVertical = () => {
         />
       </Box>
 
-      {/* --- STEP 2: INATIVO --- */}
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ height: '24px' }}>
-        {/* Ícone Inativo */}
-        <Box
-          sx={{
-            width: 24,
-            height: 24,
-            borderRadius: '50%',
-            bgcolor: '#DFE3E8', 
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#637381', 
-            fontFamily: '"Public Sans", sans-serif',
-            fontWeight: 600,
-            fontSize: '14px',
-            lineHeight: '22px',
-          }}
-        >
-          2
-        </Box>
-        
-        {/* Texto Inativo */}
-        <Typography
-          sx={{
-            fontFamily: '"Public Sans", sans-serif',
-            fontWeight: 600,
-            fontSize: '14px',
-            color: '#919EAB', 
-            lineHeight: '22px',
-          }}
-        >
-          Infos Profissionais
-        </Typography>
-      </Stack>
+      {/* Passo 2 */}
+      {renderCircle(2, "Infos Profissionais")}
     </Stack>
   );
 };
