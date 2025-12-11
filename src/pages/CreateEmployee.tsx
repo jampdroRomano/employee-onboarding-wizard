@@ -47,80 +47,73 @@ export const CreateEmployee = () => {
       <Box sx={{ pr: { xs: 0, md: '94px' } }}>
         <OnboardingProgress progress={progressValue} />
 
+        {/* CONTAINER PRINCIPAL  */}
         <Box
           sx={{
             mt: '39px',
             display: 'flex',
             flexDirection: { xs: 'column', md: 'row' },
             gap: '40px',
-            minHeight: '272px', 
-            alignItems: 'flex-start',
+            alignItems: 'flex-start', 
           }}
         >
-          {/* Coluna Esquerda: Stepper (153px) */}
+          {/* 1. COLUNA ESQUERDA: Stepper (Fixo) */}
           <Box sx={{ width: { xs: '100%', md: '153px' }, flexShrink: 0 }}>
             <StepperVertical currentStep={currentStep} />
           </Box>
 
-          {/* Coluna Direita: Conteúdo do Form */}
+          {/* 2. COLUNA DIREITA: Formulário + Botões */}
           <Box sx={{ width: '100%' }}> 
-            {currentStep === 1 ? (
-              <BasicInfoForm 
-                formData={formData}
-                errors={errors}
-                handleChange={handleChange}
-              />
-            ) : (
-              <ProfessionalInfoForm />
-            )}
-          </Box>
-        </Box>
+            <Box sx={{ minHeight: '272px' }}>
+                {currentStep === 1 ? (
+                  <BasicInfoForm 
+                    formData={formData}
+                    errors={errors}
+                    handleChange={handleChange}
+                  />
+                ) : (
+                  <ProfessionalInfoForm />
+                )}
+            </Box>
 
-        <Box
-          sx={{
-            mt: '120px', 
-            display: 'flex',
-            flexDirection: { xs: 'column', md: 'row' },
-            gap: '40px', 
-          }}
-        >
-          {/* Spacer Invisível para compensar o Stepper (153px) e alinhar os botões com o Form */}
-          <Box sx={{ width: { xs: '0', md: '153px' }, display: { xs: 'none', md: 'block' } }} />
-
-          {/* Área dos Botões (Alinhada com o Inputs/Dropdown) */}
-          <Box
-            sx={{
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              height: '48px',
-            }}
-          >
-            <AppButton
-              onClick={handleBack}
+            {/* B. ÁREA DOS BOTÕES*/}
+            <Box
               sx={{
-                width: '64px', height: '48px', minWidth: '64px',
-                backgroundColor: 'transparent', boxShadow: 'none',
-                color: '#919EABCC',
-                '&:hover': { backgroundColor: 'transparent', boxShadow: 'none', color: '#919EAB' }
+                mt: '120px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                height: '48px',
+                width: '100%' 
               }}
             >
-              Voltar
-            </AppButton>
+              <AppButton
+                onClick={handleBack}
+                sx={{
+                  width: '64px', height: '48px', minWidth: '64px',
+                  backgroundColor: 'transparent', boxShadow: 'none',
+                  color: '#919EABCC',
+                  pl: 0, 
+                  justifyContent: 'flex-start', 
+                  '&:hover': { backgroundColor: 'transparent', boxShadow: 'none', color: '#919EAB' }
+                }}
+              >
+                Voltar
+              </AppButton>
 
-            <AppButton
-              onClick={handleNext}
-              sx={{
-                width: '91px', height: '48px', minWidth: '64px',
-                fontWeight: 700, borderRadius: '8px',
-              }}
-            >
-              {currentStep === 2 ? 'Concluir' : 'Próximo'}
-            </AppButton>
+              <AppButton
+                onClick={handleNext}
+                sx={{
+                  width: '91px', height: '48px', minWidth: '64px',
+                  fontWeight: 700, borderRadius: '8px',
+                }}
+              >
+                {currentStep === 2 ? 'Concluir' : 'Próximo'}
+              </AppButton>
+            </Box>
+
           </Box>
         </Box>
-
       </Box>
     </Box>
   );
