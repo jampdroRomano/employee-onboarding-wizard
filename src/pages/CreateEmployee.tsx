@@ -57,16 +57,24 @@ export const CreateEmployee = () => {
 
   return (
     <Box>
-      <Box sx={{ mb: 2 }}>
-        <AppBreadcrumbs
-          items={[
-            { label: 'Colaboradores', path: '/' },
-            { label: 'Cadastrar Colaborador' }
-          ]}
-        />
-      </Box>
+      <Box 
+        sx={{ 
+          width: '100%', 
+          maxWidth: '100%', 
+          mx: 'auto',
+          pr: { xs: 0, lg: '5%' } 
+        }}
+      >
+        
+        <Box sx={{ mb: 2 }}>
+          <AppBreadcrumbs
+            items={[
+              { label: 'Colaboradores', path: '/' },
+              { label: 'Cadastrar Colaborador' }
+            ]}
+          />
+        </Box>
 
-      <Box sx={{ pr: { xs: 0, md: '94px' } }}>
         <OnboardingProgress progress={progressValue} />
 
         <Box
@@ -82,9 +90,18 @@ export const CreateEmployee = () => {
             <StepperVertical currentStep={currentStep} />
           </Box>
 
-          <Box sx={{ width: '100%' }}> 
+          {/* COLUNA DA DIREITA (FORM + BOTÕES) */}
+          <Box 
+            sx={{ 
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              minHeight: '440px' 
+            }}
+          > 
             
-            <Box sx={{ minHeight: '272px' }}>
+            {/* Container do Formulário */}
+            <Box>
                 {currentStep === 1 ? (
                   <BasicInfoForm 
                     formData={basicInfo.formData}
@@ -101,31 +118,33 @@ export const CreateEmployee = () => {
                 )}
             </Box>
 
+            {/* Container dos Botões */}
             <Box
               sx={{
-                mt: '120px', 
+                mt: 'auto', 
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 height: '48px',
-                width: '100%' 
+                width: '100%',
+                pt: 4 
               }}
             >
               <AppButton
                 onClick={handleBack}
-                variant="text" 
+                variant="text"
                 disableRipple
                 disabled={currentStep === 1 || isSaving}
                 sx={{
                   width: '64px', height: '48px', minWidth: '64px',
                   boxShadow: 'none',
                   pl: 0, 
-                  justifyContent: 'flex-start',
-                  color: 'text.primary',
+                  justifyContent: 'flex-start',                  
+                  color: 'text.primary',                 
                   '&:hover': { 
                       backgroundColor: 'transparent', 
                       boxShadow: 'none', 
-                      color: 'text.secondary',
+                      color: 'text.secondary', 
                   },
                   '&.Mui-disabled': {
                     color: (theme) => alpha(theme.palette.grey[500], 0.8),
