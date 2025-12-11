@@ -158,13 +158,13 @@ export const CreateEmployee = () => {
 
               <AppButton
                 onClick={handleNext}
-                disabled={isSaving}
+                loading={isSaving} 
                 sx={{
                   width: '91px', height: '48px', minWidth: '64px',
                   fontWeight: 700, borderRadius: '8px',
                 }}
               >
-                {isSaving ? '...' : (currentStep === 2 ? 'Concluir' : 'Próximo')}
+                {currentStep === 2 ? 'Concluir' : 'Próximo'}
               </AppButton>
             </Box>
 
