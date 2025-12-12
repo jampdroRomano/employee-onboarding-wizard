@@ -10,12 +10,13 @@ import { ProfessionalInfoForm } from '../components/onboarding/ProfessionalInfoF
 import { AppButton } from '../components/common/AppButton';
 import { useBasicInfo } from '../hooks/useBasicInfo'; 
 import { useProfessionalInfo } from '../hooks/useProfessionalInfo'; 
-import { createEmployee } from '../services/employeeService'; 
+import { createEmployee, checkEmailExists } from '../services/employeeService'; 
 
 export const CreateEmployee = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
+  const [isValidating, setIsValidating] = useState(false); 
 
   const basicInfo = useBasicInfo();
   const profInfo = useProfessionalInfo(); 
@@ -23,7 +24,18 @@ export const CreateEmployee = () => {
   const handleNext = async () => {
     if (currentStep === 1) {
       const isValid = basicInfo.validateStep();
-      if (isValid) setCurrentStep(2);
+      
+      if (isValid) {
+        setIsValidating(true);
+        const emailExists = await checkEmailExists(basicInfo.formData.email);
+        setIsValidating(false);
+
+        if (emailExists) {
+          basicInfo.setFieldError('email', 'Este e-mail já está em uso.');
+        } else {
+          setCurrentStep(2);
+        }
+      }
     } else {
       const isValid = profInfo.validateStep();
       
@@ -37,9 +49,9 @@ export const CreateEmployee = () => {
         try {
           await createEmployee(payload);
           navigate('/');
-        } catch (error) {
+        } catch (error: any) {
           console.error("Erro ao salvar funcionário:", error);
-          alert("Ocorreu um erro ao salvar.");
+          alert(error.message || "Ocorreu um erro ao salvar.");
         } finally {
           setIsSaving(false);
         }
@@ -99,7 +111,7 @@ export const CreateEmployee = () => {
               minHeight: '440px' 
             }}
           > 
-            
+
             {/* Container do Formulário */}
             <Box>
                 {currentStep === 1 ? (
@@ -134,7 +146,7 @@ export const CreateEmployee = () => {
                 onClick={handleBack}
                 variant="text"
                 disableRipple
-                disabled={currentStep === 1 || isSaving}
+                disabled={currentStep === 1 || isSaving || isValidating}
                 sx={{
                   width: '64px', height: '48px', minWidth: '64px',
                   boxShadow: 'none',
@@ -158,7 +170,7 @@ export const CreateEmployee = () => {
 
               <AppButton
                 onClick={handleNext}
-                loading={isSaving} 
+                loading={isSaving || isValidating} 
                 sx={{
                   width: '91px', height: '48px', minWidth: '64px',
                   fontWeight: 700, borderRadius: '8px',

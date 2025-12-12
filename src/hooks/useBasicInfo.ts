@@ -12,7 +12,7 @@ export const useBasicInfo = () => {
     email: ''
   });
 
-  // Handler para texto
+   // Handler para texto
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field as keyof typeof errors]) {
@@ -20,9 +20,13 @@ export const useBasicInfo = () => {
     }
   };
 
-  // Handler específico para o Switch
+    // Handler específico para o Switch
   const handleStatusChange = (checked: boolean) => {
     setFormData(prev => ({ ...prev, status: checked }));
+  };
+
+  const setFieldError = (field: 'nome' | 'email', message: string) => {
+    setErrors(prev => ({ ...prev, [field]: message }));
   };
 
   const validateStep = (): boolean => {
@@ -51,7 +55,8 @@ export const useBasicInfo = () => {
     formData,
     errors,
     handleChange,
-    handleStatusChange, 
+    handleStatusChange,
+    setFieldError, // Não esqueça de exportar aqui
     validateStep
   };
 };
