@@ -1,6 +1,6 @@
 # 🪄 Employee Onboarding Wizard
 
-![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
+![Status](https://img.shields.io/badge/status-concluido-gree)
 ![Frontend](https://img.shields.io/badge/tecnologia-React-blue)
 ![Backend](https://img.shields.io/badge/persistência-Firebase-red)
 ![UI](https://img.shields.io/badge/UI-Material--UI-purple)
