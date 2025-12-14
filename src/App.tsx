@@ -5,6 +5,7 @@ import { CreateEmployee } from './pages/CreateEmployee';
 import { AuthPage } from './pages/AuthPage';
 import { PrivateRoute } from './components/auth/PrivateRoute';
 import { useAuth } from './contexts/AuthContext';
+import { NotFoundPage } from './pages/NotFoundPage';
 
 function App() {
   const { userLoggedIn, currentUser } = useAuth();
@@ -43,7 +44,7 @@ function App() {
         }
       />
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
