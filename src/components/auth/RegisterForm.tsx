@@ -56,10 +56,16 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
       // 4. IMPORTANTE: Desloga imediatamente para impedir acesso sem verificar
       await signOut(auth);
 
-      alert(`Conta criada com sucesso! 
-      Enviamos um link de confirmação para ${email}.
+      alert(
+        `✅ Conta criada com sucesso!
 
-      ⚠️ ATENÇÃO: Se não encontrar na Caixa de Entrada, verifique sua caixa de SPAM ou Lixo Eletrônico.`);
+Enviamos um link de confirmação para:
+${email}
+
+⚠️ Atenção:
+Se não encontrar na Caixa de Entrada, verifique o SPAM ou Lixo Eletrônico.`
+      );
+
       // 5. Chama a função para voltar para a aba de login
       if (onSuccess) {
         onSuccess();
