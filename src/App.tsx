@@ -2,7 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { MainLayout } from './components/layout/MainLayout';
 import { Dashboard } from './pages/Dashboard';
 import { CreateEmployee } from './pages/CreateEmployee';
-import { AuthPage } from './pages/AuthPage'; // <--- Importe aqui
+import { AuthPage } from './pages/AuthPage'; 
 
 function App() {
   return (

@@ -4,12 +4,10 @@ import {
   Button, 
   useMediaQuery, 
   useTheme, 
-  Grid,
   Stack,
   Box
 } from '@mui/material';
 
-// Imports dos seus componentes
 import { 
   AuthCard, 
   SignInContainer, 
@@ -49,18 +47,14 @@ export const AuthPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  // -----------------------------------------------------------
-  // VERSÃO MOBILE (LAYOUT VERTICAL FULL SCREEN)
-  // -----------------------------------------------------------
+  // VERSÃO MOBILE 
   if (isMobile) {
     return (
-      <Box sx={{ minHeight: '100vh', bgcolor: '#fff' }}>
-        <Stack spacing={4} sx={{ p: 4, pt: 8, alignItems: 'center' }}>
+      <Box sx={{ minHeight: '100vh', bgcolor: '#fff', width: '100vw' }}>
+        <Stack spacing={4} sx={{ p: 4, pt: 8, alignItems: 'center', minHeight: '100vh', justifyContent: 'center' }}>
           
-          {/* Alterna o Formulário com base no estado */}
           {isSignIn ? <LoginForm /> : <RegisterForm />}
           
-          {/* Botão de Troca Simples */}
           <Box textAlign="center" mt={4}>
             <Typography variant="body2" color="text.secondary">
               {isSignIn ? "Ainda não tem conta?" : "Já possui cadastro?"}
@@ -78,60 +72,51 @@ export const AuthPage = () => {
     );
   }
 
-  // -----------------------------------------------------------
-  // VERSÃO DESKTOP (SLIDER ANIMADO)
-  // -----------------------------------------------------------
+  // VERSÃO DESKTOP (FULLSCREEN SPLIT)
   return (
-    <Grid 
-      container 
-      justifyContent="center" 
-      alignItems="center" 
-      sx={{ height: '100vh', bgcolor: '#f6f5f7' }} // Fundo cinza claro atrás do card
-    >
-      <AuthCard elevation={4}>
-        
-        {/* Formulário de Cadastro (Direita) */}
-        <SignUpContainer isSignIn={isSignIn}>
-          <RegisterForm />
-        </SignUpContainer>
+    <AuthCard elevation={0}>
+      
+      {/* Formulário de Cadastro (Direita) */}
+      <SignUpContainer isSignIn={isSignIn}>
+        <RegisterForm />
+      </SignUpContainer>
 
-        {/* Formulário de Login (Esquerda) */}
-        <SignInContainer isSignIn={isSignIn}>
-          <LoginForm />
-        </SignInContainer>
+      {/* Formulário de Login (Esquerda) */}
+      <SignInContainer isSignIn={isSignIn}>
+        <LoginForm />
+      </SignInContainer>
 
-        {/* Animação Verde (Overlay) */}
-        <OverlayContainer isSignIn={isSignIn}>
-          <Overlay isSignIn={isSignIn}>
+      {/* Animação Verde (Overlay) */}
+      <OverlayContainer isSignIn={isSignIn}>
+        <Overlay isSignIn={isSignIn}>
 
-            <LeftOverlayPanel isSignIn={isSignIn}>
-              <Typography variant="h4" fontWeight="bold">
-                Já tem cadastro?
-              </Typography>
-              <Typography variant="body1" sx={{ mt: 2, maxWidth: '80%' }}>
-                Para se manter conectado conosco, faça login com suas informações pessoais.
-              </Typography>
-              <GhostButton onClick={() => setIsSignIn(true)}>
-                Entrar
-              </GhostButton>
-            </LeftOverlayPanel>
+          <LeftOverlayPanel isSignIn={isSignIn}>
+            <Typography variant="h3" fontWeight="bold"> 
+              Já tem cadastro?
+            </Typography>
+            <Typography variant="h6" sx={{ mt: 2, maxWidth: '70%', fontWeight: 400 }}>
+              Para se manter conectado conosco, faça login com suas informações pessoais.
+            </Typography>
+            <GhostButton onClick={() => setIsSignIn(true)}>
+              Entrar
+            </GhostButton>
+          </LeftOverlayPanel>
 
-            <RightOverlayPanel isSignIn={isSignIn}>
-              <Typography variant="h4" fontWeight="bold">
-                Novo por aqui?
-              </Typography>
-              <Typography variant="body1" sx={{ mt: 2, maxWidth: '80%' }}>
-                Insira seus dados pessoais e comece sua jornada conosco.
-              </Typography>
-              <GhostButton onClick={() => setIsSignIn(false)}>
-                Cadastrar
-              </GhostButton>
-            </RightOverlayPanel>
+          <RightOverlayPanel isSignIn={isSignIn}>
+            <Typography variant="h3" fontWeight="bold"> 
+              Novo por aqui?
+            </Typography>
+            <Typography variant="h6" sx={{ mt: 2, maxWidth: '70%', fontWeight: 400 }}>
+              Insira seus dados pessoais e comece sua jornada conosco.
+            </Typography>
+            <GhostButton onClick={() => setIsSignIn(false)}>
+              Cadastrar
+            </GhostButton>
+          </RightOverlayPanel>
 
-          </Overlay>
-        </OverlayContainer>
+        </Overlay>
+      </OverlayContainer>
 
-      </AuthCard>
-    </Grid>
+    </AuthCard>
   );
 };

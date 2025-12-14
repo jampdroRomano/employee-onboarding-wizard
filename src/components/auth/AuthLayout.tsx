@@ -1,25 +1,21 @@
 import { Box, Paper, styled } from '@mui/material';
 
-// O Card Principal
 export const AuthCard = styled(Paper)(({ theme }) => ({
   backgroundColor: '#fff',
-  borderRadius: '16px',
-  boxShadow: '0 14px 28px rgba(0,0,0,0.15), 0 10px 10px rgba(0,0,0,0.12)',
+  borderRadius: 0, 
+  boxShadow: 'none',
   position: 'relative',
   overflow: 'hidden',
-  // Desktop: Tamanho fixo e largo
-  width: '1000px',
+  width: '100vw',
+  height: '100vh', 
   maxWidth: '100%',
-  minHeight: '600px',
-  // Mobile: Ocupa tudo
+  
+  // Mobile: Mantém comportamento de coluna
   [theme.breakpoints.down('md')]: {
-    width: '100%',
-    height: '100%',
-    minHeight: '100vh',
-    borderRadius: 0,
-    boxShadow: 'none',
     display: 'flex',
     flexDirection: 'column',
+    height: '100vh', // Garante altura total no mobile também
+    overflowY: 'auto', // Permite scroll se a tela for muito pequena verticalmente
   },
 }));
 
@@ -33,16 +29,17 @@ export const FormContainer = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  padding: theme.spacing(0, 5),
-  backgroundColor: '#FFFFFF', 
+  padding: theme.spacing(0, 10), 
+  backgroundColor: '#FFFFFF',
   
   [theme.breakpoints.down('md')]: {
     position: 'relative',
     width: '100%',
     height: 'auto',
+    minHeight: '100vh', // No mobile, cada form ocupa a tela toda
     padding: theme.spacing(4),
     top: 'auto',
-    transform: 'none !important', // Desativa animação no mobile
+    transform: 'none !important',
     opacity: '1 !important',
     zIndex: '1 !important',
   }
@@ -53,8 +50,8 @@ export const SignInContainer = styled(FormContainer)<{ isSignIn: boolean }>(({ i
   left: 0,
   width: '50%',
   zIndex: 2,
-  opacity: isSignIn ? 1 : 0, // Some suavemente quando inativo
-  pointerEvents: isSignIn ? 'all' : 'none', // Evita cliques quando invisível
+  opacity: isSignIn ? 1 : 0,
+  pointerEvents: isSignIn ? 'all' : 'none',
 }));
 
 // Cadastro (Fica na Direita)
@@ -63,7 +60,7 @@ export const SignUpContainer = styled(FormContainer)<{ isSignIn: boolean }>(({ i
   width: '50%',
   opacity: isSignIn ? 0 : 1,
   zIndex: isSignIn ? 1 : 5,
-  transform: 'translateX(100%)', // Fica posicionado na direita
+  transform: 'translateX(100%)',
   pointerEvents: isSignIn ? 'none' : 'all',
 }));
 
