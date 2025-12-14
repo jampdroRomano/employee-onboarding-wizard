@@ -3,8 +3,6 @@ import {
   TextField,
   InputAdornment,
   IconButton,
-  MenuItem, 
-  Select 
 } from '@mui/material';
 import type { TextFieldProps } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
@@ -77,37 +75,36 @@ export const AppTextField = ({
             },
         }
       }}
-      inputProps={{
-        sx: {
-            ...fontInter,
-            height: '56px',
-            boxSizing: 'border-box',
-            color: 'text.primary',
-        }
-      }}
-
-      sx={{
-        maxWidth: '100%',
-        '& .MuiOutlinedInput-root': {
-          borderRadius: '8px',
-          backgroundColor: 'transparent',
-
-          '& fieldset': {
-            borderColor: error ? 'error.main' : 'grey.300', 
-            borderWidth: '1px',
-          },
-
-          '&:hover fieldset': {
-            borderColor: error ? 'error.main' : 'primary.main',
-          },
-
-          '&.Mui-focused fieldset': {
-            borderColor: error ? 'error.main' : 'primary.main',
-          },
-        },
-        ...sx, 
-      }}
-      {...props}
+            inputProps={{
+              sx: {
+                  ...fontInter,
+                  color: 'text.primary',
+              }
+            }}
+      
+            sx={{
+              maxWidth: '100%',
+              '& .MuiOutlinedInput-root': {
+                height: '56px',
+                boxSizing: 'border-box',
+                borderRadius: '8px',
+                backgroundColor: 'transparent',
+                
+                '& fieldset': {
+                  borderColor: error ? 'error.main' : 'grey.300',
+                  borderWidth: '1px',
+                },
+                
+                '&:hover fieldset': {
+                  borderColor: error ? 'error.main' : 'primary.main', 
+                },
+                
+                '&.Mui-focused fieldset': {
+                  borderColor: error ? 'error.main' : 'primary.main', 
+                },
+              },
+              ...sx, 
+            }}      {...props}
     >
       {select && children} 
     </TextField>
