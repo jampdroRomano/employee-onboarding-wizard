@@ -51,9 +51,7 @@ export const SidebarContent = () => (
 
         <ListItemText
           primary="Colaboradores"
-          slotProps={{
-            primary: { variant: 'body2', fontWeight: 600 }
-          }}
+          primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
         />
 
         <KeyboardArrowRightIcon sx={{ fontSize: 16, opacity: 0.5 }} />
