@@ -87,7 +87,7 @@ export const LoginForm = () => {
           <Box display="flex" justifyContent="flex-end">
             <Link 
               component="button"
-              onClick={() => setForgotPasswordOpen(true)} 
+              onClick={() => setForgotPasswordOpen(true)} // <--- Abre o modal aqui
               underline="hover" 
               variant="body2" 
               color="text.primary" 
