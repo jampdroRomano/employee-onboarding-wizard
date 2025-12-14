@@ -78,7 +78,7 @@ export const AuthPage = () => {
       
       {/* Formulário de Cadastro (Direita) */}
       <SignUpContainer isSignIn={isSignIn}>
-        <RegisterForm />
+        <RegisterForm onSuccess={() => setIsSignIn(true)} />
       </SignUpContainer>
 
       {/* Formulário de Login (Esquerda) */}

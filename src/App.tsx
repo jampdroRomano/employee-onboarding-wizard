@@ -1,25 +1,49 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from './components/layout/MainLayout';
 import { Dashboard } from './pages/Dashboard';
 import { CreateEmployee } from './pages/CreateEmployee';
-import { AuthPage } from './pages/AuthPage'; 
+import { AuthPage } from './pages/AuthPage';
+import { PrivateRoute } from './components/auth/PrivateRoute';
+import { useAuth } from './contexts/AuthContext';
 
 function App() {
+  const { userLoggedIn, currentUser } = useAuth();
+  // Helper para saber se pode ir pro Dashboard
+  // O usuário só entra se estiver logado E com e-mail verificado
+  const canAccessDashboard = userLoggedIn && currentUser?.emailVerified;
+
   return (
     <Routes>
-      <Route path="/login" element={<AuthPage />} /> 
-      
-      {/* Rotas Protegidas (Futuramente) */}
-      <Route path="/" element={
-        <MainLayout>
-          <Dashboard />
-        </MainLayout>
-      } />
-      <Route path="/criar" element={
-        <MainLayout>
-          <CreateEmployee />
-        </MainLayout>
-      } />
+      {/* Rota Pública: Login */}
+      <Route 
+        path="/login" 
+        element={canAccessDashboard ? <Navigate to="/" replace /> : <AuthPage />} 
+      />
+
+      {/* Rotas Protegidas */}
+      <Route
+        path="/"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <Dashboard />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/criar"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <CreateEmployee />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
