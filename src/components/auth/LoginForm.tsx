@@ -1,5 +1,4 @@
 import { Typography, Stack, Box, Link } from '@mui/material';
-// Ajuste de imports para a estrutura src/components/auth/
 import { AppTextField } from '../common/AppTextField';
 import { AppButton } from '../common/AppButton';
 import logoFlugo from '../../assets/flugoLogo.png';

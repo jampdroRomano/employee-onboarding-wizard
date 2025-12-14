@@ -12,7 +12,7 @@ export const SocialHidden = () => {
           sx={{ 
             border: '1px solid #DDDDDD', 
             color: 'text.primary',
-            borderRadius: '50%', // Redondinho
+            borderRadius: '50%', 
             width: 40,
             height: 40,
             transition: 'all 0.3s ease',
@@ -20,7 +20,7 @@ export const SocialHidden = () => {
               bgcolor: 'grey.100',
               borderColor: 'primary.main',
               color: 'primary.main',
-              transform: 'translateY(-2px)' // Pequeno efeito de elevação
+              transform: 'translateY(-2px)' 
             }
           }}
         >

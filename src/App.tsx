@@ -6,9 +6,6 @@ import { AuthPage } from './pages/AuthPage'; // <--- Importe aqui
 
 function App() {
   return (
-    // Se quiser ver o Login FORA do layout principal (sem sidebar), 
-    // tire o AuthPage de dentro do MainLayout, ou crie uma rota separada.
-    // Geralmente Login não tem Sidebar.
     <Routes>
       <Route path="/login" element={<AuthPage />} /> 
       

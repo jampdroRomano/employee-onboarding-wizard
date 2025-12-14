@@ -34,7 +34,7 @@ export const FormContainer = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   padding: theme.spacing(0, 5),
-  backgroundColor: '#FFFFFF', // Fundo branco OBRIGATÓRIO para não vazar texto
+  backgroundColor: '#FFFFFF', 
   
   [theme.breakpoints.down('md')]: {
     position: 'relative',
