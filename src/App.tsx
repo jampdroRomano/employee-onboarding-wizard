@@ -7,17 +7,20 @@ import { PrivateRoute } from './components/auth/PrivateRoute';
 import { useAuth } from './contexts/AuthContext';
 
 function App() {
-  const { userLoggedIn } = useAuth();
+  const { userLoggedIn, currentUser } = useAuth();
+  // Helper para saber se pode ir pro Dashboard
+  // O usuário só entra se estiver logado E com e-mail verificado
+  const canAccessDashboard = userLoggedIn && currentUser?.emailVerified;
 
   return (
     <Routes>
-      {/* Rota Pública: Login*/}
+      {/* Rota Pública: Login */}
       <Route 
         path="/login" 
-        element={userLoggedIn ? <Navigate to="/" replace /> : <AuthPage />} 
+        element={canAccessDashboard ? <Navigate to="/" replace /> : <AuthPage />} 
       />
 
-      {/* Rotas Protegidas (Agrupadas) */}
+      {/* Rotas Protegidas */}
       <Route
         path="/"
         element={
@@ -40,7 +43,6 @@ function App() {
         }
       />
 
-      {/* Rota pega-tudo (404) -> Manda para home ou login */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

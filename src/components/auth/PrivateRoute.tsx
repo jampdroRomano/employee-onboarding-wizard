@@ -1,16 +1,16 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Box, CircularProgress } from '@mui/material';
-import type { ReactNode } from 'react'; 
+import type { ReactNode } from 'react';
 
 interface PrivateRouteProps {
-  children: ReactNode; 
+  children: ReactNode;
 }
 
 export const PrivateRoute = ({ children }: PrivateRouteProps) => {
-  const { userLoggedIn, loading } = useAuth();
+  const { userLoggedIn, loading, currentUser } = useAuth();
 
-  // 1. Enquanto o Firebase verifica o login, mostramos um loading
+  // 1. Enquanto o Firebase verifica o login, mostra um loading
   if (loading) {
     return (
       <Box sx={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}>
@@ -19,11 +19,15 @@ export const PrivateRoute = ({ children }: PrivateRouteProps) => {
     );
   }
 
-  // 2. Se terminou de carregar e NÃO tem usuário, vai para o login
+    // 2. Se terminou de carregar e NÃO tem usuário, vai para o login
   if (!userLoggedIn) {
     return <Navigate to="/login" replace />;
   }
 
-  // 3. Se tem usuário, renderiza a página protegida
+    // 3. Se tem usuário, renderiza a página protegida
+  if (userLoggedIn && !currentUser?.emailVerified) {
+    return <Navigate to="/login" replace />;
+  }
+
   return <>{children}</>;
 };
