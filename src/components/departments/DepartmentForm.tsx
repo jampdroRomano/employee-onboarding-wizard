@@ -1,42 +1,63 @@
-import { Stack } from '@mui/material';
+import { Box, Typography, Stack } from '@mui/material';
 import { AppTextField } from '../common/AppTextField';
-
-interface DepartmentData {
+import type { DepartmentErrors } from '../../hooks/useDepartmentForm';
+interface DepartmentFormProps {
   name: string;
   description: string;
-  managerId: string | null;
+  errors: DepartmentErrors; 
+  onChangeName: (value: string) => void;
+  onChangeDesc: (value: string) => void;
 }
 
-interface Props {
-  data: DepartmentData;
-  onChange: (data: DepartmentData) => void;
-}
-
-export const DepartmentForm = ({ data, onChange }: Props) => {
-  
-  const handleChange = (field: keyof DepartmentData, value: string) => {
-    onChange({ ...data, [field]: value });
-  };
-
+export const DepartmentForm = ({ name, description, errors, onChangeName, onChangeDesc }: DepartmentFormProps) => {
   return (
-    <Stack spacing={3} sx={{ maxWidth: '600px' }}>
-      <AppTextField
-        label="Nome do Departamento"
-        placeholder="Ex: Tecnologia da Informação"
-        value={data.name}
-        onChange={(e) => handleChange('name', e.target.value)}
-        fullWidth
-      />
+    <Box sx={{ width: '100%' }}>
+      <Typography 
+        component="h2"
+        variant="h4" 
+        sx={{ 
+          mb: '31px',
+          color: 'text.secondary' 
+        }}
+      >
+        Informações do Departamento
+      </Typography>
 
-      <AppTextField
-        label="Descrição"
-        placeholder="Breve descrição das responsabilidades..."
-        value={data.description}
-        onChange={(e) => handleChange('description', e.target.value)}
-        fullWidth
-        multiline
-        rows={4}
-      />
-    </Stack>
+      <Stack spacing={3}>
+        <AppTextField 
+          label="Nome do Departamento" 
+          placeholder="Ex: Marketing"
+          value={name}
+          onChange={(e) => onChangeName(e.target.value)}
+          error={!!errors.name}
+          helperText={errors.name}
+        />
+
+        <AppTextField 
+          label="Descrição"
+          placeholder="Descreva as responsabilidades..."
+          multiline
+          rows={4}
+          value={description}
+          onChange={(e) => onChangeDesc(e.target.value)}
+          error={!!errors.description}
+          helperText={errors.description}
+          
+          InputLabelProps={{ shrink: true }} 
+          sx={{
+            '& .MuiInputBase-root': {
+                height: 'auto !important', 
+                minHeight: '120px', 
+                alignItems: 'flex-start', 
+                padding: '12px', 
+            },
+            '& .MuiInputBase-input': {
+                height: 'auto !important',
+                overflow: 'auto',
+            }
+          }}
+        />
+      </Stack>
+    </Box>
   );
 };

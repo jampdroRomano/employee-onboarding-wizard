@@ -49,7 +49,9 @@ export const SidebarContent = () => {
       {/* 2. Lista de Navegação */}
       <List disablePadding>
         {menuItems.map((item) => {
-          const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
+          const isActive = item.path === '/'
+            ? (location.pathname === '/' || location.pathname === '/criar') 
+            : location.pathname.startsWith(item.path); 
 
           return (
             <ListItemButton
@@ -61,8 +63,8 @@ export const SidebarContent = () => {
                 mx: 2,
                 borderRadius: 1,
                 color: isActive ? 'primary.main' : 'text.secondary',
-                bgcolor: 'transparent', 
-                
+                bgcolor: 'transparent',
+
                 '&:hover': {
                   backgroundColor: 'transparent',
                   color: isActive ? 'primary.main' : 'text.primary',
@@ -72,7 +74,7 @@ export const SidebarContent = () => {
                   }
                 },
                 '& .MuiSvgIcon-root': {
-                   color: isActive ? 'primary.main' : 'inherit'
+                  color: isActive ? 'primary.main' : 'inherit'
                 }
               }}
             >
@@ -85,12 +87,12 @@ export const SidebarContent = () => {
                 primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
               />
 
-              <KeyboardArrowRightIcon 
-                sx={{ 
-                  fontSize: 16, 
+              <KeyboardArrowRightIcon
+                sx={{
+                  fontSize: 16,
                   opacity: isActive ? 1 : 0.5,
-                  color: isActive ? 'primary.main' : 'inherit' 
-                }} 
+                  color: isActive ? 'primary.main' : 'inherit'
+                }}
               />
 
             </ListItemButton>

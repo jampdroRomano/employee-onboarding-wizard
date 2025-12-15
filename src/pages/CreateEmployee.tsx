@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react'; 
 import { AppBreadcrumbs } from '../components/common/AppBreadcrumbs';
 import { OnboardingProgress } from '../components/common/OnboardingProgress';
-import { StepperVertical } from '../components/onboarding/StepperVertical';
+import { StepperVertical } from '../components/common/StepperVertical';
 import { BasicInfoForm } from '../components/onboarding/BasicInfoForm';
 import { ProfessionalInfoForm } from '../components/onboarding/ProfessionalInfoForm';
 import { AppButton } from '../components/common/AppButton';
@@ -17,6 +17,7 @@ export const CreateEmployee = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
   const [isValidating, setIsValidating] = useState(false); 
+  const steps = ["Infos Básicas", "Infos Profissionais"];
 
   const basicInfo = useBasicInfo();
   const profInfo = useProfessionalInfo(); 
@@ -99,7 +100,7 @@ export const CreateEmployee = () => {
           }}
         >
           <Box sx={{ width: { xs: '100%', md: '153px' }, flexShrink: 0 }}>
-            <StepperVertical currentStep={currentStep} />
+            <StepperVertical currentStep={currentStep} steps={steps} />
           </Box>
 
           {/* COLUNA DA DIREITA (FORM + BOTÕES) */}
