@@ -1,4 +1,3 @@
-// src/components/onboarding/ContractInfoForm.tsx
 import { Box, Typography, MenuItem, CircularProgress, Stack, InputAdornment } from '@mui/material';
 import { AppTextField } from '../common/AppTextField';
 import type { IEmployee } from '../../services/employeeService';
@@ -20,6 +19,11 @@ export const ContractInfoForm = ({
   handleChange 
 }: ContractInfoFormProps) => {
 
+  const isManager = formData.seniority === 'Gestor';
+  const managerLabel = isManager ? "Reporta a (Superior Imediato)" : "Gestor Responsável";
+  const managerPlaceholder = isManager ? "Selecione a diretoria/superior" : "Selecione o gestor";
+  const availableManagers = employeesList;
+
   return (
     <Box sx={{ width: '100%' }}>
       <Typography 
@@ -36,8 +40,8 @@ export const ContractInfoForm = ({
         <AppTextField 
             select
             fullWidth
-            label="Gestor Responsável"
-            placeholder="Selecione um gestor"
+            label={managerLabel} 
+            placeholder={managerPlaceholder}
             value={formData.managerId}
             onChange={(e) => handleChange('managerId', e.target.value)}
             error={!!errors.managerId}
@@ -47,7 +51,7 @@ export const ContractInfoForm = ({
                displayEmpty: true,
                renderValue: (selected: any) => {
                   if (isLoading) return <span style={{ color: '#919EAB' }}>Carregando...</span>;
-                  if (!selected) return <span style={{ color: '#919EAB' }}>Selecione um gestor</span>;
+                  if (!selected) return <span style={{ color: '#919EAB' }}>{managerPlaceholder}</span>;
                   
                   const selectedEmp = employeesList.find(e => e.id === selected);
                   return selectedEmp ? selectedEmp.nome : selected;
@@ -60,12 +64,12 @@ export const ContractInfoForm = ({
                         <CircularProgress size={20} /> Carregando...
                     </Box>
                 </MenuItem>
-            ) : employeesList.length === 0 ? (
+            ) : availableManagers.length === 0 ? (
                 <MenuItem disabled>Nenhum colaborador disponível</MenuItem>
             ) : (
-                employeesList.map((emp) => (
+                availableManagers.map((emp) => (
                     <MenuItem key={emp.id} value={emp.id}>
-                        {emp.nome}
+                        {emp.nome} {emp.seniority === 'Gestor' ? '(Gestor)' : ''}
                     </MenuItem>
                 ))
             )}

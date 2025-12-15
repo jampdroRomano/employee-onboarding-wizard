@@ -17,6 +17,7 @@ export const DepartmentManagerStep = ({
   loading = false 
 }: DepartmentManagerStepProps) => {
 
+  const managers = employees.filter(emp => emp.seniority === 'Gestor');
   const selectedOption = employees.find(emp => emp.id === value) || null;
 
   return (
@@ -31,28 +32,29 @@ export const DepartmentManagerStep = ({
 
       <Box sx={{ width: '100%' }}>
         <Autocomplete
-            options={employees}
+            options={managers}
             getOptionLabel={(option) => option.nome}
             
-            // Controle do valor selecionado
             value={selectedOption}
             
-            // Ao mudar, devolve apenas o ID para o formulário
             onChange={(_event, newValue) => {
                 onChange(newValue ? newValue.id : null);
             }}
             
             loading={loading}
-            noOptionsText="Nenhum colaborador encontrado"
+            noOptionsText={
+                employees.length > 0 && managers.length === 0 
+                ? "Nenhum colaborador com cargo de 'Gestor' encontrado."
+                : "Nenhum colaborador encontrado"
+            }
             
-            // Renderização do Input
             renderInput={(params) => (
                 <TextField 
                     {...params} 
-                    label="Responsável (Opcional)" 
-                    placeholder="Selecione um gestor ou deixe em branco"
+                    label="Responsável pelo Departamento" 
+                    placeholder="Selecione um gestor"
                     error={!!error}
-                    helperText={error}
+                    helperText={error || (managers.length === 0 && !loading ? "Dica: Cadastre um funcionário com senioridade 'Gestor' primeiro." : "")}
                     InputProps={{
                         ...params.InputProps,
                         endAdornment: (

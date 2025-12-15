@@ -29,16 +29,42 @@ interface Employee {
   nome: string;
   email: string;
   departamento: string; 
-  status: boolean;      
+  role?: string;        
+  seniority?: string;   
+  admissionDate?: string; 
+  managerId?: string;
+  salary?: string;
+  status: boolean | string;      
   img: string;
 }
 
+// Definição das colunas mantendo a estrutura original de objetos
 const columns = [
-  { id: 'nome', label: 'Nome', width: '25%' },
-  { id: 'email', label: 'Email', width: '25%' },
-  { id: 'departamento', label: 'Departamento' },
+  { id: 'colaborador', label: 'Colaborador', width: '28%' },
+  { id: 'ocupacao', label: 'Ocupação', width: '22%' }, 
+  { id: 'detalhes', label: 'Nível & Admissão', width: '20%' }, 
+  { id: 'contrato', label: 'Gestão & Salário', width: '20%' }, 
   { id: 'status', label: 'Status', align: 'right' as const },
 ];
+
+// Helper: Formata Moeda
+const formatCurrency = (value?: string | number) => {
+  if (!value) return '-';
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+  if (isNaN(num)) return value;
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(num);
+};
+
+// Helper: Formata Data (YYYY-MM-DD para DD/MM/AAAA)
+const formatDate = (dateString?: string) => {
+  if (!dateString) return '-';
+  try {
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${month}/${year}`;
+  } catch {
+    return dateString;
+  }
+};
 
 export const EmployeeTable = memo(() => {
   const [rows, setRows] = useState<Employee[]>([]);
@@ -47,6 +73,7 @@ export const EmployeeTable = memo(() => {
   const [loadingEmps, setLoadingEmps] = useState(true);
 
   useEffect(() => {
+    // 1. Carrega Departamentos
     const loadDepartments = async () => {
       try {
         const data = await departmentService.getAll();
@@ -57,9 +84,9 @@ export const EmployeeTable = memo(() => {
         setLoadingDepts(false);
       }
     };
-
     loadDepartments();
 
+    // 2. Ouve os funcionários em tempo real
     const q = query(collection(db, "employees"), orderBy("createdAt", "desc"));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -69,9 +96,14 @@ export const EmployeeTable = memo(() => {
           id: doc.id,
           nome: data.nome,
           email: data.email,
-          departamento: data.departamento || '', 
+          departamento: data.departamento || '',
           status: data.status,
-          img: data.img || ''
+          img: data.img || '',
+          role: data.role,
+          seniority: data.seniority,
+          admissionDate: data.admissionDate,
+          managerId: data.managerId,
+          salary: data.salary,
         };
       }) as Employee[];
       
@@ -82,6 +114,7 @@ export const EmployeeTable = memo(() => {
     return () => unsubscribe();
   }, []);
 
+  // Mapas para tradução rápida de IDs
   const departmentsMap = useMemo(() => {
     return departments.reduce((acc, dept) => {
       acc[dept.id] = dept.name;
@@ -89,9 +122,22 @@ export const EmployeeTable = memo(() => {
     }, {} as Record<string, string>);
   }, [departments]);
 
+  const employeesMap = useMemo(() => {
+    return rows.reduce((acc, emp) => {
+      acc[emp.id] = emp.nome;
+      return acc;
+    }, {} as Record<string, string>);
+  }, [rows]);
+
+  // Helpers de exibição
   const getDepartmentName = (id: string) => {
     if (!id) return 'Não atribuído';
     return departmentsMap[id] || 'Desconhecido';
+  };
+
+  const getManagerName = (id?: string) => {
+    if (!id) return '-';
+    return employeesMap[id] || 'Não encontrado';
   };
 
   const isStatusActive = (status: boolean | string) => {
@@ -118,7 +164,12 @@ export const EmployeeTable = memo(() => {
                   align={col.align || 'left'} 
                   sx={{ width: col.width || 'auto', fontWeight: 600, color: 'text.secondary' }}
                 >
-                  <Stack direction="row" alignItems="center" spacing={0.5} justifyContent={col.align === 'right' ? 'flex-end' : 'flex-start'}>
+                  <Stack 
+                    direction="row" 
+                    alignItems="center" 
+                    spacing={0.5} 
+                    justifyContent={col.align === 'right' ? 'flex-end' : 'flex-start'}
+                  >
                     <span>{col.label}</span>
                     <ArrowDownwardIcon sx={{ fontSize: 16, opacity: 0.5 }} />
                   </Stack>
@@ -130,7 +181,7 @@ export const EmployeeTable = memo(() => {
           <TableBody>
             {rows.length === 0 ? (
                 <TableRow>
-                    <TableCell colSpan={4} align="center" sx={{ py: 3 }}>
+                    <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
                         <Typography variant="body1" color="text.secondary">
                             Nenhum colaborador encontrado.
                         </Typography>
@@ -139,25 +190,59 @@ export const EmployeeTable = memo(() => {
             ) : (
                 rows.map((row) => (
                 <TableRow key={row.id} hover>
+                    
+                    {/* 1. Colaborador: Avatar + Nome + Email */}
                     <TableCell>
                       <Stack direction="row" alignItems="center" spacing={2}>
                           <Avatar src={row.img} alt={row.nome} />
-                          <Typography variant="subtitle2" color="text.primary" noWrap>
-                          {row.nome}
-                          </Typography>
+                          <Box>
+                            <Typography variant="subtitle2" color="text.primary" noWrap>
+                                {row.nome}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" noWrap sx={{ fontSize: '0.80rem' }}>
+                                {row.email}
+                            </Typography>
+                          </Box>
                       </Stack>
                     </TableCell>
                     
+                    {/* 2. Ocupação: Cargo (negrito) + Departamento (cinza) */}
                     <TableCell>
-                      <Typography variant="body2" noWrap>{row.email}</Typography>
+                      <Box>
+                        <Typography variant="subtitle2" color="text.primary" noWrap>
+                            {row.role || 'Sem cargo'}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" noWrap sx={{ fontSize: '0.80rem' }}>
+                            {getDepartmentName(row.departamento)}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+
+                    {/* 3. Detalhes: Senioridade + Data Admissão */}
+                    <TableCell>
+                       <Box>
+                            <Typography variant="subtitle2" color="text.primary" sx={{ fontSize: '0.875rem' }}>
+                                {row.seniority || '-'}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                                {formatDate(row.admissionDate)}
+                            </Typography>
+                       </Box>
+                    </TableCell>
+
+                    {/* 4. Contrato: Gestor + Salário */}
+                    <TableCell>
+                        <Box>
+                            <Typography variant="body2" color="text.primary" noWrap>
+                                {getManagerName(row.managerId)}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                                {formatCurrency(row.salary)}
+                            </Typography>
+                        </Box>
                     </TableCell>
                     
-                    <TableCell>
-                      <Typography variant="body2" noWrap>
-                          {getDepartmentName(row.departamento)}
-                      </Typography>
-                    </TableCell>
-                    
+                    {/* 5. Status: Chip */}
                     <TableCell align="right">
                       <Chip 
                           label={isStatusActive(row.status) ? 'Ativo' : 'Inativo'} 
