@@ -1,50 +1,67 @@
-import { Box, Typography, Autocomplete, TextField } from '@mui/material';
+import { Box, Typography, Autocomplete, TextField, CircularProgress } from '@mui/material';
+import type { IEmployee } from '../../services/employeeService';
 
 interface DepartmentManagerStepProps {
   value: string | null;
   error?: string;
   onChange: (id: string | null) => void;
+  employees: IEmployee[];
+  loading?: boolean;
 }
 
-const managers = [
-  { id: '1', name: 'João da Silva' },
-  { id: '2', name: 'Maria Oliveira' },
-  { id: '3', name: 'Carlos Souza' },
-  { id: '4', name: 'Ana Pereira' },
-  { id: '5', name: 'Lucas Santos' }
-];
+export const DepartmentManagerStep = ({ 
+  value, 
+  error, 
+  onChange,
+  employees = [], 
+  loading = false 
+}: DepartmentManagerStepProps) => {
 
-export const DepartmentManagerStep = ({ value, error, onChange }: DepartmentManagerStepProps) => {
-  const selectedOption = managers.find(m => m.id === value) || null;
+  const selectedOption = employees.find(emp => emp.id === value) || null;
 
   return (
     <Box sx={{ width: '100%' }}>
       <Typography 
         component="h2"
         variant="h4" 
-        sx={{ 
-            mb: '31px',
-            color: 'text.secondary' 
-        }}
+        sx={{ mb: '31px', color: 'text.secondary' }}
       >
         Gestão do Departamento
       </Typography>
 
       <Box sx={{ width: '100%' }}>
         <Autocomplete
-            options={managers}
-            getOptionLabel={(option) => option.name}
+            options={employees}
+            getOptionLabel={(option) => option.nome}
+            
+            // Controle do valor selecionado
             value={selectedOption}
+            
+            // Ao mudar, devolve apenas o ID para o formulário
             onChange={(_event, newValue) => {
                 onChange(newValue ? newValue.id : null);
             }}
+            
+            loading={loading}
+            noOptionsText="Nenhum colaborador encontrado"
+            
+            // Renderização do Input
             renderInput={(params) => (
                 <TextField 
                     {...params} 
-                    label="Responsável" 
-                    placeholder="Pesquise pelo nome..."
+                    label="Responsável (Opcional)" 
+                    placeholder="Selecione um gestor ou deixe em branco"
                     error={!!error}
                     helperText={error}
+                    InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        ),
+                    }}
                 />
             )}
             sx={{

@@ -21,7 +21,7 @@ export const useDepartmentForm = () => {
 
   const [errors, setErrors] = useState<DepartmentErrors>({});
 
-  const handleChange = (field: keyof DepartmentState, value: any) => {
+  const handleChange = (field: keyof DepartmentState, value: string | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
@@ -50,10 +50,10 @@ export const useDepartmentForm = () => {
 
     // Validação do Passo 2: Gestão 
     if (step === 1) {
-      if (!formData.managerId) {
-        newErrors.managerId = 'Selecione um responsável pelo departamento.';
-        isValid = false;
-      }
+      // if (!formData.managerId) {
+      //   newErrors.managerId = 'Selecione um responsável pelo departamento.';
+      //   isValid = false;
+      // }
     }
 
     setErrors(newErrors);

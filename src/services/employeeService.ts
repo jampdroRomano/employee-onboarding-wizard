@@ -6,7 +6,8 @@ import {
   serverTimestamp,
   query,
   where,
-  getDocs 
+  getDocs,
+  orderBy
 } from "firebase/firestore";
 
 const AVATARS = [
@@ -16,12 +17,38 @@ const AVATARS = [
   '/avatars/avatar4.png',
 ];
 
+export interface IEmployee {
+  id: string;
+  nome: string;
+  email: string;
+  departamento?: string;
+  status?: string | boolean;
+  img?: string;
+}
+
 interface NewEmployeeData {
   nome: string;
   email: string;
   departamento: string;
   status?: boolean; 
 }
+
+export const getAllEmployees = async (): Promise<IEmployee[]> => {
+  try {
+    const employeesRef = collection(db, "employees");
+    const q = query(employeesRef, orderBy("nome", "asc")); 
+    
+    const querySnapshot = await getDocs(q);
+    
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as IEmployee));
+  } catch (error) {
+    console.error("Erro ao buscar colaboradores:", error);
+    return [];
+  }
+};
 
 export const checkEmailExists = async (email: string) => {
   const employeesRef = collection(db, "employees");
