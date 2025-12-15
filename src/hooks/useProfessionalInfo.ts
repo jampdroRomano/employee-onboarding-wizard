@@ -1,50 +1,108 @@
-// src/hooks/useProfessionalInfo.ts
 import { useState, useEffect } from 'react';
 import { departmentService } from '../services/departmentService';
+import { getAllEmployees } from '../services/employeeService';
 import type { Department } from '../services/departmentService';
+import type { IEmployee } from '../services/employeeService'; 
+
+export interface ProfessionalData {
+  department: string;
+  role: string;
+  seniority: string;
+  admissionDate: string;
+  managerId: string;
+  salary: string;
+}
 
 export const useProfessionalInfo = () => {
-  const [department, setDepartment] = useState('');
-  const [departmentList, setDepartmentList] = useState<Department[]>([]); // Lista dinâmica
-  const [isLoadingDepts, setIsLoadingDepts] = useState(false);
-  const [error, setError] = useState('');
+  const [formData, setFormData] = useState<ProfessionalData>({
+    department: '',
+    role: '',
+    seniority: '',
+    admissionDate: '',
+    managerId: '',
+    salary: ''
+  });
 
-  // Busca os departamentos ao iniciar
+  const [departmentList, setDepartmentList] = useState<Department[]>([]);
+  const [employeesList, setEmployeesList] = useState<IEmployee[]>([]); 
+  const [isLoading, setIsLoading] = useState(false); 
+  const [errors, setErrors] = useState<Partial<ProfessionalData>>({});
+
   useEffect(() => {
-    const fetchDepartments = async () => {
-      setIsLoadingDepts(true);
+    const fetchData = async () => {
+      setIsLoading(true);
       try {
-        const data = await departmentService.getAll();
-        setDepartmentList(data);
+        const [deptData, empData] = await Promise.all([
+          departmentService.getAll(),
+          getAllEmployees()
+        ]);
+        setDepartmentList(deptData);
+        setEmployeesList(empData);
       } catch (err) {
-        console.error("Erro ao buscar departamentos", err);
+        console.error("Erro ao buscar dados:", err);
       } finally {
-        setIsLoadingDepts(false);
+        setIsLoading(false);
       }
     };
 
-    fetchDepartments();
+    fetchData();
   }, []);
 
-  const handleChange = (value: string) => {
-    setDepartment(value);
-    if (value) setError('');
+  const handleChange = (field: keyof ProfessionalData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
   };
 
-  const validateStep = () => {
-    if (!department) {
-      setError('Selecione um departamento.');
-      return false;
+  // Validação do Step 2 (Profissional)
+  const validateStep2 = () => {
+    const newErrors: Partial<ProfessionalData> = {};
+    let isValid = true;
+
+    if (!formData.department) {
+        newErrors.department = 'Selecione um departamento.';
+        isValid = false;
     }
-    return true;
+    if (!formData.role.trim()) {
+        newErrors.role = 'O cargo é obrigatório.';
+        isValid = false;
+    }
+    if (!formData.seniority) {
+        newErrors.seniority = 'Selecione a senioridade.';
+        isValid = false;
+    }
+    if (!formData.admissionDate) {
+        newErrors.admissionDate = 'Informe a data de admissão.';
+        isValid = false;
+    }
+
+    setErrors(prev => ({ ...prev, ...newErrors }));
+    return isValid;
+  };
+
+  // Validação do Step 3 (Contratual)
+  const validateStep3 = () => {
+    const newErrors: Partial<ProfessionalData> = {};
+    let isValid = true;
+
+    if (!formData.salary.trim()) {
+        newErrors.salary = 'Informe o salário base.';
+        isValid = false;
+    }
+
+    setErrors(prev => ({ ...prev, ...newErrors }));
+    return isValid;
   };
 
   return {
-    department,
-    departmentList, // Exportamos a lista
-    isLoadingDepts, // Exportamos o loading
-    error,
+    formData,
+    departmentList,
+    employeesList, 
+    isLoading,
+    errors,
     handleChange,
-    validateStep
+    validateStep2,
+    validateStep3
   };
 };
