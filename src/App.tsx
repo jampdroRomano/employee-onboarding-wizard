@@ -6,6 +6,8 @@ import { AuthPage } from './pages/AuthPage';
 import { PrivateRoute } from './components/auth/PrivateRoute';
 import { useAuth } from './contexts/AuthContext';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { DepartmentsPage } from './pages/DepartmentsPage';
+import { CreateDepartment } from './pages/CreateDepartment';
 
 function App() {
   const { userLoggedIn, currentUser } = useAuth();
@@ -16,9 +18,9 @@ function App() {
   return (
     <Routes>
       {/* Rota Pública: Login */}
-      <Route 
-        path="/login" 
-        element={canAccessDashboard ? <Navigate to="/" replace /> : <AuthPage />} 
+      <Route
+        path="/login"
+        element={canAccessDashboard ? <Navigate to="/" replace /> : <AuthPage />}
       />
 
       {/* Rotas Protegidas */}
@@ -39,6 +41,28 @@ function App() {
           <PrivateRoute>
             <MainLayout>
               <CreateEmployee />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/departamentos"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <DepartmentsPage />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/departamentos/criar"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <CreateDepartment />
             </MainLayout>
           </PrivateRoute>
         }
