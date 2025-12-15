@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; 
 import { Box, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
@@ -10,15 +10,35 @@ import { OnboardingProgress } from '../components/common/OnboardingProgress';
 import { DepartmentForm } from '../components/departments/DepartmentForm';
 import { DepartmentManagerStep } from '../components/departments/DepartmentManagerStep';
 import { departmentService } from '../services/departmentService';
-import { useDepartmentForm } from '../hooks/useDepartmentForm'; // Importe o hook
+import { getAllEmployees, type IEmployee } from '../services/employeeService'; 
+import { useDepartmentForm } from '../hooks/useDepartmentForm'; 
 
 export const CreateDepartment = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0); 
   const [loading, setLoading] = useState(false);
+  
+  // NOVO: Estado para armazenar os funcionários carregados
+  const [employees, setEmployees] = useState<IEmployee[]>([]);
+  const [loadingEmployees, setLoadingEmployees] = useState(false);
 
-  // Usando o Hook customizado
   const { formData, errors, handleChange, validateStep } = useDepartmentForm();
+
+  //Busca funcionários assim que o componente monta
+  useEffect(() => {
+    const fetchEmployees = async () => {
+        setLoadingEmployees(true);
+        try {
+            const data = await getAllEmployees();
+            setEmployees(data);
+        } catch (error) {
+            console.error("Erro ao buscar funcionários para seleção de gestor:", error);
+        } finally {
+            setLoadingEmployees(false);
+        }
+    };
+    fetchEmployees();
+  }, []);
 
   const steps = [
     'Informações', 
@@ -29,26 +49,20 @@ export const CreateDepartment = () => {
   const progressValue = activeStep === 0 ? 0 : activeStep === 1 ? 50 : 100;
 
   const handleNext = async () => {
-    // Valida o passo atual antes de prosseguir
     const isValid = validateStep(activeStep);
 
-    if (!isValid) {
-        return; 
-    }
+    if (!isValid) return; 
 
-    // Se validou o passo 0, vai pro 1
     if (activeStep === 0) {
       setActiveStep(1);
       return;
     }
 
-    // Se validou o passo 1, vai pro 2
     if (activeStep === 1) {
       setActiveStep(2);
       return;
     }
 
-    // Se estiver no passo 2, salva
     if (activeStep === 2) {
       await handleSave();
     }
@@ -89,6 +103,8 @@ export const CreateDepartment = () => {
             value={formData.managerId}
             error={errors.managerId} 
             onChange={(id) => handleChange('managerId', id)}
+            employees={employees}      
+            loading={loadingEmployees} 
           />
         );
       case 2:

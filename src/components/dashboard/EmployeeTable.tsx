@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, memo } from 'react';
 import { 
   Card, 
   Table, 
@@ -24,7 +24,7 @@ import { db } from '../../config/firebase';
 import { departmentService } from '../../services/departmentService';
 import type { Department } from '../../services/departmentService';
 
-// Interface ajustada para refletir o dado real
+// Interface
 interface Employee {
   id: string;
   nome: string;
@@ -41,13 +41,13 @@ const columns = [
   { id: 'status', label: 'Status', align: 'right' as const },
 ];
 
-export const EmployeeTable = () => {
+export const EmployeeTable = memo(() => {
   const [rows, setRows] = useState<Employee[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]); 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 1. Carrega os departamentos primeiro (Promise)
+    // 1. Carrega os departamentos
     const loadDepartments = async () => {
       try {
         const data = await departmentService.getAll();
@@ -82,11 +82,16 @@ export const EmployeeTable = () => {
     return () => unsubscribe();
   }, []);
 
-  // 3. Função "Helper" para traduzir ID -> Nome
+  const departmentsMap = useMemo(() => {
+    return departments.reduce((acc, dept) => {
+      acc[dept.id] = dept.name;
+      return acc;
+    }, {} as Record<string, string>);
+  }, [departments]);
+
   const getDepartmentName = (id: string) => {
     if (!id) return 'Não atribuído';
-    const dept = departments.find(d => d.id === id);
-    return dept ? dept.name : 'Desconhecido';
+    return departmentsMap[id] || 'Desconhecido';
   };
 
   const isStatusActive = (status: boolean | string) => {
@@ -147,7 +152,6 @@ export const EmployeeTable = () => {
                       <Typography variant="body2" noWrap>{row.email}</Typography>
                     </TableCell>
                     
-                    {/* AQUI A MÁGICA ACONTECE: Exibe o nome usando a função */}
                     <TableCell>
                       <Typography variant="body2" noWrap>
                           {getDepartmentName(row.departamento)}
@@ -174,4 +178,6 @@ export const EmployeeTable = () => {
       </TableContainer>
     </Card>
   );
-};
+});
+
+EmployeeTable.displayName = 'EmployeeTable'; 
