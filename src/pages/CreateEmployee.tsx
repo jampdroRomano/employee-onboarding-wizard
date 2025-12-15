@@ -1,31 +1,31 @@
 import { Box } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react'; 
+import { useState } from 'react';
 import { AppBreadcrumbs } from '../components/common/AppBreadcrumbs';
 import { OnboardingProgress } from '../components/common/OnboardingProgress';
 import { StepperVertical } from '../components/common/StepperVertical';
 import { BasicInfoForm } from '../components/onboarding/BasicInfoForm';
 import { ProfessionalInfoForm } from '../components/onboarding/ProfessionalInfoForm';
 import { AppButton } from '../components/common/AppButton';
-import { useBasicInfo } from '../hooks/useBasicInfo'; 
-import { useProfessionalInfo } from '../hooks/useProfessionalInfo'; 
-import { createEmployee, checkEmailExists } from '../services/employeeService'; 
+import { useBasicInfo } from '../hooks/useBasicInfo';
+import { useProfessionalInfo } from '../hooks/useProfessionalInfo';
+import { createEmployee, checkEmailExists } from '../services/employeeService';
 
 export const CreateEmployee = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
-  const [isValidating, setIsValidating] = useState(false); 
+  const [isValidating, setIsValidating] = useState(false);
   const steps = ["Infos Básicas", "Infos Profissionais"];
 
   const basicInfo = useBasicInfo();
-  const profInfo = useProfessionalInfo(); 
+  const profInfo = useProfessionalInfo();
 
   const handleNext = async () => {
     if (currentStep === 1) {
       const isValid = basicInfo.validateStep();
-      
+
       if (isValid) {
         setIsValidating(true);
         const emailExists = await checkEmailExists(basicInfo.formData.email);
@@ -39,12 +39,12 @@ export const CreateEmployee = () => {
       }
     } else {
       const isValid = profInfo.validateStep();
-      
+
       if (isValid) {
         setIsSaving(true);
         const payload = {
-            ...basicInfo.formData, 
-            departamento: profInfo.department
+          ...basicInfo.formData,
+          departamento: profInfo.department
         };
 
         try {
@@ -63,22 +63,22 @@ export const CreateEmployee = () => {
   const handleBack = () => {
     if (currentStep === 2) {
       setCurrentStep(1);
-    } 
+    }
   };
 
   const progressValue = currentStep === 1 ? 0 : 50;
 
   return (
     <Box>
-      <Box 
-        sx={{ 
-          width: '100%', 
-          maxWidth: '100%', 
+      <Box
+        sx={{
+          width: '100%',
+          maxWidth: '100%',
           mx: 'auto',
-          pr: { xs: 0, lg: '5%' } 
+          pr: { xs: 0, lg: '5%' }
         }}
       >
-        
+
         <Box sx={{ mb: 2 }}>
           <AppBreadcrumbs
             items={[
@@ -96,7 +96,7 @@ export const CreateEmployee = () => {
             display: 'flex',
             flexDirection: { xs: 'column', md: 'row' },
             gap: '40px',
-            alignItems: 'flex-start', 
+            alignItems: 'flex-start',
           }}
         >
           <Box sx={{ width: { xs: '100%', md: '153px' }, flexShrink: 0 }}>
@@ -104,43 +104,45 @@ export const CreateEmployee = () => {
           </Box>
 
           {/* COLUNA DA DIREITA (FORM + BOTÕES) */}
-          <Box 
-            sx={{ 
+          <Box
+            sx={{
               width: '100%',
               display: 'flex',
               flexDirection: 'column',
-              minHeight: '440px' 
+              minHeight: '440px'
             }}
-          > 
+          >
 
             {/* Container do Formulário */}
             <Box>
-                {currentStep === 1 ? (
-                  <BasicInfoForm 
-                    formData={basicInfo.formData}
-                    errors={basicInfo.errors}
-                    handleChange={basicInfo.handleChange}
-                    handleStatusChange={basicInfo.handleStatusChange} 
-                  />
-                ) : (
-                  <ProfessionalInfoForm 
-                    department={profInfo.department}
-                    error={profInfo.error}
-                    handleChange={profInfo.handleChange}
-                  />
-                )}
+              {currentStep === 1 ? (
+                <BasicInfoForm
+                  formData={basicInfo.formData}
+                  errors={basicInfo.errors}
+                  handleChange={basicInfo.handleChange}
+                  handleStatusChange={basicInfo.handleStatusChange}
+                />
+              ) : (
+                <ProfessionalInfoForm
+                  department={profInfo.department}
+                  departmentList={profInfo.departmentList} 
+                  isLoading={profInfo.isLoadingDepts}
+                  error={profInfo.error}
+                  handleChange={profInfo.handleChange}
+                />
+              )}
             </Box>
 
             {/* Container dos Botões */}
             <Box
               sx={{
-                mt: 'auto', 
+                mt: 'auto',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 height: '48px',
                 width: '100%',
-                pt: 4 
+                pt: 4
               }}
             >
               <AppButton
@@ -151,13 +153,13 @@ export const CreateEmployee = () => {
                 sx={{
                   width: '64px', height: '48px', minWidth: '64px',
                   boxShadow: 'none',
-                  pl: 0, 
-                  justifyContent: 'flex-start',                  
-                  color: 'text.primary',                 
-                  '&:hover': { 
-                      backgroundColor: 'transparent', 
-                      boxShadow: 'none', 
-                      color: 'text.secondary', 
+                  pl: 0,
+                  justifyContent: 'flex-start',
+                  color: 'text.primary',
+                  '&:hover': {
+                    backgroundColor: 'transparent',
+                    boxShadow: 'none',
+                    color: 'text.secondary',
                   },
                   '&.Mui-disabled': {
                     color: (theme) => alpha(theme.palette.grey[500], 0.8),
@@ -171,7 +173,7 @@ export const CreateEmployee = () => {
 
               <AppButton
                 onClick={handleNext}
-                loading={isSaving || isValidating} 
+                loading={isSaving || isValidating}
                 sx={{
                   width: '91px', height: '48px', minWidth: '64px',
                   fontWeight: 700, borderRadius: '8px',

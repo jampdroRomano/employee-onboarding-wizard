@@ -1,18 +1,39 @@
-import { useState } from 'react';
+// src/hooks/useProfessionalInfo.ts
+import { useState, useEffect } from 'react';
+import { departmentService } from '../services/departmentService';
+import type { Department } from '../services/departmentService';
 
 export const useProfessionalInfo = () => {
   const [department, setDepartment] = useState('');
+  const [departmentList, setDepartmentList] = useState<Department[]>([]); // Lista dinâmica
+  const [isLoadingDepts, setIsLoadingDepts] = useState(false);
   const [error, setError] = useState('');
+
+  // Busca os departamentos ao iniciar
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      setIsLoadingDepts(true);
+      try {
+        const data = await departmentService.getAll();
+        setDepartmentList(data);
+      } catch (err) {
+        console.error("Erro ao buscar departamentos", err);
+      } finally {
+        setIsLoadingDepts(false);
+      }
+    };
+
+    fetchDepartments();
+  }, []);
 
   const handleChange = (value: string) => {
     setDepartment(value);
-    // Limpa o erro assim que o usuário seleciona algo
-    if (error) setError('');
+    if (value) setError('');
   };
 
-  const validateStep = (): boolean => {
+  const validateStep = () => {
     if (!department) {
-      setError('Por favor, selecione um departamento.');
+      setError('Selecione um departamento.');
       return false;
     }
     return true;
@@ -20,6 +41,8 @@ export const useProfessionalInfo = () => {
 
   return {
     department,
+    departmentList, // Exportamos a lista
+    isLoadingDepts, // Exportamos o loading
     error,
     handleChange,
     validateStep

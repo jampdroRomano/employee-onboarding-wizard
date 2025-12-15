@@ -5,21 +5,36 @@ import {
   updateDoc, 
   deleteDoc, 
   doc, 
-  getDoc
+  getDoc,
+  query,
+  orderBy
 } from 'firebase/firestore';
-import { db } from '../config/firebase';
-import type { Department } from '../types'; 
+import { db } from '../config/firebase'; 
 
 const DEPARTMENT_COLLECTION = 'departments';
 
+export interface Department {
+  id: string;
+  name: string;
+  description: string;
+  managerId: string | null;
+}
+
 export const departmentService = {
-  // Listar todos
   getAll: async (): Promise<Department[]> => {
-    const querySnapshot = await getDocs(collection(db, DEPARTMENT_COLLECTION));
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as Department));
+    try {
+      const departmentsRef = collection(db, DEPARTMENT_COLLECTION);
+      const q = query(departmentsRef, orderBy('name', 'asc')); 
+      const querySnapshot = await getDocs(q);
+      
+      return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as Department));
+    } catch (error) {
+      console.error("Erro ao buscar departamentos:", error);
+      return [];
+    }
   },
 
   // Criar novo

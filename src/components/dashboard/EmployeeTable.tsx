@@ -16,47 +16,82 @@ import {
 } from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
-// Firebase Imports
+// Firebase
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 
+// Service e Tipos
+import { departmentService } from '../../services/departmentService';
+import type { Department } from '../../services/departmentService';
+
+// Interface ajustada para refletir o dado real
 interface Employee {
   id: string;
   nome: string;
   email: string;
-  cargo: string; 
-  status: string;
+  departamento: string; 
+  status: boolean;      
   img: string;
 }
 
 const columns = [
   { id: 'nome', label: 'Nome', width: '25%' },
   { id: 'email', label: 'Email', width: '25%' },
-  { id: 'cargo', label: 'Departamento' },
+  { id: 'departamento', label: 'Departamento' },
   { id: 'status', label: 'Status', align: 'right' as const },
 ];
 
 export const EmployeeTable = () => {
   const [rows, setRows] = useState<Employee[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]); 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Cria a query ordenando por data de criação (mais novos primeiro)
-    const q = query(collection(db, "employees"), orderBy("createdAt", "desc"));
+    // 1. Carrega os departamentos primeiro (Promise)
+    const loadDepartments = async () => {
+      try {
+        const data = await departmentService.getAll();
+        setDepartments(data);
+      } catch (error) {
+        console.error("Erro ao carregar departamentos", error);
+      }
+    };
 
+    loadDepartments();
+
+    // 2. Ouve os funcionários em tempo real
+    const q = query(collection(db, "employees"), orderBy("createdAt", "desc"));
+    
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const employees = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Employee[];
+      const employees = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          nome: data.nome,
+          email: data.email,
+          departamento: data.departamento || '', 
+          status: data.status,
+          img: data.img || ''
+        };
+      }) as Employee[];
       
       setRows(employees);
       setLoading(false);
     });
 
-    // Limpa o listener quando o componente desmonta
     return () => unsubscribe();
   }, []);
+
+  // 3. Função "Helper" para traduzir ID -> Nome
+  const getDepartmentName = (id: string) => {
+    if (!id) return 'Não atribuído';
+    const dept = departments.find(d => d.id === id);
+    return dept ? dept.name : 'Desconhecido';
+  };
+
+  const isStatusActive = (status: boolean | string) => {
+    return status === true || status === 'Ativo';
+  };
 
   if (loading) {
     return (
@@ -76,18 +111,9 @@ export const EmployeeTable = () => {
                 <TableCell 
                   key={col.id} 
                   align={col.align || 'left'} 
-                  sx={{ 
-                    width: col.width || 'auto', 
-                    fontWeight: 600, 
-                    color: 'text.secondary' 
-                  }}
+                  sx={{ width: col.width || 'auto', fontWeight: 600, color: 'text.secondary' }}
                 >
-                  <Stack 
-                    direction="row" 
-                    alignItems="center" 
-                    spacing={0.5}
-                    justifyContent={col.align === 'right' ? 'flex-end' : 'flex-start'}
-                  >
+                  <Stack direction="row" alignItems="center" spacing={0.5} justifyContent={col.align === 'right' ? 'flex-end' : 'flex-start'}>
                     <span>{col.label}</span>
                     <ArrowDownwardIcon sx={{ fontSize: 16, opacity: 0.5 }} />
                   </Stack>
@@ -109,33 +135,36 @@ export const EmployeeTable = () => {
                 rows.map((row) => (
                 <TableRow key={row.id} hover>
                     <TableCell>
-                    <Stack direction="row" alignItems="center" spacing={2}>
-                        <Avatar src={row.img} alt={row.nome} />
-                        <Typography variant="subtitle2" color="text.primary" noWrap>
-                        {row.nome}
-                        </Typography>
-                    </Stack>
+                      <Stack direction="row" alignItems="center" spacing={2}>
+                          <Avatar src={row.img} alt={row.nome} />
+                          <Typography variant="subtitle2" color="text.primary" noWrap>
+                          {row.nome}
+                          </Typography>
+                      </Stack>
                     </TableCell>
                     
                     <TableCell>
-                    <Typography variant="body2" noWrap>{row.email}</Typography>
+                      <Typography variant="body2" noWrap>{row.email}</Typography>
                     </TableCell>
                     
+                    {/* AQUI A MÁGICA ACONTECE: Exibe o nome usando a função */}
                     <TableCell>
-                    <Typography variant="body2" noWrap>{row.cargo}</Typography>
+                      <Typography variant="body2" noWrap>
+                          {getDepartmentName(row.departamento)}
+                      </Typography>
                     </TableCell>
                     
                     <TableCell align="right">
-                    <Chip 
-                        label={row.status} 
-                        size="small"
-                        sx={{
-                        fontWeight: 700,
-                        borderRadius: '6px',
-                        bgcolor: row.status === 'Ativo' ? 'rgba(34, 197, 94, 0.16)' : 'rgba(255, 86, 48, 0.16)',
-                        color: row.status === 'Ativo' ? '#118D57' : '#B71D18',
-                        }}
-                    />
+                      <Chip 
+                          label={isStatusActive(row.status) ? 'Ativo' : 'Inativo'} 
+                          size="small"
+                          sx={{
+                            fontWeight: 700,
+                            borderRadius: '6px',
+                            bgcolor: isStatusActive(row.status) ? 'rgba(34, 197, 94, 0.16)' : 'rgba(255, 86, 48, 0.16)',
+                            color: isStatusActive(row.status) ? '#118D57' : '#B71D18',
+                          }}
+                      />
                     </TableCell>
                 </TableRow>
                 ))
