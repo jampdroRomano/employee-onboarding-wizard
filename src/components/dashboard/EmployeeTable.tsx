@@ -24,7 +24,6 @@ import { db } from '../../config/firebase';
 import { departmentService } from '../../services/departmentService';
 import type { Department } from '../../services/departmentService';
 
-// Interface
 interface Employee {
   id: string;
   nome: string;
@@ -44,22 +43,23 @@ const columns = [
 export const EmployeeTable = memo(() => {
   const [rows, setRows] = useState<Employee[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]); 
-  const [loading, setLoading] = useState(true);
+  const [loadingDepts, setLoadingDepts] = useState(true);
+  const [loadingEmps, setLoadingEmps] = useState(true);
 
   useEffect(() => {
-    // 1. Carrega os departamentos
     const loadDepartments = async () => {
       try {
         const data = await departmentService.getAll();
         setDepartments(data);
       } catch (error) {
         console.error("Erro ao carregar departamentos", error);
+      } finally {
+        setLoadingDepts(false);
       }
     };
 
     loadDepartments();
 
-    // 2. Ouve os funcionários em tempo real
     const q = query(collection(db, "employees"), orderBy("createdAt", "desc"));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -76,7 +76,7 @@ export const EmployeeTable = memo(() => {
       }) as Employee[];
       
       setRows(employees);
-      setLoading(false);
+      setLoadingEmps(false);
     });
 
     return () => unsubscribe();
@@ -98,7 +98,7 @@ export const EmployeeTable = memo(() => {
     return status === true || status === 'Ativo';
   };
 
-  if (loading) {
+  if (loadingDepts || loadingEmps) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
         <CircularProgress />
@@ -180,4 +180,4 @@ export const EmployeeTable = memo(() => {
   );
 });
 
-EmployeeTable.displayName = 'EmployeeTable'; 
+EmployeeTable.displayName = 'EmployeeTable';

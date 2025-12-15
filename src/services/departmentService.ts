@@ -20,42 +20,51 @@ export interface Department {
   managerId: string | null;
 }
 
+let departmentsCache: Department[] | null = null;
+
 export const departmentService = {
   getAll: async (): Promise<Department[]> => {
+    if (departmentsCache) {
+      return departmentsCache;
+    }
+
     try {
       const departmentsRef = collection(db, DEPARTMENT_COLLECTION);
       const q = query(departmentsRef, orderBy('name', 'asc')); 
       const querySnapshot = await getDocs(q);
       
-      return querySnapshot.docs.map(doc => ({
+      const data = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       } as Department));
+
+      departmentsCache = data;
+      return data;
+
     } catch (error) {
       console.error("Erro ao buscar departamentos:", error);
       return [];
     }
   },
 
-  // Criar novo
   create: async (data: Omit<Department, 'id'>) => {
+    departmentsCache = null; 
     const docRef = await addDoc(collection(db, DEPARTMENT_COLLECTION), data);
     return docRef.id;
   },
 
-  // Atualizar
   update: async (id: string, data: Partial<Department>) => {
+    departmentsCache = null; 
     const docRef = doc(db, DEPARTMENT_COLLECTION, id);
     await updateDoc(docRef, data);
   },
 
-  // Excluir
   delete: async (id: string) => {
+    departmentsCache = null; 
     const docRef = doc(db, DEPARTMENT_COLLECTION, id);
     await deleteDoc(docRef);
   },
 
-  // Buscar por ID
   getById: async (id: string): Promise<Department | null> => {
     const docRef = doc(db, DEPARTMENT_COLLECTION, id);
     const docSnap = await getDoc(docRef);
