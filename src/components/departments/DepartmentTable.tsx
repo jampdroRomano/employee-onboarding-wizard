@@ -12,7 +12,8 @@ import {
   Box
 } from '@mui/material';
 import { departmentService } from '../../services/departmentService';
-import type { Department } from '../../types';
+import { getAllEmployees } from '../../services/employeeService';
+import type { Department } from '../../types'; 
 
 const columns = [
   { id: 'name', label: 'Nome', width: '30%' },
@@ -23,14 +24,31 @@ const columns = [
 
 export const DepartmentTable = () => {
   const [rows, setRows] = useState<Department[]>([]);
+  const [employeeCounts, setEmployeeCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
   const loadData = async () => {
     try {
-      const data = await departmentService.getAll();
-      setRows(data);
+      setLoading(true);
+      
+      const [departmentsData, employeesData] = await Promise.all([
+        departmentService.getAll(),
+        getAllEmployees()
+      ]);
+
+      const counts: Record<string, number> = {};
+      
+      employeesData.forEach(emp => {
+        if (emp.departamento) {
+          counts[emp.departamento] = (counts[emp.departamento] || 0) + 1;
+        }
+      });
+
+      setRows(departmentsData);
+      setEmployeeCounts(counts);
+
     } catch (error) {
-      console.error(error);
+      console.error("Erro ao carregar dados:", error);
     } finally {
       setLoading(false);
     }
@@ -83,18 +101,28 @@ export const DepartmentTable = () => {
                             {row.name}
                         </Typography>
                     </TableCell>
+                    
                     <TableCell>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" color="text.secondary" sx={{ 
+                            display: '-webkit-box',
+                            overflow: 'hidden',
+                            WebkitBoxOrient: 'vertical',
+                            WebkitLineClamp: 2, 
+                        }}>
                             {row.description || '-'}
                         </Typography>
                     </TableCell>
+                    
                     <TableCell>
-                        <Typography variant="body2">
-                            {row.managerId ? 'Definido (ID)' : 'Sem Gestor'} 
+                        <Typography variant="body2" color={row.managerId ? 'text.primary' : 'text.disabled'}>
+                            {row.managerId ? 'Definido' : 'Não atribuído'} 
                         </Typography>
                     </TableCell>
+                    
                     <TableCell align="center">
-                        <Typography variant="body2">0</Typography>
+                        <Typography variant="body2">
+                            {employeeCounts[row.id] || 0}
+                        </Typography>
                     </TableCell>
                 </TableRow>
                 ))
