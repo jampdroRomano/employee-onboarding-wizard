@@ -5,7 +5,7 @@ import type { ProfessionalData } from '../../hooks/useProfessionalInfo';
 
 interface ContractInfoFormProps {
   formData: ProfessionalData;
-  employeesList: Employee[]; 
+  employeesList: Employee[];
   isLoading: boolean;
   errors: Partial<ProfessionalData>;
   handleChange: (field: keyof ProfessionalData, value: string) => void;
@@ -19,6 +19,7 @@ export const ContractInfoForm = ({
   handleChange 
 }: ContractInfoFormProps) => {
 
+  const managersList = employeesList.filter(emp => emp.seniority === 'Gestor');
   const isManager = formData.seniority === 'Gestor';
   const managerLabel = isManager ? "Reporta a (Superior Imediato)" : "Gestor Responsável";
   const managerPlaceholder = isManager ? "Selecione a diretoria/superior" : "Selecione o gestor";
@@ -34,6 +35,8 @@ export const ContractInfoForm = ({
       </Typography>
 
       <Stack spacing={3} sx={{ width: '100%' }}> 
+        
+        {/* 1. Gestor Responsável (Select) */}
         <AppTextField 
             select
             fullWidth
@@ -51,6 +54,11 @@ export const ContractInfoForm = ({
                   if (!selected) return <span style={{ color: '#919EAB' }}>{managerPlaceholder}</span>;
                   const selectedEmp = employeesList.find(e => e.id === selected);
                   return selectedEmp ? selectedEmp.nome : selected;
+               },
+               MenuProps: {
+                 PaperProps: { 
+                   sx: { maxHeight: 300 } 
+                 }
                }
             }}
         >
@@ -60,17 +68,20 @@ export const ContractInfoForm = ({
                         <CircularProgress size={20} /> Carregando...
                     </Box>
                 </MenuItem>
-            ) : employeesList.length === 0 ? (
-                <MenuItem disabled>Nenhum colaborador disponível</MenuItem>
+            ) : managersList.length === 0 ? (
+                <MenuItem disabled value="">
+                    Nenhum gestor encontrado. Cadastre um funcionário como 'Gestor' primeiro.
+                </MenuItem>
             ) : (
-                employeesList.map((emp) => (
+                managersList.map((emp) => (
                     <MenuItem key={emp.id} value={emp.id}>
-                        {emp.nome} {emp.seniority === 'Gestor' ? '(Gestor)' : ''}
+                        {emp.nome}
                     </MenuItem>
                 ))
             )}
         </AppTextField>
 
+        {/* 2. Salário Base */}
         <AppTextField
           label="Salário Base"
           placeholder="0,00"
@@ -83,6 +94,7 @@ export const ContractInfoForm = ({
             startAdornment: <InputAdornment position="start">R$</InputAdornment>,
           }}
         />
+
       </Stack>
     </Box>
   );
