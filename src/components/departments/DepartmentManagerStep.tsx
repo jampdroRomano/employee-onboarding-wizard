@@ -1,11 +1,13 @@
-import { Box, Typography, Autocomplete, TextField, CircularProgress } from '@mui/material';
-import type { IEmployee } from '../../services/employeeService';
+import { Box, Typography, Autocomplete, TextField, CircularProgress, Paper } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import type { Employee } from '../../types';
+import { StickyActionMenuItem } from '../common/StickyActionMenuItem';
 
 interface DepartmentManagerStepProps {
   value: string | null;
   error?: string;
   onChange: (id: string | null) => void;
-  employees: IEmployee[];
+  employees: Employee[]; 
   loading?: boolean;
 }
 
@@ -16,7 +18,9 @@ export const DepartmentManagerStep = ({
   employees = [], 
   loading = false 
 }: DepartmentManagerStepProps) => {
+  const navigate = useNavigate();
 
+  // Filtra apenas Gestores
   const managers = employees.filter(emp => emp.seniority === 'Gestor');
   const selectedOption = employees.find(emp => emp.id === value) || null;
 
@@ -34,20 +38,26 @@ export const DepartmentManagerStep = ({
         <Autocomplete
             options={managers}
             getOptionLabel={(option) => option.nome}
-            
             value={selectedOption}
-            
             onChange={(_event, newValue) => {
                 onChange(newValue ? newValue.id : null);
             }}
-            
             loading={loading}
             noOptionsText={
                 employees.length > 0 && managers.length === 0 
                 ? "Nenhum colaborador com cargo de 'Gestor' encontrado."
                 : "Nenhum colaborador encontrado"
             }
-            
+            PaperComponent={({ children, ...props }) => (
+              <Paper {...props}>
+                {children}
+                <Box onMouseDown={(e) => e.preventDefault()}>
+                  <StickyActionMenuItem 
+                    onClick={() => navigate('/criar')} 
+                  />
+                </Box>
+              </Paper>
+            )}
             renderInput={(params) => (
                 <TextField 
                     {...params} 

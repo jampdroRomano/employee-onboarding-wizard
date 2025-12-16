@@ -1,24 +1,38 @@
+// Definição Central de Funcionário
 export interface Employee {
   id: string;
-  firstName: string;
-  lastName: string;
+  nome: string;
   email: string;
-  role: string; // Cargo (ex: Desenvolvedor, Designer)
-  departmentId: string; // Vínculo com o departamento
-  admissionDate: string; // Data de admissão
-  // Nível hierárquico
-  seniority: 'Júnior' | 'Pleno' | 'Sênior' | 'Gestor';
-  managerId?: string; // ID do gestor responsável (se houver)
-  baseSalary?: number; // Opcional por enquanto
-  status: 'Ativo' | 'Inativo'; // Para exclusão lógica ou filtros
+  status: boolean | string; 
+  img: string;
+  createdAt?: any; 
+  
+  // Dados Profissionais & Contratuais
+  departamento: string; 
+  role?: string;        
+  seniority?: string;
+  admissionDate?: string;
+  managerId?: string | null;
+  salary?: string;
 }
 
-// Definição do Departamento
+// Payload para criação (sem ID, img e data de criação)
+export interface NewEmployeePayload {
+  nome: string;
+  email: string;
+  status: boolean;
+  departamento: string; 
+  role: string;
+  seniority: string;
+  admissionDate: string;
+  managerId: string;
+  salary: string;
+}
+
+// Definição Central de Departamento
 export interface Department {
   id: string;
   name: string;
-  managerId: string | null; // ID do Colaborador que é o Gestor
-  description?: string;
-  // A lista de colaboradores não fica salva aqui no banco para evitar duplicidade.
-  // Sera calculado filtrando os employees pelo departmentId.
+  description: string;
+  managerId: string | null; 
 }

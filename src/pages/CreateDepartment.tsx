@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'; 
+import { useState, useEffect } from 'react';
 import { Box, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +10,10 @@ import { OnboardingProgress } from '../components/common/OnboardingProgress';
 import { DepartmentForm } from '../components/departments/DepartmentForm';
 import { DepartmentManagerStep } from '../components/departments/DepartmentManagerStep';
 import { departmentService } from '../services/departmentService';
-import { getAllEmployees, type IEmployee } from '../services/employeeService'; 
+// CORREÇÃO: Importar apenas a função, sem o tipo antigo
+import { getAllEmployees } from '../services/employeeService'; 
+// CORREÇÃO: Importar Employee do arquivo de types
+import type { Employee } from '../types'; 
 import { useDepartmentForm } from '../hooks/useDepartmentForm'; 
 
 export const CreateDepartment = () => {
@@ -18,13 +21,12 @@ export const CreateDepartment = () => {
   const [activeStep, setActiveStep] = useState(0); 
   const [loading, setLoading] = useState(false);
   
-  // NOVO: Estado para armazenar os funcionários carregados
-  const [employees, setEmployees] = useState<IEmployee[]>([]);
+  // CORREÇÃO: Tipagem correta do estado
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [loadingEmployees, setLoadingEmployees] = useState(false);
 
   const { formData, errors, handleChange, validateStep } = useDepartmentForm();
 
-  //Busca funcionários assim que o componente monta
   useEffect(() => {
     const fetchEmployees = async () => {
         setLoadingEmployees(true);
@@ -32,7 +34,7 @@ export const CreateDepartment = () => {
             const data = await getAllEmployees();
             setEmployees(data);
         } catch (error) {
-            console.error("Erro ao buscar funcionários para seleção de gestor:", error);
+            console.error("Erro ao buscar funcionários:", error);
         } finally {
             setLoadingEmployees(false);
         }
@@ -102,9 +104,10 @@ export const CreateDepartment = () => {
           <DepartmentManagerStep 
             value={formData.managerId}
             error={errors.managerId} 
-            onChange={(id) => handleChange('managerId', id)}
-            employees={employees}      
-            loading={loadingEmployees} 
+            // CORREÇÃO: Tipagem explícita para resolver erro de "implicit any"
+            onChange={(id: string | null) => handleChange('managerId', id)}
+            employees={employees}
+            loading={loadingEmployees}
           />
         );
       case 2:
@@ -113,14 +116,10 @@ export const CreateDepartment = () => {
                 <Typography 
                     component="h2"
                     variant="h4" 
-                    sx={{ 
-                        mb: '31px',
-                        color: 'text.secondary' 
-                    }}
+                    sx={{ mb: '31px', color: 'text.secondary' }}
                 >
                     Colaboradores
                 </Typography>
-                
                 <Box 
                   sx={{ 
                       p: 4, 
@@ -144,7 +143,6 @@ export const CreateDepartment = () => {
   return (
     <Box>
       <Box sx={{ width: '100%', maxWidth: '100%', mx: 'auto', pr: { xs: 0, lg: '5%' } }}>
-        
         <Box sx={{ mb: 2 }}>
           <AppBreadcrumbs
             items={[
@@ -156,66 +154,22 @@ export const CreateDepartment = () => {
 
         <OnboardingProgress progress={progressValue} />
 
-        <Box
-          sx={{
-            mt: '39px',
-            display: 'flex',
-            flexDirection: { xs: 'column', md: 'row' },
-            gap: '40px',
-            alignItems: 'flex-start',
-          }}
-        >
+        <Box sx={{ mt: '39px', display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: '40px', alignItems: 'flex-start' }}>
           <Box sx={{ width: { xs: '100%', md: '153px' }, flexShrink: 0 }}>
              <StepperVertical currentStep={activeStep + 1} steps={steps} />
           </Box>
 
-          <Box 
-            sx={{ 
-                width: '100%', 
-                display: 'flex', 
-                flexDirection: 'column', 
-                minHeight: '440px' 
-            }}
-          >
-             
-             <Box>
-                {renderStepContent()}
-             </Box>
+          <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', minHeight: '440px' }}>
+             <Box>{renderStepContent()}</Box>
 
-             <Box 
-                sx={{ 
-                    mt: 'auto', 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center',
-                    height: '48px',
-                    width: '100%',
-                    pt: 4
-                }}
-             >
+             <Box sx={{ mt: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '48px', width: '100%', pt: 4 }}>
                 {activeStep > 0 ? (
                   <AppButton 
                     onClick={handleBack}
                     variant="text"
                     disableRipple
                     disabled={loading}
-                    sx={{
-                      width: '64px', height: '48px', minWidth: '64px',
-                      boxShadow: 'none',
-                      pl: 0, 
-                      justifyContent: 'flex-start',                  
-                      color: 'text.primary',                 
-                      '&:hover': { 
-                          backgroundColor: 'transparent', 
-                          boxShadow: 'none', 
-                          color: 'text.secondary', 
-                      },
-                      '&.Mui-disabled': {
-                        color: (theme) => alpha(theme.palette.grey[500], 0.8),
-                      },
-                      '&:focus': { backgroundColor: 'transparent' },
-                      '&:active': { backgroundColor: 'transparent' }
-                    }}
+                    sx={{ width: '64px', height: '48px', minWidth: '64px', boxShadow: 'none', pl: 0, justifyContent: 'flex-start', color: 'text.primary', '&:hover': { backgroundColor: 'transparent', boxShadow: 'none', color: 'text.secondary' }, '&.Mui-disabled': { color: (theme) => alpha(theme.palette.grey[500], 0.8) }, '&:focus': { backgroundColor: 'transparent' }, '&:active': { backgroundColor: 'transparent' } }}
                   >
                     Voltar
                   </AppButton>
@@ -225,20 +179,7 @@ export const CreateDepartment = () => {
                     variant="text"
                     disableRipple
                     disabled={loading}
-                    sx={{
-                      width: '64px', height: '48px', minWidth: '64px',
-                      boxShadow: 'none',
-                      pl: 0, 
-                      justifyContent: 'flex-start',                  
-                      color: 'text.primary',                 
-                      '&:hover': { 
-                          backgroundColor: 'transparent', 
-                          boxShadow: 'none', 
-                          color: 'text.secondary', 
-                      },
-                      '&:focus': { backgroundColor: 'transparent' },
-                      '&:active': { backgroundColor: 'transparent' }
-                    }}
+                    sx={{ width: '64px', height: '48px', minWidth: '64px', boxShadow: 'none', pl: 0, justifyContent: 'flex-start', color: 'text.primary', '&:hover': { backgroundColor: 'transparent', boxShadow: 'none', color: 'text.secondary' }, '&:focus': { backgroundColor: 'transparent' }, '&:active': { backgroundColor: 'transparent' } }}
                   >
                     Cancelar
                   </AppButton>
@@ -247,16 +188,12 @@ export const CreateDepartment = () => {
                 <AppButton 
                   onClick={handleNext}
                   loading={loading}
-                  sx={{
-                    width: '91px', height: '48px', minWidth: '64px',
-                    fontWeight: 700, borderRadius: '8px',
-                  }}
+                  sx={{ width: '91px', height: '48px', minWidth: '64px', fontWeight: 700, borderRadius: '8px' }}
                 >
                   {activeStep === steps.length - 1 ? 'Salvar' : 'Próximo'}
                 </AppButton>
              </Box>
           </Box>
-
         </Box>
       </Box>
     </Box>

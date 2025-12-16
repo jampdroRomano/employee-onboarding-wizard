@@ -9,42 +9,10 @@ import {
   getDocs,
   orderBy
 } from "firebase/firestore";
+import { AVATARS } from "../utils/constants"; 
+import type { Employee, NewEmployeePayload } from "../types"; 
 
-const AVATARS = [
-  '/avatars/avatar1.png', 
-  '/avatars/avatar2.png',
-  '/avatars/avatar3.png',
-  '/avatars/avatar4.png',
-];
-
-export interface IEmployee {
-  id: string;
-  nome: string;
-  email: string;
-  departamento: string;
-  status: boolean | string;
-  img: string;
-  role?: string;
-  seniority?: string;
-  admissionDate?: string;
-  managerId?: string;
-  salary?: string;
-}
-
-// Interface para escrita (o que o formulário envia)
-interface NewEmployeeData {
-  nome: string;
-  email: string;
-  status: boolean;
-  departamento: string; 
-  role: string;
-  seniority: string;
-  admissionDate: string;
-  managerId: string;
-  salary: string;
-}
-
-export const getAllEmployees = async (): Promise<IEmployee[]> => {
+export const getAllEmployees = async (): Promise<Employee[]> => {
   try {
     const employeesRef = collection(db, "employees");
     const q = query(employeesRef, orderBy("nome", "asc")); 
@@ -54,7 +22,7 @@ export const getAllEmployees = async (): Promise<IEmployee[]> => {
     return querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
-    } as IEmployee));
+    } as Employee));
   } catch (error) {
     console.error("Erro ao buscar colaboradores:", error);
     return [];
@@ -68,7 +36,7 @@ export const checkEmailExists = async (email: string) => {
   return !querySnapshot.empty; 
 };
 
-export const createEmployee = async (data: NewEmployeeData) => {
+export const createEmployee = async (data: NewEmployeePayload) => {
   const employeesRef = collection(db, "employees");
 
   try {
@@ -77,12 +45,10 @@ export const createEmployee = async (data: NewEmployeeData) => {
       throw new Error("Este e-mail já está cadastrado no sistema.");
     }
 
-    // Gera um avatar aleatório baseado na contagem 
     const snapshot = await getCountFromServer(employeesRef);
     const count = snapshot.data().count;
     const avatarUrl = AVATARS[count % AVATARS.length];
 
-    // Salva o objeto completo no Firestore
     await addDoc(employeesRef, {
       nome: data.nome,
       email: data.email,

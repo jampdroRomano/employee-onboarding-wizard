@@ -20,30 +20,15 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 
-// Service e Tipos
+// Services
 import { departmentService } from '../../services/departmentService';
-import type { Department } from '../../services/departmentService';
+import type { Employee, Department } from '../../types';
 
-interface Employee {
-  id: string;
-  nome: string;
-  email: string;
-  departamento: string; 
-  role?: string;        
-  seniority?: string;   
-  admissionDate?: string; 
-  managerId?: string;
-  salary?: string;
-  status: boolean | string;      
-  img: string;
-}
-
-// Definição das colunas mantendo a estrutura original de objetos
 const columns = [
-  { id: 'colaborador', label: 'Colaborador', width: '28%' },
-  { id: 'ocupacao', label: 'Ocupação', width: '22%' }, 
+  { id: 'colaborador', label: 'Colaborador', width: '30%' },
+  { id: 'ocupacao', label: 'Cargo & Dept.', width: '25%' },
   { id: 'detalhes', label: 'Nível & Admissão', width: '20%' }, 
-  { id: 'contrato', label: 'Gestão & Salário', width: '20%' }, 
+  { id: 'contrato', label: 'Gestão & Salário', width: '15%' }, 
   { id: 'status', label: 'Status', align: 'right' as const },
 ];
 
@@ -73,7 +58,7 @@ export const EmployeeTable = memo(() => {
   const [loadingEmps, setLoadingEmps] = useState(true);
 
   useEffect(() => {
-    // 1. Carrega Departamentos
+        // 1. Carrega Departamentos
     const loadDepartments = async () => {
       try {
         const data = await departmentService.getAll();
@@ -129,13 +114,13 @@ export const EmployeeTable = memo(() => {
     }, {} as Record<string, string>);
   }, [rows]);
 
-  // Helpers de exibição
+    // Helpers de exibição
   const getDepartmentName = (id: string) => {
     if (!id) return 'Não atribuído';
     return departmentsMap[id] || 'Desconhecido';
   };
 
-  const getManagerName = (id?: string) => {
+  const getManagerName = (id?: string | null) => {
     if (!id) return '-';
     return employeesMap[id] || 'Não encontrado';
   };
@@ -155,7 +140,7 @@ export const EmployeeTable = memo(() => {
   return (
     <Card>
       <TableContainer>
-        <Table sx={{ minWidth: 800 }}>
+        <Table sx={{ minWidth: 900 }}>
           <TableHead sx={{ bgcolor: '#F4F6F8' }}>
             <TableRow>
               {columns.map((col) => (
@@ -164,14 +149,9 @@ export const EmployeeTable = memo(() => {
                   align={col.align || 'left'} 
                   sx={{ width: col.width || 'auto', fontWeight: 600, color: 'text.secondary' }}
                 >
-                  <Stack 
-                    direction="row" 
-                    alignItems="center" 
-                    spacing={0.5} 
-                    justifyContent={col.align === 'right' ? 'flex-end' : 'flex-start'}
-                  >
+                  <Stack direction="row" alignItems="center" spacing={0.5} justifyContent={col.align === 'right' ? 'flex-end' : 'flex-start'}>
                     <span>{col.label}</span>
-                    <ArrowDownwardIcon sx={{ fontSize: 16, opacity: 0.5 }} />
+                    {col.id === 'colaborador' && <ArrowDownwardIcon sx={{ fontSize: 16, opacity: 0.5 }} />}
                   </Stack>
                 </TableCell>
               ))}
@@ -190,8 +170,7 @@ export const EmployeeTable = memo(() => {
             ) : (
                 rows.map((row) => (
                 <TableRow key={row.id} hover>
-                    
-                    {/* 1. Colaborador: Avatar + Nome + Email */}
+                  {/* 1. Colaborador: Avatar + Nome + Email */}
                     <TableCell>
                       <Stack direction="row" alignItems="center" spacing={2}>
                           <Avatar src={row.img} alt={row.nome} />
@@ -212,7 +191,7 @@ export const EmployeeTable = memo(() => {
                         <Typography variant="subtitle2" color="text.primary" noWrap>
                             {row.role || 'Sem cargo'}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary" noWrap sx={{ fontSize: '0.80rem' }}>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
                             {getDepartmentName(row.departamento)}
                         </Typography>
                       </Box>
@@ -221,7 +200,7 @@ export const EmployeeTable = memo(() => {
                     {/* 3. Detalhes: Senioridade + Data Admissão */}
                     <TableCell>
                        <Box>
-                            <Typography variant="subtitle2" color="text.primary" sx={{ fontSize: '0.875rem' }}>
+                            <Typography variant="subtitle2" sx={{ color: 'text.primary', fontSize: '0.85rem' }}>
                                 {row.seniority || '-'}
                             </Typography>
                             <Typography variant="caption" color="text.secondary">
@@ -233,7 +212,7 @@ export const EmployeeTable = memo(() => {
                     {/* 4. Contrato: Gestor + Salário */}
                     <TableCell>
                         <Box>
-                            <Typography variant="body2" color="text.primary" noWrap>
+                            <Typography variant="body2" color="text.primary" sx={{ fontSize: '0.875rem' }}>
                                 {getManagerName(row.managerId)}
                             </Typography>
                             <Typography variant="caption" color="text.secondary" fontWeight={500}>
@@ -242,7 +221,7 @@ export const EmployeeTable = memo(() => {
                         </Box>
                     </TableCell>
                     
-                    {/* 5. Status: Chip */}
+                    {/* 5. Status: Chip Ativo/Inativo */}
                     <TableCell align="right">
                       <Chip 
                           label={isStatusActive(row.status) ? 'Ativo' : 'Inativo'} 
@@ -250,6 +229,7 @@ export const EmployeeTable = memo(() => {
                           sx={{
                             fontWeight: 700,
                             borderRadius: '6px',
+                            height: '24px',
                             bgcolor: isStatusActive(row.status) ? 'rgba(34, 197, 94, 0.16)' : 'rgba(255, 86, 48, 0.16)',
                             color: isStatusActive(row.status) ? '#118D57' : '#B71D18',
                           }}
