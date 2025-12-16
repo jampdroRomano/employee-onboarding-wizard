@@ -30,7 +30,8 @@ export const StickyActionMenuItem = ({ onClick, icon }: StickyActionMenuItemProp
             <Box
                 sx={{
                     width: '100%',
-                    height: '28px',
+                    minHeight: { xs: '48px', md: '36px' }, 
+                    p: { xs: 1, md: 0.5 },
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -43,7 +44,9 @@ export const StickyActionMenuItem = ({ onClick, icon }: StickyActionMenuItemProp
                     },
                 }}
             >
-                {icon || <AddIcon />}
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', '& .MuiSvgIcon-root': { fontSize: { xs: '1.5rem', md: '1.25rem' } } }}>
+                    {icon || <AddIcon />}
+                </Box>
             </Box>
         </MenuItem>
     );

@@ -5,9 +5,9 @@ import { useState } from 'react';
 import { AppBreadcrumbs } from '../components/common/AppBreadcrumbs';
 import { OnboardingProgress } from '../components/common/OnboardingProgress';
 import { StepperVertical } from '../components/common/StepperVertical';
-import { BasicInfoForm } from '../components/onboarding/BasicInfoForm';
-import { ProfessionalInfoForm } from '../components/onboarding/ProfessionalInfoForm';
-import { ContractInfoForm } from '../components/onboarding/ContractInfoForm';
+import { BasicInfoForm } from '../components/collaborators/BasicInfoForm';
+import { ProfessionalInfoForm } from '../components/collaborators/ProfessionalInfoForm';
+import { ContractInfoForm } from '../components/collaborators/ContractInfoForm';
 import { AppButton } from '../components/common/AppButton';
 import { useBasicInfo } from '../hooks/useBasicInfo';
 import { useProfessionalInfo } from '../hooks/useProfessionalInfo';
@@ -20,8 +20,8 @@ export const CreateEmployee = () => {
   const [isValidating, setIsValidating] = useState(false);
 
   const steps = [
-    "Infos Básicas", 
-    "Infos Profissionais", 
+    "Infos Básicas",
+    "Infos Profissionais",
     "Infos Contratuais"
   ];
 
@@ -43,11 +43,11 @@ export const CreateEmployee = () => {
         }
       }
       return;
-    } 
-    
+    }
+
     // --- LÓGICA DO PASSO 2 ---
     if (currentStep === 2) {
-      const isValid = profInfo.validateStep2(); 
+      const isValid = profInfo.validateStep2();
       if (isValid) {
         setCurrentStep(3);
       }
@@ -57,18 +57,18 @@ export const CreateEmployee = () => {
     // --- LÓGICA DO PASSO 3 (SALVAR) ---
     if (currentStep === 3) {
       const isValid = profInfo.validateStep3();
-      
+
       if (isValid) {
         setIsSaving(true);
-        
+
         const payload = {
           ...basicInfo.formData,
-          ...profInfo.formData, 
-          departamento: profInfo.formData.department 
+          ...profInfo.formData,
+          departamento: profInfo.formData.department
         };
 
         try {
-          await createEmployee(payload); 
+          await createEmployee(payload);
           navigate('/');
         } catch (error: any) {
           console.error("Erro ao salvar funcionário:", error);
@@ -117,12 +117,12 @@ export const CreateEmployee = () => {
                   handleStatusChange={basicInfo.handleStatusChange}
                 />
               )}
-              
+
               {currentStep === 2 && (
                 <ProfessionalInfoForm
                   formData={profInfo.formData}
-                  departmentList={profInfo.departmentList} 
-                  isLoading={profInfo.isLoading} 
+                  departmentList={profInfo.departmentList}
+                  isLoading={profInfo.isLoading}
                   errors={profInfo.errors}
                   handleChange={profInfo.handleChange}
                 />
@@ -130,11 +130,11 @@ export const CreateEmployee = () => {
 
               {currentStep === 3 && (
                 <ContractInfoForm
-                    formData={profInfo.formData}
-                    employeesList={profInfo.employeesList}
-                    isLoading={profInfo.isLoading}
-                    errors={profInfo.errors}
-                    handleChange={profInfo.handleChange}
+                  formData={profInfo.formData}
+                  employeesList={profInfo.employeesList}
+                  isLoading={profInfo.isLoading}
+                  errors={profInfo.errors}
+                  handleChange={profInfo.handleChange}
                 />
               )}
             </Box>

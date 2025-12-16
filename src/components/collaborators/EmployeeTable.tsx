@@ -151,7 +151,7 @@ export const EmployeeTable = memo(() => {
                 >
                   <Stack direction="row" alignItems="center" spacing={0.5} justifyContent={col.align === 'right' ? 'flex-end' : 'flex-start'}>
                     <span>{col.label}</span>
-                    {col.id === 'colaborador' && <ArrowDownwardIcon sx={{ fontSize: 16, opacity: 0.5 }} />}
+                    <ArrowDownwardIcon sx={{ fontSize: 16, opacity: 0.5 }} />
                   </Stack>
                 </TableCell>
               ))}

@@ -9,8 +9,10 @@ import {
   TableRow, 
   Typography, 
   CircularProgress,
-  Box
+  Box,
+  Stack
 } from '@mui/material';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { departmentService } from '../../services/departmentService';
 import { getAllEmployees } from '../../services/employeeService';
 import type { Department } from '../../types'; 
@@ -78,7 +80,15 @@ export const DepartmentTable = () => {
                   align={col.align || 'left'} 
                   sx={{ width: col.width || 'auto', fontWeight: 600, color: 'text.secondary' }}
                 >
-                  {col.label}
+                  <Stack 
+                    direction="row" 
+                    alignItems="center" 
+                    spacing={0.5} 
+                    justifyContent={col.align === 'center' ? 'center' : 'flex-start'}
+                  >
+                    <span>{col.label}</span>
+                    <ArrowDownwardIcon sx={{ fontSize: 16, opacity: 0.5 }} />
+                  </Stack>
                 </TableCell>
               ))}
             </TableRow>
