@@ -122,12 +122,12 @@ export const EmployeeTable = memo(() => {
 
   // --- COLUNAS ---
   const columns: TableColumn[] = [
-    { id: 'colaborador', label: 'Colaborador', width: '30%' },
+    { id: 'colaborador', label: 'Colaborador', width: '25%' },
     { id: 'ocupacao', label: 'Cargo & Dept.', width: '25%' },
     { id: 'detalhes', label: 'Nível & Admissão', width: '20%' }, 
-    { id: 'contrato', label: 'Gestão & Salário', width: '15%' }, 
+    { id: 'contrato', label: 'Gestão & Salário', width: '20%' }, 
     { id: 'status', label: 'Status', align: 'left' },
-    { id: 'actions', label: '', width: 50, align: 'right', disableSort: true}
+    { id: 'actions', label: '', disableSort: true}
   ];
 
   // --- EFEITOS (CARREGAMENTO DE DADOS) ---
