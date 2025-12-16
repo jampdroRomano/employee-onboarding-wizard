@@ -1,27 +1,21 @@
 import { useEffect, useState } from 'react';
 import { 
-  Card, 
-  Table, 
-  TableBody, 
   TableCell, 
-  TableContainer, 
-  TableHead, 
   TableRow, 
-  Typography, 
-  CircularProgress,
-  Box,
-  Stack
+  Typography
 } from '@mui/material';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { departmentService } from '../../services/departmentService';
 import { getAllEmployees } from '../../services/employeeService';
 import type { Department } from '../../types'; 
 
-const columns = [
+import { GenericTable } from '../common/GenericTable';
+import type { TableColumn } from '../common/GenericTable';
+
+const columns: TableColumn[] = [
   { id: 'name', label: 'Nome', width: '30%' },
   { id: 'description', label: 'Descrição', width: '40%' },
   { id: 'manager', label: 'Gestor Responsável' },
-  { id: 'employees', label: 'Colaboradores', align: 'center' as const },
+  { id: 'employees', label: 'Colaboradores', align: 'center' },
 ];
 
 export const DepartmentTable = () => {
@@ -60,86 +54,45 @@ export const DepartmentTable = () => {
     loadData();
   }, []);
 
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
   return (
-    <Card>
-      <TableContainer>
-        <Table sx={{ minWidth: 800 }}>
-          <TableHead sx={{ bgcolor: '#F4F6F8' }}>
-            <TableRow>
-              {columns.map((col) => (
-                <TableCell 
-                  key={col.id} 
-                  align={col.align || 'left'} 
-                  sx={{ width: col.width || 'auto', fontWeight: 600, color: 'text.secondary' }}
-                >
-                  <Stack 
-                    direction="row" 
-                    alignItems="center" 
-                    spacing={0.5} 
-                    justifyContent={col.align === 'center' ? 'center' : 'flex-start'}
-                  >
-                    <span>{col.label}</span>
-                    <ArrowDownwardIcon sx={{ fontSize: 16, opacity: 0.5 }} />
-                  </Stack>
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {rows.length === 0 ? (
-                <TableRow>
-                    <TableCell colSpan={4} align="center" sx={{ py: 3 }}>
-                        <Typography variant="body1" color="text.secondary">
-                            Nenhum departamento cadastrado.
-                        </Typography>
-                    </TableCell>
-                </TableRow>
-            ) : (
-                rows.map((row) => (
-                <TableRow key={row.id} hover>
-                    <TableCell>
-                        <Typography variant="subtitle2" color="text.primary">
-                            {row.name}
-                        </Typography>
-                    </TableCell>
-                    
-                    <TableCell>
-                        <Typography variant="body2" color="text.secondary" sx={{ 
-                            display: '-webkit-box',
-                            overflow: 'hidden',
-                            WebkitBoxOrient: 'vertical',
-                            WebkitLineClamp: 2, 
-                        }}>
-                            {row.description || '-'}
-                        </Typography>
-                    </TableCell>
-                    
-                    <TableCell>
-                        <Typography variant="body2" color={row.managerId ? 'text.primary' : 'text.disabled'}>
-                            {row.managerId ? 'Definido' : 'Não atribuído'} 
-                        </Typography>
-                    </TableCell>
-                    
-                    <TableCell align="center">
-                        <Typography variant="body2">
-                            {employeeCounts[row.id] || 0}
-                        </Typography>
-                    </TableCell>
-                </TableRow>
-                ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Card>
+    <GenericTable<Department>
+      columns={columns}
+      rows={rows}
+      isLoading={loading}
+      emptyMessage="Nenhum departamento cadastrado."
+      minWidth={800}
+      renderRow={(row) => (
+        <TableRow key={row.id} hover>
+            <TableCell>
+                <Typography variant="subtitle2" color="text.primary">
+                    {row.name}
+                </Typography>
+            </TableCell>
+            
+            <TableCell>
+                <Typography variant="body2" color="text.secondary" sx={{ 
+                    display: '-webkit-box',
+                    overflow: 'hidden',
+                    WebkitBoxOrient: 'vertical',
+                    WebkitLineClamp: 2, 
+                }}>
+                    {row.description || '-'}
+                </Typography>
+            </TableCell>
+            
+            <TableCell>
+                <Typography variant="body2" color={row.managerId ? 'text.primary' : 'text.disabled'}>
+                    {row.managerId ? 'Definido' : 'Não atribuído'} 
+                </Typography>
+            </TableCell>
+            
+            <TableCell align="center">
+                <Typography variant="body2">
+                    {employeeCounts[row.id] || 0}
+                </Typography>
+            </TableCell>
+        </TableRow>
+      )}
+    />
   );
 };
