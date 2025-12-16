@@ -28,6 +28,7 @@ interface GenericTableProps<T> {
   emptyMessage?: string;
   renderRow: (row: T) => ReactNode;
   minWidth?: number;
+  filters?: ReactNode; 
 }
 
 export const GenericTable = <T,>({ 
@@ -36,7 +37,8 @@ export const GenericTable = <T,>({
   isLoading, 
   emptyMessage = "Nenhum registro encontrado.",
   renderRow,
-  minWidth = 900
+  minWidth = 900,
+  filters 
 }: GenericTableProps<T>) => {
 
   if (isLoading) {
@@ -49,7 +51,19 @@ export const GenericTable = <T,>({
 
   return (
     <Card>
-      <TableContainer>
+      <TableContainer
+         sx={{
+    border: '2px solid #F4F6F8',
+    borderRadius: 2
+  }}
+      >
+        {/* --- ÁREA DE FILTROS CUSTOMIZÁVEIS --- */}
+        {filters && (
+          <Box sx={{ p: 2, bgcolor: 'background.pape' }}>
+            {filters}
+          </Box>
+        )}
+
         <Table sx={{ minWidth: minWidth }}>
           <TableHead sx={{ bgcolor: '#F4F6F8' }}>
             <TableRow>

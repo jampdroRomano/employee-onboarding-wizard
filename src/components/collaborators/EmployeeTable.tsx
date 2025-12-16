@@ -6,21 +6,28 @@ import {
   Avatar, 
   Chip, 
   Stack,
-  Box
+  Box,
+  TextField,
+  MenuItem,
+  IconButton,
+  Tooltip
 } from '@mui/material';
 
-// Firebase
+// Ícones
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+
+// Firebase e Services
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../../config/firebase';
-
-// Services
 import { departmentService } from '../../services/departmentService';
 import type { Employee, Department } from '../../types';
 
+// Componentes Comuns
 import { GenericTable } from '../common/GenericTable';
+import { TableToolbar } from '../common/TableToolbar'; // Certifique-se de ter criado este arquivo em common
 import type { TableColumn } from '../common/GenericTable';
 
-// Helper: Formata Moeda
+// --- HELPERS (Moeda e Data) ---
 const formatCurrency = (value?: string | number) => {
   if (!value) return '-';
   const num = typeof value === 'string' ? parseFloat(value) : value;
@@ -28,7 +35,6 @@ const formatCurrency = (value?: string | number) => {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(num);
 };
 
-// Helper: Formata Data (YYYY-MM-DD para DD/MM/AAAA)
 const formatDate = (dateString?: string) => {
   if (!dateString) return '-';
   try {
@@ -44,6 +50,8 @@ export const EmployeeTable = memo(() => {
   const [departments, setDepartments] = useState<Department[]>([]); 
   const [loadingDepts, setLoadingDepts] = useState(true);
   const [loadingEmps, setLoadingEmps] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterDept, setFilterDept] = useState('todos');
 
   const columns: TableColumn[] = [
     { id: 'colaborador', label: 'Colaborador', width: '30%' },
@@ -53,8 +61,9 @@ export const EmployeeTable = memo(() => {
     { id: 'status', label: 'Status', align: 'right' },
   ];
 
+  // --- 1. CARREGAMENTO DE DADOS ---
   useEffect(() => {
-        // 1. Carrega Departamentos
+    // Carrega Departamentos (para o filtro e labels)
     const loadDepartments = async () => {
       try {
         const data = await departmentService.getAll();
@@ -67,9 +76,8 @@ export const EmployeeTable = memo(() => {
     };
     loadDepartments();
 
-    // 2. Ouve os funcionários em tempo real
+    // Ouve Funcionários em Tempo Real (Firebase)
     const q = query(collection(db, "employees"), orderBy("createdAt", "desc"));
-    
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const employees = snapshot.docs.map(doc => {
         const data = doc.data();
@@ -95,7 +103,7 @@ export const EmployeeTable = memo(() => {
     return () => unsubscribe();
   }, []);
 
-  // Mapas para tradução rápida de IDs
+  // --- 2. MAPAS DE DADOS ---
   const departmentsMap = useMemo(() => {
     return departments.reduce((acc, dept) => {
       acc[dept.id] = dept.name;
@@ -110,12 +118,23 @@ export const EmployeeTable = memo(() => {
     }, {} as Record<string, string>);
   }, [rows]);
 
-    // Helpers de exibição
-  const getDepartmentName = (id: string) => {
-    if (!id) return 'Não atribuído';
-    return departmentsMap[id] || 'Desconhecido';
-  };
+  // --- 3. LÓGICA DE FILTRAGEM ---
+  const filteredRows = useMemo(() => {
+    return rows.filter((row) => {
+      // Filtro de Texto (Nome ou Email)
+      const s = searchTerm.toLowerCase();
+      const matchText = 
+        row.nome.toLowerCase().includes(s) || 
+        row.email.toLowerCase().includes(s);
+      // Filtro de Departamento
+      const matchDept = filterDept === 'todos' || row.departamento === filterDept;
+      return matchText && matchDept;
+    });
+  }, [rows, searchTerm, filterDept]);
 
+  // --- Helpers de Exibição ---
+  const getDepartmentName = (id: string) => departmentsMap[id] || 'Não atribuído';
+  
   const getManagerName = (id?: string | null) => {
     if (!id) return '-';
     return employeesMap[id] || 'Não encontrado';
@@ -128,10 +147,47 @@ export const EmployeeTable = memo(() => {
   return (
     <GenericTable<Employee>
       columns={columns}
-      rows={rows}
+      rows={filteredRows} // Passamos a lista filtrada
       isLoading={loadingDepts || loadingEmps}
       emptyMessage="Nenhum colaborador encontrado."
-      minWidth={900}
+      
+      // --- INJEÇÃO DA BARRA DE FERRAMENTAS ---
+      filters={
+        <TableToolbar
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          placeholder="Buscar por nome ou e-mail..."
+        >
+          {/* Conteúdo Específico (Lado Direito da Toolbar) */}
+          
+          {/* 1. Dropdown de Departamentos */}
+          <TextField
+            select
+            size="small"
+            value={filterDept}
+            onChange={(e) => setFilterDept(e.target.value)}
+            sx={{ minWidth: '200px' }}
+          >
+            <MenuItem value="todos">Todos Departamentos</MenuItem>
+            {departments.map((dept) => (
+              <MenuItem key={dept.id} value={dept.id}>
+                {dept.name}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          {/* 2. Botão de Ação (Excluir) */}
+          <Tooltip title="Excluir selecionados">
+            <IconButton 
+              onClick={() => console.log('Ação de excluir (Visual)')} 
+              color="error"
+            >
+              <DeleteOutlineIcon />
+            </IconButton>
+          </Tooltip>
+        </TableToolbar>
+      }
+
       renderRow={(row) => (
         <TableRow key={row.id} hover>
             {/* 1. Colaborador: Avatar + Nome + Email */}
@@ -149,7 +205,7 @@ export const EmployeeTable = memo(() => {
               </Stack>
             </TableCell>
             
-            {/* 2. Ocupação: Cargo (negrito) + Departamento (cinza) */}
+            {/* 2. Ocupação: Cargo + Dept */}
             <TableCell>
               <Box>
                 <Typography variant="subtitle2" color="text.primary" noWrap>
@@ -161,7 +217,7 @@ export const EmployeeTable = memo(() => {
               </Box>
             </TableCell>
 
-            {/* 3. Detalhes: Senioridade + Data Admissão */}
+            {/* 3. Detalhes: Nível + Admissão */}
             <TableCell>
                <Box>
                     <Typography variant="subtitle2" sx={{ color: 'text.primary', fontSize: '0.85rem' }}>
@@ -185,7 +241,7 @@ export const EmployeeTable = memo(() => {
                 </Box>
             </TableCell>
             
-            {/* 5. Status: Chip Ativo/Inativo */}
+            {/* 5. Status */}
             <TableCell align="right">
               <Chip 
                   label={isStatusActive(row.status) ? 'Ativo' : 'Inativo'} 
