@@ -10,15 +10,9 @@ import {
   orderBy
 } from 'firebase/firestore';
 import { db } from '../config/firebase'; 
+import type { Department } from '../types'; 
 
 const DEPARTMENT_COLLECTION = 'departments';
-
-export interface Department {
-  id: string;
-  name: string;
-  description: string;
-  managerId: string | null;
-}
 
 let departmentsCache: Department[] | null = null;
 

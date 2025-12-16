@@ -1,11 +1,11 @@
 import { Box, Typography, MenuItem, CircularProgress, Stack, InputAdornment } from '@mui/material';
 import { AppTextField } from '../common/AppTextField';
-import type { IEmployee } from '../../services/employeeService';
+import type { Employee } from '../../types';
 import type { ProfessionalData } from '../../hooks/useProfessionalInfo';
 
 interface ContractInfoFormProps {
   formData: ProfessionalData;
-  employeesList: IEmployee[];
+  employeesList: Employee[]; 
   isLoading: boolean;
   errors: Partial<ProfessionalData>;
   handleChange: (field: keyof ProfessionalData, value: string) => void;
@@ -22,7 +22,6 @@ export const ContractInfoForm = ({
   const isManager = formData.seniority === 'Gestor';
   const managerLabel = isManager ? "Reporta a (Superior Imediato)" : "Gestor Responsável";
   const managerPlaceholder = isManager ? "Selecione a diretoria/superior" : "Selecione o gestor";
-  const availableManagers = employeesList;
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -35,12 +34,10 @@ export const ContractInfoForm = ({
       </Typography>
 
       <Stack spacing={3} sx={{ width: '100%' }}> 
-        
-        {/* 1. Gestor Responsável (Select) */}
         <AppTextField 
             select
             fullWidth
-            label={managerLabel} 
+            label={managerLabel}
             placeholder={managerPlaceholder}
             value={formData.managerId}
             onChange={(e) => handleChange('managerId', e.target.value)}
@@ -52,7 +49,6 @@ export const ContractInfoForm = ({
                renderValue: (selected: any) => {
                   if (isLoading) return <span style={{ color: '#919EAB' }}>Carregando...</span>;
                   if (!selected) return <span style={{ color: '#919EAB' }}>{managerPlaceholder}</span>;
-                  
                   const selectedEmp = employeesList.find(e => e.id === selected);
                   return selectedEmp ? selectedEmp.nome : selected;
                }
@@ -64,10 +60,10 @@ export const ContractInfoForm = ({
                         <CircularProgress size={20} /> Carregando...
                     </Box>
                 </MenuItem>
-            ) : availableManagers.length === 0 ? (
+            ) : employeesList.length === 0 ? (
                 <MenuItem disabled>Nenhum colaborador disponível</MenuItem>
             ) : (
-                availableManagers.map((emp) => (
+                employeesList.map((emp) => (
                     <MenuItem key={emp.id} value={emp.id}>
                         {emp.nome} {emp.seniority === 'Gestor' ? '(Gestor)' : ''}
                     </MenuItem>
@@ -75,7 +71,6 @@ export const ContractInfoForm = ({
             )}
         </AppTextField>
 
-        {/* 2. Salário Base */}
         <AppTextField
           label="Salário Base"
           placeholder="0,00"
@@ -88,7 +83,6 @@ export const ContractInfoForm = ({
             startAdornment: <InputAdornment position="start">R$</InputAdornment>,
           }}
         />
-
       </Stack>
     </Box>
   );

@@ -1,8 +1,8 @@
+// src/hooks/useProfessionalInfo.ts
 import { useState, useEffect } from 'react';
 import { departmentService } from '../services/departmentService';
 import { getAllEmployees } from '../services/employeeService';
-import type { Department } from '../services/departmentService';
-import type { IEmployee } from '../services/employeeService'; 
+import type { Department, Employee } from '../types';
 
 export interface ProfessionalData {
   department: string;
@@ -24,7 +24,7 @@ export const useProfessionalInfo = () => {
   });
 
   const [departmentList, setDepartmentList] = useState<Department[]>([]);
-  const [employeesList, setEmployeesList] = useState<IEmployee[]>([]); 
+  const [employeesList, setEmployeesList] = useState<Employee[]>([]); 
   const [isLoading, setIsLoading] = useState(false); 
   const [errors, setErrors] = useState<Partial<ProfessionalData>>({});
 

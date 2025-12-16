@@ -1,29 +1,31 @@
 import { Box, Typography, MenuItem, CircularProgress, Stack } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { AppTextField } from '../common/AppTextField';
-import type { Department } from '../../services/departmentService'; 
+import { StickyActionMenuItem } from '../common/StickyActionMenuItem';
+import type { Department } from '../../types';
 import type { ProfessionalData } from '../../hooks/useProfessionalInfo';
+import { SENIORITY_OPTIONS } from '../../utils/constants';
 
 interface ProfessionalInfoFormProps {
-  formData: ProfessionalData; 
+  formData: ProfessionalData;
   departmentList: Department[];
   isLoading: boolean;
-  errors: Partial<ProfessionalData>; 
-  handleChange: (field: keyof ProfessionalData, value: string) => void; 
+  errors: Partial<ProfessionalData>;
+  handleChange: (field: keyof ProfessionalData, value: string) => void;
 }
 
-const SENIORITY_OPTIONS = ['Júnior', 'Pleno', 'Sênior', 'Gestor'];
-
-export const ProfessionalInfoForm = ({ 
-  formData, 
-  departmentList, 
-  isLoading, 
-  errors, 
-  handleChange 
+export const ProfessionalInfoForm = ({
+  formData,
+  departmentList,
+  isLoading,
+  errors,
+  handleChange
 }: ProfessionalInfoFormProps) => {
+  const navigate = useNavigate();
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Typography 
+      <Typography
         component="h2"
         variant="h4"
         sx={{ mb: '31px', color: 'text.secondary' }}
@@ -31,47 +33,69 @@ export const ProfessionalInfoForm = ({
         Informações Profissionais
       </Typography>
 
-      <Stack spacing={3} sx={{ width: '100%' }}> 
-        
-        {/* 1. Departamento (Existente) */}
-        <AppTextField 
-            select
-            fullWidth
-            label="Departamento"
-            placeholder="Selecione um departamento"
-            value={formData.department}
-            onChange={(e) => handleChange('department', e.target.value)}
-            error={!!errors.department}
-            helperText={errors.department}
-            disabled={isLoading}
-            SelectProps={{
-               displayEmpty: true,
-               renderValue: (selected: any) => {
-                  if (isLoading) return <span style={{ color: '#919EAB' }}>Carregando...</span>;
-                  if (!selected) return <span style={{ color: '#919EAB' }}>Selecione um departamento</span>;
-                  const selectedDept = departmentList.find(d => d.id === selected);
-                  return selectedDept ? selectedDept.name : selected;
-               }
-            }}
+      <Stack spacing={3} sx={{ width: '100%' }}>
+
+        {/* Departamento */}
+        <AppTextField
+          select
+          fullWidth
+          label="Departamento"
+          placeholder="Selecione um departamento"
+          value={formData.department}
+          onChange={(e) => handleChange('department', e.target.value)}
+          error={!!errors.department}
+          helperText={errors.department}
+          disabled={isLoading}
+          SelectProps={{
+            displayEmpty: true,
+            renderValue: (selected: any) => {
+              if (isLoading) return <span style={{ color: '#919EAB' }}>Carregando...</span>;
+              if (!selected) return <span style={{ color: '#919EAB' }}>Selecione um departamento</span>;
+              const selectedDept = departmentList.find(d => d.id === selected);
+              return selectedDept ? selectedDept.name : selected;
+            },
+            MenuProps: {
+              disablePortal: true,
+              PaperProps: {
+                sx: {
+                  maxHeight: 300,
+                  '& .MuiList-root': { pb: 0 }
+                }
+              }
+            }
+          }}
         >
-            {isLoading ? (
-                <MenuItem disabled>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <CircularProgress size={20} /> Carregando...
-                    </Box>
+          {isLoading ? (
+            <MenuItem disabled>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <CircularProgress size={20} /> Carregando...
+              </Box>
+            </MenuItem>
+          ) : (
+            [
+              departmentList.length === 0 && (
+                <MenuItem key="empty" disabled value="">
+                  <Typography variant="body2" color="text.secondary">
+                    Nenhum departamento encontrado.
+                  </Typography>
                 </MenuItem>
-            ) : departmentList.length === 0 ? (
-                <MenuItem disabled>Nenhum departamento cadastrado</MenuItem>
-            ) : (
-                departmentList.map((dept) => (
-                    <MenuItem key={dept.id} value={dept.id}>
-                        {dept.name}
-                    </MenuItem>
-                ))
-            )}
+              ),
+
+              ...departmentList.map((dept) => (
+                <MenuItem key={dept.id} value={dept.id}>
+                  {dept.name}
+                </MenuItem>
+              )),
+
+              <StickyActionMenuItem
+                key="add-sticky"
+                onClick={() => navigate('/departamentos/criar')}
+              />
+            ]
+          )}
         </AppTextField>
 
-        {/* 2. Cargo (Novo - 100% width) */}
+        {/* 2. Cargo */}
         <AppTextField
           label="Cargo"
           placeholder="Ex: Desenvolvedor Front-end"
@@ -82,12 +106,9 @@ export const ProfessionalInfoForm = ({
           helperText={errors.role}
         />
 
-        {/* 3. Linha Dividida: Senioridade e Data */}
-        <Stack 
-          direction={{ xs: 'column', md: 'row' }} 
-          spacing={1.5} 
-          sx={{ width: '100%' }}
-        >
+        {/* 3. Senioridade e Data de Admissão */}
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ width: '100%' }}>
+
           {/* Senioridade */}
           <AppTextField
             select
@@ -97,18 +118,10 @@ export const ProfessionalInfoForm = ({
             onChange={(e) => handleChange('seniority', e.target.value)}
             error={!!errors.seniority}
             helperText={errors.seniority}
-            SelectProps={{
-                displayEmpty: true,
-                renderValue: (selected: any) => {
-                   if (!selected) return <span style={{ color: '#919EAB' }}>Selecione</span>;
-                   return selected;
-                }
-             }}
+            SelectProps={{ displayEmpty: true }}
           >
             {SENIORITY_OPTIONS.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
+              <MenuItem key={option} value={option}>{option}</MenuItem>
             ))}
           </AppTextField>
 
@@ -121,7 +134,7 @@ export const ProfessionalInfoForm = ({
             onChange={(e) => handleChange('admissionDate', e.target.value)}
             error={!!errors.admissionDate}
             helperText={errors.admissionDate}
-            InputLabelProps={{ shrink: true }} 
+            InputLabelProps={{ shrink: true }}
           />
         </Stack>
 
