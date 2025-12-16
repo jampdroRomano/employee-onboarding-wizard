@@ -7,6 +7,8 @@ import {
   query,
   where,
   getDocs,
+  doc,
+  deleteDoc,
   orderBy
 } from "firebase/firestore";
 import { AVATARS } from "../utils/constants"; 
@@ -67,5 +69,17 @@ export const createEmployee = async (data: NewEmployeePayload) => {
   } catch (error) {
     console.error("Erro ao criar funcionário:", error);
     throw error;
+  }
+};
+
+export const employeeService = {
+  delete: async (id: string) => {
+    const docRef = doc(db, 'employees', id);
+    await deleteDoc(docRef);
+  },
+
+  deleteMany: async (ids: string[]) => {
+    const deletePromises = ids.map(id => deleteDoc(doc(db, 'employees', id)));
+    await Promise.all(deletePromises);
   }
 };

@@ -3,24 +3,27 @@ import { ptBR } from '@mui/material/locale';
 
 // Definição das cores para reutilização
 const GREY = {
-  300: '#DFE3E8', // Usado no fundo inativo do Stepper
+  300: '#DFE3E8', 
   400: '#C4CDD5',
-  500: '#919EAB', // Usado em bordas e textos secundários
+  500: '#919EAB', 
 };
 
 const PRIMARY = {
-  main: '#22C55E', // Verde principal
+  main: '#22C55E', 
   contrastText: '#FFFFFF',
 };
 
+export const CHECKBOX_GREEN = '#00A76F';
+
+
 const TEXT = {
-  primary: '#212B36', // Preto/Cinza Escuro (Títulos e Labels ativos)
-  secondary: '#637381', // Cinza Texto (Subtítulos)
+  primary: '#212B36', 
+  secondary: '#637381', 
   disabled: '#919EAB',
 };
 
 const ERROR = {
-  main: '#FF5630', // Um vermelho padrão moderno
+  main: '#FF5630', 
 };
 
 export const mainTheme = createTheme({
@@ -49,8 +52,8 @@ export const mainTheme = createTheme({
       default: '#FFFFFF',
       paper: '#FFFFFF',
     },
-    divider: alpha(GREY[500], 0.24), // Define a cor padrão das bordas (Divider)
-    grey: GREY, // Paleta de cinza customizada
+    divider: alpha(GREY[500], 0.24),
+    grey: GREY,
   },
   shape: {
     borderRadius: 8,
@@ -83,16 +86,17 @@ export const mainTheme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: alpha(GREY[500], 0.32), // Borda inativa padrão
+            borderColor: alpha(GREY[500], 0.32),
           },
           '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: PRIMARY.main, // Borda hover
+            borderColor: PRIMARY.main,
           },
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: PRIMARY.main, // Borda focado
+            borderColor: PRIMARY.main,
           },
         },
       },
     },
+    // Removida a estilização global do MuiCheckbox daqui
   },
 }, ptBR);
