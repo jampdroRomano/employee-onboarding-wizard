@@ -90,7 +90,7 @@ export const DepartmentEditEmployeesStep = (props: DepartmentEditEmployeesStepPr
 
   const columns: TableColumn[] = [
     { id: 'colaborador', label: 'Colaborador', width: '40%' },
-    { id: 'email', label: 'E-mail', width: '30%' },
+    { id: 'cargo_nivel', label: 'Cargo & Nível', width: '30%' },
     { id: 'atual_dept', label: 'Departamento Atual', width: '30%' },
   ];
 
@@ -121,7 +121,7 @@ export const DepartmentEditEmployeesStep = (props: DepartmentEditEmployeesStepPr
           <TableToolbar
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
-            placeholder="Buscar por nome ou e-mail..."
+            placeholder="Buscar por nome, e-mail, cargo..."
           >
             {selectedIds.length > 0 && (
                 <Button 
@@ -191,11 +191,25 @@ export const DepartmentEditEmployeesStep = (props: DepartmentEditEmployeesStepPr
               <TableCell>
                 <Stack direction="row" alignItems="center" spacing={2}>
                   <Avatar src={row.img} alt={row.nome} sx={{ width: 32, height: 32 }} />
-                  <Typography variant="subtitle2" noWrap>{row.nome}</Typography>
+                  <Box>
+                    <Typography variant="subtitle2" color="text.primary" noWrap>
+                      {row.nome}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" noWrap sx={{ fontSize: '0.80rem' }}>
+                      {row.email}
+                    </Typography>
+                  </Box>
                 </Stack>
               </TableCell>
               <TableCell>
-                <Typography variant="body2" color="text.secondary" noWrap>{row.email}</Typography>
+                <Box>
+                  <Typography variant="subtitle2" color="text.primary" noWrap>
+                    {row.role || '-'}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                    {row.seniority || 'N/A'}
+                  </Typography>
+                </Box>
               </TableCell>
               <TableCell>
                  <Typography variant="caption" sx={{ 

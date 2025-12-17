@@ -67,11 +67,14 @@ export const useDepartmentMemberManagement = ({
 
   const filteredRows = useMemo(() => {
     return rows.filter((row) => {
+      const s = searchTerm.toLowerCase();
       const currentEmployeeDept = effectiveDepartmentMap.get(row.id);
-      const matchText = row.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        row.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchText = row.nome.toLowerCase().includes(s) ||
+                        row.email.toLowerCase().includes(s) ||
+                        (row.role && row.role.toLowerCase().includes(s)) ||
+                        (row.seniority && row.seniority.toLowerCase().includes(s));
       const matchDept = filterDept === 'todos' ? true :
-                        !currentEmployeeDept ? false : // Ajuste para não quebrar se for nulo
+                        !currentEmployeeDept ? false : 
                         currentEmployeeDept === filterDept;
       return matchText && matchDept;
     });
