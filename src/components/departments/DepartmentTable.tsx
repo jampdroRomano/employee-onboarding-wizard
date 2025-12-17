@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, memo } from 'react';
+import { useEffect, useState, useMemo, memo, useCallback } from 'react';
 import { 
   TableCell, 
   TableRow, 
@@ -61,7 +61,7 @@ export const DepartmentTable = memo(() => {
     handleOpenDelete, 
     handleClose: handleCloseDeleteDialog, 
     handleConfirmDelete 
-  } = useTableDelete({
+   } = useTableDelete({
     onDelete: async (ids) => {
       await departmentService.deleteMany(ids);
       const updatedData = await departmentService.getAll();
@@ -135,6 +135,39 @@ export const DepartmentTable = memo(() => {
     });
   }, [rows, searchTerm, filterDeptId, employeesMap]);
 
+  // --- Lógica para os novos manipuladores de seleção ---
+  const handleRowToggle = useCallback((id: string) => {
+    const selectedIndex = selected.indexOf(id);
+    let newSelected: string[] = [];
+
+    if (selectedIndex === -1) {
+        newSelected = newSelected.concat(selected, id);
+    } else {
+        newSelected = selected.filter(itemId => itemId !== id);
+    }
+    setSelected(newSelected);
+  }, [selected]);
+
+  const handleSelectAllToggle = useCallback(() => {
+      const numSelectedVisible = filteredRows.filter(row => selected.includes(row.id)).length;
+      const rowCountVisible = filteredRows.length;
+      
+      if (numSelectedVisible === rowCountVisible) { // Todos visíveis selecionados, então desmarca tudo
+          setSelected([]); // Limpa tudo
+      } else { // Alguns ou nenhum visível selecionado, então seleciona todos os visíveis
+          const newSelected = filteredRows.map(r => r.id);
+          setSelected(newSelected);
+      }
+  }, [selected, filteredRows]);
+
+  // --- Estados do checkbox do cabeçalho ---
+  const numSelectedVisible = filteredRows.filter(row => selected.includes(row.id)).length;
+  const rowCountVisible = filteredRows.length;
+
+  const isSelectAllChecked = rowCountVisible > 0 && numSelectedVisible === rowCountVisible;
+  const isSelectAllIndeterminate = numSelectedVisible > 0 && numSelectedVisible < rowCountVisible;
+
+
   // --- HANDLERS ---
   const handleOpenMenu = (event: React.MouseEvent<HTMLElement>, id: string) => {
     event.stopPropagation();
@@ -182,8 +215,10 @@ export const DepartmentTable = memo(() => {
         
         enableSelection={true}
         selectedIds={selected}
-        onSelectionChange={setSelected}
-
+        onRowToggle={handleRowToggle}
+        onSelectAllToggle={handleSelectAllToggle}
+        isSelectAllChecked={isSelectAllChecked}
+        isSelectAllIndeterminate={isSelectAllIndeterminate}
         filters={
           <TableToolbar
             searchTerm={searchTerm}

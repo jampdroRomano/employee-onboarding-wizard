@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { 
   Box, 
   Typography, 
@@ -64,6 +64,41 @@ export const EmployeeSelectionStep = ({ selectedIds, onSelectionChange }: Employ
     });
   }, [rows, searchTerm, filterDept]);
 
+  // --- Lógica para os novos manipuladores de seleção ---
+
+  const handleRowToggle = useCallback((id: string) => {
+    const selectedIndex = selectedIds.indexOf(id);
+    let newSelected: string[] = [];
+
+    if (selectedIndex === -1) {
+        newSelected = newSelected.concat(selectedIds, id);
+    } else {
+        newSelected = selectedIds.filter(itemId => itemId !== id);
+    }
+    onSelectionChange(newSelected);
+  }, [selectedIds, onSelectionChange]);
+
+  const handleSelectAllToggle = useCallback(() => {
+    const numSelectedVisible = filteredRows.filter(row => selectedIds.includes(row.id)).length;
+    const rowCountVisible = filteredRows.length;
+    
+    if (numSelectedVisible === rowCountVisible) { // Todos visíveis selecionados, então desmarca todos os visíveis
+        const newSelected = selectedIds.filter(id => !filteredRows.map(r => r.id).includes(id));
+        onSelectionChange(newSelected);
+    } else { // Alguns ou nenhum visível selecionado, então seleciona todos os visíveis
+        const newSelected = Array.from(new Set([...selectedIds, ...filteredRows.map(r => r.id)]));
+        onSelectionChange(newSelected);
+    }
+  }, [selectedIds, filteredRows, onSelectionChange]);
+
+  // --- Estados do checkbox do cabeçalho ---
+  const numSelectedVisible = filteredRows.filter(row => selectedIds.includes(row.id)).length;
+  const rowCountVisible = filteredRows.length;
+
+  const isSelectAllChecked = rowCountVisible > 0 && numSelectedVisible === rowCountVisible;
+  const isSelectAllIndeterminate = numSelectedVisible > 0 && numSelectedVisible < rowCountVisible;
+
+
   const columns: TableColumn[] = [
     { id: 'colaborador', label: 'Colaborador', width: '40%' },
     { id: 'email', label: 'E-mail', width: '30%' },
@@ -89,8 +124,10 @@ export const EmployeeSelectionStep = ({ selectedIds, onSelectionChange }: Employ
         
         enableSelection={true}
         selectedIds={selectedIds}
-        onSelectionChange={onSelectionChange}
-
+        onRowToggle={handleRowToggle}
+        onSelectAllToggle={handleSelectAllToggle}
+        isSelectAllChecked={isSelectAllChecked}
+        isSelectAllIndeterminate={isSelectAllIndeterminate}
         filters={
           <TableToolbar
             searchTerm={searchTerm}

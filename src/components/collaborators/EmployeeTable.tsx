@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, memo } from 'react';
+import { useEffect, useState, useMemo, memo, useCallback } from 'react';
 import {
   TableCell,
   TableRow,
@@ -167,6 +167,39 @@ export const EmployeeTable = memo(() => {
     });
   }, [rows, searchTerm, filterDept]);
 
+  // --- Lógica para os novos manipuladores de seleção ---
+  const handleRowToggle = useCallback((id: string) => {
+    const selectedIndex = selected.indexOf(id);
+    let newSelected: string[] = [];
+
+    if (selectedIndex === -1) {
+        newSelected = newSelected.concat(selected, id);
+    } else {
+        newSelected = selected.filter(itemId => itemId !== id);
+    }
+    setSelected(newSelected);
+  }, [selected]);
+
+  const handleSelectAllToggle = useCallback(() => {
+    const numSelectedVisible = filteredRows.filter(row => selected.includes(row.id)).length;
+    const rowCountVisible = filteredRows.length;
+      
+    if (numSelectedVisible === rowCountVisible) {
+        setSelected([]);
+    } else {
+        const newSelected = filteredRows.map(r => r.id);
+        setSelected(newSelected);
+    }
+  }, [selected, filteredRows]);
+
+  // --- Estados do checkbox do cabeçalho ---
+  const numSelectedVisible = filteredRows.filter(row => selected.includes(row.id)).length;
+  const rowCountVisible = filteredRows.length;
+
+  const isSelectAllChecked = rowCountVisible > 0 && numSelectedVisible === rowCountVisible;
+  const isSelectAllIndeterminate = numSelectedVisible > 0 && numSelectedVisible < rowCountVisible;
+
+
   const getDepartmentName = (id: string) => departmentsMap[id] || 'Não atribuído';
   const getManagerName = (id?: string | null) => (!id ? '-' : employeesMap[id] || 'Não encontrado');
   const isStatusActive = (s: any) => s === true || s === 'Ativo';
@@ -181,7 +214,10 @@ export const EmployeeTable = memo(() => {
         // Configuração de Seleção
         enableSelection={true}
         selectedIds={selected}
-        onSelectionChange={setSelected}
+        onRowToggle={handleRowToggle}
+        onSelectAllToggle={handleSelectAllToggle}
+        isSelectAllChecked={isSelectAllChecked}
+        isSelectAllIndeterminate={isSelectAllIndeterminate}
 
         // Barra de Ferramentas (Filtros + Botão de Excluir em massa)
         filters={
