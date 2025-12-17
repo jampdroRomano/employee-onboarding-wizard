@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Box, CircularProgress } from '@mui/material'; // Adicione CircularProgress
-import { useNavigate, useParams } from 'react-router-dom'; // Adicione useParams
+import { Box, CircularProgress, alpha } from '@mui/material'; 
+import { useNavigate, useParams } from 'react-router-dom'; 
 import { AppBreadcrumbs } from '../components/common/AppBreadcrumbs';
 import { AppButton } from '../components/common/AppButton';
 import { StepperVertical } from '../components/common/StepperVertical';
@@ -8,7 +8,6 @@ import { OnboardingProgress } from '../components/common/OnboardingProgress';
 import { DepartmentForm } from '../components/departments/DepartmentForm';
 import { DepartmentManagerStep } from '../components/departments/DepartmentManagerStep';
 import { EmployeeSelectionStep } from '../components/departments/EmployeeSelectionStep';
-// Importe o novo componente de edição (crie o arquivo se não tiver ainda)
 import { DepartmentEditEmployeesStep } from '../components/departments/DepartmentEditEmployeesStep'; 
 
 import { departmentService } from '../services/departmentService';
@@ -207,21 +206,20 @@ export const CreateDepartment = () => {
             <Box>{renderStepContent()}</Box>
 
             <Box sx={{ mt: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '48px', width: '100%', pt: 4 }}>
-              
               <AppButton
-                  onClick={handleBack}
-                  variant="text"
-                  disabled={loading}
-                  // ... estilos do botão voltar
-                  sx={{ color: 'text.secondary' }}
+                onClick={handleBack}
+                variant="text"
+                disableRipple
+                disabled={loading}
+                sx={{ width: '64px', height: '48px', minWidth: '64px', boxShadow: 'none', pl: 0, justifyContent: 'flex-start', color: 'text.primary', '&:hover': { backgroundColor: 'transparent', boxShadow: 'none', color: 'text.secondary', }, '&.Mui-disabled': { color: (theme) => alpha(theme.palette.grey[500], 0.8), }, '&:focus': { backgroundColor: 'transparent' }, '&:active': { backgroundColor: 'transparent' } }}
               >
-                  {activeStep === 0 ? 'Cancelar' : 'Voltar'}
+                Voltar
               </AppButton>
 
               <AppButton
                 onClick={handleNext}
                 loading={loading}
-                variant="contained"
+                sx={{ width: '91px', height: '48px', minWidth: '64px', fontWeight: 700, borderRadius: '8px' }}
               >
                 {activeStep === steps.length - 1 ? 'Salvar' : 'Próximo'}
               </AppButton>
