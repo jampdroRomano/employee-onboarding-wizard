@@ -34,7 +34,11 @@ interface GenericTableProps<T> {
     filters?: ReactNode;
     enableSelection?: boolean;
     selectedIds?: string[];
-    onSelectionChange?: (ids: string[]) => void;
+    onRowToggle?: (id: string) => void;
+    onSelectAllToggle?: () => void;
+    headerCheckboxColor?: string;
+    isSelectAllChecked?: boolean;
+    isSelectAllIndeterminate?: boolean;
 
     renderRow: (row: T, isSelected: boolean, toggleSelect: () => void) => ReactNode;
 }
@@ -50,40 +54,14 @@ export const GenericTable = <T extends { id: string }>({
     filters,
     enableSelection = false,
     selectedIds = [],
-    onSelectionChange
+    onRowToggle,
+    onSelectAllToggle,
+    headerCheckboxColor,
+    isSelectAllChecked,
+    isSelectAllIndeterminate,
 }: GenericTableProps<T>) => {
 
-    const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.checked) {
-            const newSelected = rows.map((n) => n.id);
-            onSelectionChange?.(newSelected);
-            return;
-        }
-        onSelectionChange?.([]);
-    };
-
     const isSelected = (id: string) => selectedIds.indexOf(id) !== -1;
-
-    const handleRowClick = (id: string) => {
-        if (!onSelectionChange) return;
-
-        const selectedIndex = selectedIds.indexOf(id);
-        let newSelected: string[] = [];
-
-        if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selectedIds, id);
-        } else if (selectedIndex === 0) {
-            newSelected = newSelected.concat(selectedIds.slice(1));
-        } else if (selectedIndex === selectedIds.length - 1) {
-            newSelected = newSelected.concat(selectedIds.slice(0, -1));
-        } else if (selectedIndex > 0) {
-            newSelected = newSelected.concat(
-                selectedIds.slice(0, selectedIndex),
-                selectedIds.slice(selectedIndex + 1),
-            );
-        }
-        onSelectionChange(newSelected);
-    };
 
     if (isLoading) {
         return (
@@ -114,12 +92,12 @@ export const GenericTable = <T extends { id: string }>({
                             {enableSelection && (
                                 <TableCell padding="checkbox" sx={{ width: '48px' }}>
                                     <Checkbox
-                                        indeterminate={selectedIds.length > 0 && selectedIds.length < rows.length}
-                                        checked={rows.length > 0 && selectedIds.length === rows.length}
-                                        onChange={handleSelectAllClick}
+                                        indeterminate={isSelectAllIndeterminate}
+                                        checked={isSelectAllChecked}
+                                        onChange={() => onSelectAllToggle?.()}
                                         sx={{
-                                            '&.Mui-checked': { color: CHECKBOX_GREEN },
-                                            '&.MuiCheckbox-indeterminate': { color: CHECKBOX_GREEN }
+                                            '&.Mui-checked': { color: headerCheckboxColor || CHECKBOX_GREEN },
+                                            '&.MuiCheckbox-indeterminate': { color: headerCheckboxColor || CHECKBOX_GREEN }
                                         }}
                                     />
                                 </TableCell>
@@ -163,7 +141,7 @@ export const GenericTable = <T extends { id: string }>({
                         ) : (
                             rows.map((row) => {
                                 const isItemSelected = isSelected(row.id);
-                                return renderRow(row, isItemSelected, () => handleRowClick(row.id));
+                                return renderRow(row, isItemSelected, () => onRowToggle?.(row.id));
                             })
                         )}
                     </TableBody>

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useState } from 'react';
 import { 
   Box, 
   Typography, 
@@ -21,13 +21,12 @@ import {
 } from '@mui/material';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import { getAllEmployees } from '../../services/employeeService'; // employeeService importado não é mais usado para update direto
-import { departmentService } from '../../services/departmentService';
-import type { Employee, Department } from '../../types';
+import type { Employee } from '../../types';
 import { GenericTable } from '../common/GenericTable';
 import type { TableColumn } from '../common/GenericTable';
 import { TableToolbar } from '../common/TableToolbar';
 import { CHECKBOX_GREEN } from '../../theme/mainTheme';
+import { useDepartmentMemberManagement } from '../../hooks/useDepartmentMemberManagement';
 
 interface EmployeeChange {
   employeeId: string;
@@ -40,126 +39,34 @@ interface DepartmentEditEmployeesStepProps {
   initialEmployeeChanges?: EmployeeChange[];
 }
 
-export const DepartmentEditEmployeesStep = ({ currentDepartmentId, onEmployeeChanges, initialEmployeeChanges }: DepartmentEditEmployeesStepProps) => {
-  const [rows, setRows] = useState<Employee[]>([]);
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterDept, setFilterDept] = useState(currentDepartmentId); 
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+export const DepartmentEditEmployeesStep = (props: DepartmentEditEmployeesStepProps) => {
+  const {
+    loading,
+    filteredRows,
+    departments,
+    deptNameMap,
+    searchTerm,
+    setSearchTerm,
+    filterDept,
+    handleChangeFilter,
+    selectedIds,
+    handleRowToggle,
+    handleSelectAllToggle,
+    clearSelection,
+    isSelectionFromCurrentDept,
+    isSelectionMixed,
+    isSelectAllChecked,
+    isSelectAllIndeterminate,
+    applyChanges,
+    effectiveDepartmentMap,
+  } = useDepartmentMemberManagement(props);
+
   const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [targetTransferDept, setTargetTransferDept] = useState('');
 
-  // Estado para armazenar as alterações que serão enviadas ao pai
-  const [localEmployeeChanges, setLocalEmployeeChanges] = useState<EmployeeChange[]>(initialEmployeeChanges || []);
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        const [empData, deptData] = await Promise.all([
-          getAllEmployees(),
-          departmentService.getAll()
-        ]);
-        setRows(empData);
-        setDepartments(deptData);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, []);
-
-  // Notificar o pai sobre as mudanças locais
-  useEffect(() => {
-    onEmployeeChanges(localEmployeeChanges);
-  }, [localEmployeeChanges, onEmployeeChanges]);
-
-
-  useEffect(() => {
-    setSelectedIds([]);
-  }, [filterDept]);
-
-  const deptNameMap = useMemo(() => {
-    return departments.reduce((acc, d) => ({ ...acc, [d.id]: d.name }), {} as Record<string, string>);
-  }, [departments]);
-
-  // Mapa de departamentos efetivos (original + mudanças locais)
-  const effectiveDepartmentMap = useMemo(() => {
-    const map = new Map<string, string | null>();
-    rows.forEach(emp => map.set(emp.id, emp.departamento || null)); // original
-
-    localEmployeeChanges.forEach(change => {
-      map.set(change.employeeId, change.newDepartmentId); // override with local change
-    });
-    return map;
-  }, [rows, localEmployeeChanges]);
-
-  const filteredRows = useMemo(() => {
-    return rows.filter((row) => {
-      const currentEmployeeDept = effectiveDepartmentMap.get(row.id);
-
-      const matchText = row.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        row.email.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchDept = filterDept === 'todos' ? true :
-                        filterDept === 'sem_departamento' ? !currentEmployeeDept :
-                        currentEmployeeDept === filterDept;
-
-      return matchText && matchDept;
-    });
-  }, [rows, searchTerm, filterDept, effectiveDepartmentMap]);
-  
-  const isSelectionFromCurrentDept = useMemo(() => {
-    if (selectedIds.length === 0) return false;
-    const firstSelectedId = selectedIds[0];
-    const firstEmployeeDept = effectiveDepartmentMap.get(firstSelectedId);
-    return firstEmployeeDept === currentDepartmentId;
-  }, [selectedIds, currentDepartmentId, effectiveDepartmentMap]);
-
-  const handleSelectionChange = (newSelectedIds: string[]) => {
-    if (newSelectedIds.length === 0) {
-      setSelectedIds([]);
-      return;
-    }
-
-    const firstSelectedId = newSelectedIds[0];
-    const firstEmployeeDept = effectiveDepartmentMap.get(firstSelectedId);
-    
-    const isFirstFromCurrentDept = firstEmployeeDept === currentDepartmentId;
-
-    const filteredSelection = newSelectedIds.filter(id => {
-      const employeeDept = effectiveDepartmentMap.get(id);
-      const isEmployeeFromCurrentDept = employeeDept === currentDepartmentId;
-      return isEmployeeFromCurrentDept === isFirstFromCurrentDept;
-    });
-    
-    setSelectedIds(filteredSelection);
-  };
-
-  const applyChanges = (employeeIds: string[], newDeptId: string | null) => {
-    setLocalEmployeeChanges(prevChanges => {
-      const updatedChanges = [...prevChanges];
-      employeeIds.forEach(empId => {
-        const existingIndex = updatedChanges.findIndex(c => c.employeeId === empId);
-        if (existingIndex > -1) {
-          updatedChanges[existingIndex].newDepartmentId = newDeptId;
-        } else {
-          updatedChanges.push({ employeeId: empId, newDepartmentId: newDeptId });
-        }
-      });
-      // Remove changes that revert to original
-      return updatedChanges.filter(change => {
-        const originalDept = rows.find(r => r.id === change.employeeId)?.departamento || null;
-        return originalDept !== change.newDepartmentId;
-      });
-    });
-  };
-
   const handleActionClick = () => {
+    if (isSelectionMixed) return;
     if (isSelectionFromCurrentDept) {
       setTargetTransferDept('');
       setIsTransferDialogOpen(true);
@@ -168,16 +75,16 @@ export const DepartmentEditEmployeesStep = ({ currentDepartmentId, onEmployeeCha
     }
   };
 
-  const handleConfirmTransfer = () => { // Não é mais async
+  const handleConfirmTransfer = () => {
     if (!targetTransferDept) return;
     applyChanges(selectedIds, targetTransferDept);
-    setSelectedIds([]);
+    clearSelection();
     setIsTransferDialogOpen(false);
   };
 
-  const handleConfirmAdd = () => { // Não é mais async
-    applyChanges(selectedIds, currentDepartmentId);
-    setSelectedIds([]);
+  const handleConfirmAdd = () => {
+    applyChanges(selectedIds, props.currentDepartmentId);
+    clearSelection();
     setIsAddDialogOpen(false);
   };
 
@@ -203,11 +110,13 @@ export const DepartmentEditEmployeesStep = ({ currentDepartmentId, onEmployeeCha
         rows={filteredRows}
         isLoading={loading}
         maxHeight={400}
-        
         enableSelection={true}
         selectedIds={selectedIds}
-        onSelectionChange={handleSelectionChange}
-
+        onRowToggle={handleRowToggle}
+        onSelectAllToggle={handleSelectAllToggle}
+        isSelectAllChecked={isSelectAllChecked}
+        isSelectAllIndeterminate={isSelectAllIndeterminate}
+        headerCheckboxColor={isSelectionFromCurrentDept ? '#0288d1' : CHECKBOX_GREEN}
         filters={
           <TableToolbar
             searchTerm={searchTerm}
@@ -220,6 +129,8 @@ export const DepartmentEditEmployeesStep = ({ currentDepartmentId, onEmployeeCha
                     color={isSelectionFromCurrentDept ? "info" : "primary"}
                     startIcon={isSelectionFromCurrentDept ? <SwapHorizIcon /> : <PersonAddIcon />}
                     onClick={handleActionClick}
+                    disabled={isSelectionMixed}
+                    title={isSelectionMixed ? "Você não pode misturar colaboradores do departamento atual com outros." : ""}
                     sx={{ mr: 2, fontWeight: 'bold' }}
                 >
                     {isSelectionFromCurrentDept 
@@ -228,33 +139,32 @@ export const DepartmentEditEmployeesStep = ({ currentDepartmentId, onEmployeeCha
                     }
                 </Button>
             )}
-
             <TextField
               select
               size="small"
               value={filterDept}
-              onChange={(e) => setFilterDept(e.target.value)}
+              onChange={(e) => handleChangeFilter(e.target.value)}
               sx={{ minWidth: '220px' }}
             >
               <MenuItem value="todos">Todos Departamentos</MenuItem>
-              <MenuItem value="sem_departamento">Sem Departamento</MenuItem>
               {departments.map((dept) => (
                 <MenuItem key={dept.id} value={dept.id}>
-                    {dept.id === currentDepartmentId ? `📍 ${dept.name} (Atual)` : dept.name}
+                    {dept.id === props.currentDepartmentId ? `${dept.name} (Atual)` : dept.name}
                 </MenuItem>
               ))}
             </TextField>
           </TableToolbar>
         }
-
         renderRow={(row, isSelected, toggleSelect) => {
           const currentEmployeeDept = effectiveDepartmentMap.get(row.id);
+          const isRowFromCurrentDept = currentEmployeeDept === props.currentDepartmentId;
+          
           let isDisabled = false;
-          if (selectedIds.length > 0) {
-             const isRowFromCurrentDept = currentEmployeeDept === currentDepartmentId;
-             if (isSelectionFromCurrentDept !== isRowFromCurrentDept) {
-                isDisabled = true;
-             }
+          if (selectedIds.length > 0 && !selectedIds.includes(row.id)) {
+            const isFirstSelectionFromCurrent = effectiveDepartmentMap.get(selectedIds[0]) === props.currentDepartmentId;
+            if (isFirstSelectionFromCurrent !== isRowFromCurrentDept) {
+               isDisabled = true;
+            }
           }
 
           return (
@@ -275,30 +185,24 @@ export const DepartmentEditEmployeesStep = ({ currentDepartmentId, onEmployeeCha
                 <Checkbox
                   checked={isSelected}
                   disabled={isDisabled}
-                  sx={{ 
-                      '&.Mui-checked': { 
-                          color: isSelectionFromCurrentDept ? '#0288d1' : CHECKBOX_GREEN 
-                      } 
-                  }}
+                  sx={{ '&.Mui-checked': { color: isSelectionFromCurrentDept ? '#0288d1' : CHECKBOX_GREEN } }}
                 />
               </TableCell>
-
               <TableCell>
                 <Stack direction="row" alignItems="center" spacing={2}>
                   <Avatar src={row.img} alt={row.nome} sx={{ width: 32, height: 32 }} />
                   <Typography variant="subtitle2" noWrap>{row.nome}</Typography>
                 </Stack>
               </TableCell>
-
               <TableCell>
                 <Typography variant="body2" color="text.secondary" noWrap>{row.email}</Typography>
               </TableCell>
-
               <TableCell>
                  <Typography variant="caption" sx={{ 
                      bgcolor: currentEmployeeDept ? 'rgba(145, 158, 171, 0.12)' : 'transparent',
                      px: 1, py: 0.5, borderRadius: 1,
-                     color: currentEmployeeDept ? 'text.primary' : 'text.disabled'
+                     color: isRowFromCurrentDept ? 'primary.main' : (currentEmployeeDept ? 'text.primary' : 'text.disabled'),
+                     fontWeight: isRowFromCurrentDept ? 700 : 400,
                  }}>
                     {deptNameMap[currentEmployeeDept || ''] || 'Sem departamento'}
                  </Typography>
@@ -322,7 +226,7 @@ export const DepartmentEditEmployeesStep = ({ currentDepartmentId, onEmployeeCha
                     onChange={(e) => setTargetTransferDept(e.target.value)}
                 >
                     {departments
-                        .filter(d => d.id !== currentDepartmentId)
+                        .filter(d => d.id !== props.currentDepartmentId)
                         .map(d => (
                             <MenuItem key={d.id} value={d.id}>{d.name}</MenuItem>
                         ))
@@ -332,12 +236,7 @@ export const DepartmentEditEmployeesStep = ({ currentDepartmentId, onEmployeeCha
         </DialogContent>
         <DialogActions>
             <Button onClick={() => setIsTransferDialogOpen(false)} color="inherit">Cancelar</Button>
-            <Button 
-                onClick={handleConfirmTransfer} 
-                variant="contained" 
-                color="info"
-                disabled={!targetTransferDept}
-            >
+            <Button onClick={handleConfirmTransfer} variant="contained" color="info" disabled={!targetTransferDept}>
                 Transferir
             </Button>
         </DialogActions>
@@ -352,11 +251,7 @@ export const DepartmentEditEmployeesStep = ({ currentDepartmentId, onEmployeeCha
         </DialogContent>
         <DialogActions>
             <Button onClick={() => setIsAddDialogOpen(false)} color="inherit">Cancelar</Button>
-            <Button 
-                onClick={handleConfirmAdd} 
-                variant="contained" 
-                color="primary"
-            >
+            <Button onClick={handleConfirmAdd} variant="contained" color="primary">
                 Adicionar
             </Button>
         </DialogActions>

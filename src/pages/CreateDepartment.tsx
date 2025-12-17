@@ -107,39 +107,26 @@ export const CreateDepartment = () => {
     setLoading(true);
     try {
       if (isEditMode && id) {
-         // --- MODO EDIÇÃO ---
-         await departmentService.update(id, {
-             name: formData.name,
-             description: formData.description,
-             managerId: formData.managerId
-         });
-         
-         // Processar mudanças de funcionários acumuladas do Step 3
-         if (employeeChanges.length > 0) {
-            const changesByDept = employeeChanges.reduce((acc, change) => {
-                const key = change.newDepartmentId || 'none';
-                if (!acc[key]) acc[key] = [];
-                acc[key].push(change.employeeId);
-                return acc;
-            }, {} as Record<string, string[]>);
-
-            const updatePromises = Object.entries(changesByDept).map(([deptId, empIds]) => {
-                const targetDeptId = deptId === 'none' ? null : deptId;
-                return employeeService.updateEmployeesDepartment(empIds, targetDeptId as string);
-            });
-            await Promise.all(updatePromises);
-        }
-
+        // --- MODO EDIÇÃO ---
+        await departmentService.updateDepartmentAndMembers(
+          id,
+          {
+            name: formData.name,
+            description: formData.description,
+            managerId: formData.managerId,
+          },
+          employeeChanges
+        );
       } else {
-         // --- MODO CRIAÇÃO ---
-         const newDepartmentId = await departmentService.create(formData);
-         // Move colaboradores selecionados
-         if (formData.employeeIds && formData.employeeIds.length > 0) {
-            await employeeService.updateEmployeesDepartment(
-              formData.employeeIds,
-              newDepartmentId
-            );
-         }
+        // --- MODO CRIAÇÃO ---
+        const newDepartmentId = await departmentService.create(formData);
+        // Move colaboradores selecionados
+        if (formData.employeeIds && formData.employeeIds.length > 0) {
+          await employeeService.updateEmployeesDepartment(
+            formData.employeeIds,
+            newDepartmentId
+          );
+        }
       }
       navigate('/departamentos');
     } catch (error) {
