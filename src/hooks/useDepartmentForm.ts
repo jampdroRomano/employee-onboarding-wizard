@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 export interface DepartmentState {
   name: string;
@@ -23,18 +23,18 @@ export const useDepartmentForm = () => {
 
   const [errors, setErrors] = useState<DepartmentErrors>({});
 
-  const handleChange = (field: 'name' | 'description' | 'managerId', value: string | null) => {
+  const handleChange = useCallback((field: 'name' | 'description' | 'managerId', value: string | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
-  };
+  }, [errors]);
 
-  const handleEmployeeSelection = (ids: string[]) => {
+  const handleEmployeeSelection = useCallback((ids: string[]) => {
     setFormData(prev => ({ ...prev, employeeIds: ids }));
-  };
+  }, []);
 
-  const validateStep = (step: number): boolean => {
+  const validateStep = useCallback((step: number): boolean => {
     const newErrors: DepartmentErrors = {};
     let isValid = true;
 
@@ -56,21 +56,23 @@ export const useDepartmentForm = () => {
 
     // Validação do Passo 2: Gestão
     if (step === 1) {
-      // if (!formData.managerId) {
-      //   newErrors.managerId = 'Selecione um responsável pelo departamento.';
-      //   isValid = false;
-      // }
+      // Lógica de validação se necessário
     }
 
     setErrors(newErrors);
     return isValid;
-  };
+  }, [formData]);
+
+  const setValues = useCallback((values: Partial<DepartmentState>) => {
+    setFormData(prev => ({ ...prev, ...values }));
+  }, []);
 
   return {
     formData,
     errors,
     handleChange,
     handleEmployeeSelection,
-    validateStep
+    validateStep,
+    setValues
   };
 };

@@ -77,6 +77,17 @@ function App() {
         }
       />
 
+      <Route
+        path="/departamentos/editar/:id"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <CreateDepartment />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
