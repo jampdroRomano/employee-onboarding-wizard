@@ -1,70 +1,93 @@
+import { db } from "../config/firebase";
 import { 
   collection, 
   getDocs, 
   addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  doc, 
-  getDoc,
-  query,
-  orderBy
-} from 'firebase/firestore';
-import { db } from '../config/firebase'; 
-import type { Department } from '../types'; 
-
-const DEPARTMENT_COLLECTION = 'departments';
-
-let departmentsCache: Department[] | null = null;
+  query, 
+  orderBy, 
+  serverTimestamp,
+  where,
+  doc,
+  deleteDoc,
+  writeBatch 
+} from "firebase/firestore";
+import type { Department } from "../types";
 
 export const departmentService = {
   getAll: async (): Promise<Department[]> => {
-    if (departmentsCache) {
-      return departmentsCache;
-    }
-
     try {
-      const departmentsRef = collection(db, DEPARTMENT_COLLECTION);
-      const q = query(departmentsRef, orderBy('name', 'asc')); 
+      const deptRef = collection(db, "departments");
+      const q = query(deptRef, orderBy("name", "asc"));
       const querySnapshot = await getDocs(q);
       
-      const data = querySnapshot.docs.map(doc => ({
+      return querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       } as Department));
-
-      departmentsCache = data;
-      return data;
-
     } catch (error) {
       console.error("Erro ao buscar departamentos:", error);
       return [];
     }
   },
 
+  checkNameExists: async (name: string) => {
+    const deptRef = collection(db, "departments");
+    const q = query(deptRef, where("name", "==", name));
+    const querySnapshot = await getDocs(q);
+    return !querySnapshot.empty;
+  },
+
   create: async (data: Omit<Department, 'id'>) => {
-    departmentsCache = null; 
-    const docRef = await addDoc(collection(db, DEPARTMENT_COLLECTION), data);
-    return docRef.id;
+    const deptRef = collection(db, "departments");
+    const exists = await departmentService.checkNameExists(data.name);
+    
+    if (exists) {
+      throw new Error("Já existe um departamento com este nome.");
+    }
+
+    await addDoc(deptRef, {
+      ...data,
+      createdAt: serverTimestamp()
+    });
   },
 
-  update: async (id: string, data: Partial<Department>) => {
-    departmentsCache = null; 
-    const docRef = doc(db, DEPARTMENT_COLLECTION, id);
-    await updateDoc(docRef, data);
-  },
-
+  // --- EXCLUSÃO COM LIMPEZA DE REFERÊNCIAS ---
+  
   delete: async (id: string) => {
-    departmentsCache = null; 
-    const docRef = doc(db, DEPARTMENT_COLLECTION, id);
+    // 1. Buscar colaboradores deste departamento
+    const employeesRef = collection(db, 'employees');
+    const q = query(employeesRef, where('departamento', '==', id));
+    const snapshot = await getDocs(q);
+
+    // 2. Limpar a referência neles (Batch Update)
+    const batch = writeBatch(db);
+    snapshot.docs.forEach(doc => {
+      batch.update(doc.ref, { departamento: '' });
+    });
+    await batch.commit();
+
+    // 3. Deletar o Departamento
+    const docRef = doc(db, 'departments', id);
     await deleteDoc(docRef);
   },
 
-  getById: async (id: string): Promise<Department | null> => {
-    const docRef = doc(db, DEPARTMENT_COLLECTION, id);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() } as Department;
-    }
-    return null;
+  deleteMany: async (ids: string[]) => {
+    const deletePromises = ids.map(async (id) => {
+      // 1. Limpar referências
+      const employeesRef = collection(db, 'employees');
+      const q = query(employeesRef, where('departamento', '==', id));
+      const snapshot = await getDocs(q);
+
+      const batch = writeBatch(db);
+      snapshot.docs.forEach(doc => {
+        batch.update(doc.ref, { departamento: '' });
+      });
+      await batch.commit();
+
+      // 2. Deletar doc
+      return deleteDoc(doc(db, 'departments', id));
+    });
+
+    await Promise.all(deletePromises);
   }
 };

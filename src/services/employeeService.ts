@@ -10,8 +10,9 @@ import {
   doc,
   deleteDoc,
   orderBy,
-  getDoc,    
-  updateDoc 
+  getDoc,
+  updateDoc,
+  writeBatch 
 } from "firebase/firestore";
 import { AVATARS } from "../utils/constants"; 
 import type { Employee, NewEmployeePayload } from "../types"; 
@@ -75,13 +76,46 @@ export const createEmployee = async (data: NewEmployeePayload) => {
 };
 
 export const employeeService = {
+  // --- EXCLUSÃO COM LIMPEZA DE REFERÊNCIAS (GESTOR) ---
   delete: async (id: string) => {
+    // 1. Verificar se alguém tem este ID como managerId
+    const employeesRef = collection(db, 'employees');
+    const q = query(employeesRef, where('managerId', '==', id));
+    const snapshot = await getDocs(q);
+
+    // 2. Limpar a referência (Setar managerId como null ou string vazia)
+    if (!snapshot.empty) {
+      const batch = writeBatch(db);
+      snapshot.docs.forEach(doc => {
+        batch.update(doc.ref, { managerId: null }); 
+      });
+      await batch.commit();
+    }
+
+    // 3. Deletar o Funcionário
     const docRef = doc(db, 'employees', id);
     await deleteDoc(docRef);
   },
 
   deleteMany: async (ids: string[]) => {
-    const deletePromises = ids.map(id => deleteDoc(doc(db, 'employees', id)));
+    const deletePromises = ids.map(async (id) => {
+      // 1. Limpar referências de gestor
+      const employeesRef = collection(db, 'employees');
+      const q = query(employeesRef, where('managerId', '==', id));
+      const snapshot = await getDocs(q);
+
+      if (!snapshot.empty) {
+        const batch = writeBatch(db);
+        snapshot.docs.forEach(doc => {
+          batch.update(doc.ref, { managerId: null });
+        });
+        await batch.commit();
+      }
+
+      // 2. Deletar
+      return deleteDoc(doc(db, 'employees', id));
+    });
+
     await Promise.all(deletePromises);
   },
 
@@ -98,7 +132,7 @@ export const employeeService = {
 
   update: async (id: string, data: Partial<NewEmployeePayload>) => {
     const docRef = doc(db, 'employees', id);
-
+    
     const updatePayload: any = { ...data };
     
     if (typeof data.status === 'boolean') {
