@@ -144,5 +144,20 @@ export const employeeService = {
     );
 
     await updateDoc(docRef, updatePayload);
+  },
+
+  updateEmployeesDepartment: async (employeeIds: string[], departmentId: string) => {
+    if (!employeeIds || employeeIds.length === 0) {
+      return;
+    }
+    
+    const batch = writeBatch(db);
+    
+    employeeIds.forEach(employeeId => {
+      const employeeRef = doc(db, 'employees', employeeId);
+      batch.update(employeeRef, { departamento: departmentId });
+    });
+    
+    await batch.commit();
   }
 };

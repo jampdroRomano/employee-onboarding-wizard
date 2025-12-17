@@ -7,7 +7,9 @@ import {
   Checkbox, 
   TableRow, 
   TableCell,
-  Chip
+  Chip,
+  TextField,
+  MenuItem
 } from '@mui/material';
 import { getAllEmployees } from '../../services/employeeService';
 import { departmentService } from '../../services/departmentService';
@@ -28,6 +30,7 @@ export const EmployeeSelectionStep = ({ selectedIds, onSelectionChange }: Employ
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterDept, setFilterDept] = useState('todos');
 
   useEffect(() => {
     const loadData = async () => {
@@ -53,11 +56,13 @@ export const EmployeeSelectionStep = ({ selectedIds, onSelectionChange }: Employ
   }, [departments]);
 
   const filteredRows = useMemo(() => {
-    return rows.filter((row) => 
-      row.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      row.email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [rows, searchTerm]);
+    return rows.filter((row) => {
+      const matchText = row.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        row.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchDept = filterDept === 'todos' || row.departamento === filterDept;
+      return matchText && matchDept;
+    });
+  }, [rows, searchTerm, filterDept]);
 
   const columns: TableColumn[] = [
     { id: 'colaborador', label: 'Colaborador', width: '40%' },
@@ -100,6 +105,18 @@ export const EmployeeSelectionStep = ({ selectedIds, onSelectionChange }: Employ
                     sx={{ bgcolor: 'rgba(34, 197, 94, 0.16)', color: 'primary.main', fontWeight: 700 }}
                 />
             )}
+            <TextField
+              select
+              size="small"
+              value={filterDept}
+              onChange={(e) => setFilterDept(e.target.value)}
+              sx={{ minWidth: '200px' }}
+            >
+              <MenuItem value="todos">Todos Departamentos</MenuItem>
+              {departments.map((dept) => (
+                <MenuItem key={dept.id} value={dept.id}>{dept.name}</MenuItem>
+              ))}
+            </TextField>
           </TableToolbar>
         }
 

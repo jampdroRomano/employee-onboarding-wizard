@@ -9,7 +9,7 @@ import { OnboardingProgress } from '../components/common/OnboardingProgress';
 import { DepartmentForm } from '../components/departments/DepartmentForm';
 import { DepartmentManagerStep } from '../components/departments/DepartmentManagerStep';
 import { departmentService } from '../services/departmentService';
-import { getAllEmployees } from '../services/employeeService';
+import { employeeService, getAllEmployees } from '../services/employeeService';
 import type { Employee } from '../types';
 import { useDepartmentForm } from '../hooks/useDepartmentForm';
 import { EmployeeSelectionStep } from '../components/departments/EmployeeSelectionStep';
@@ -70,7 +70,15 @@ export const CreateDepartment = () => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      await departmentService.create(formData);
+      const newDepartmentId = await departmentService.create(formData);
+
+      if (formData.employeeIds && formData.employeeIds.length > 0) {
+        await employeeService.updateEmployeesDepartment(
+          formData.employeeIds,
+          newDepartmentId
+        );
+      }
+
       navigate('/departamentos');
     } catch (error) {
       console.error(error);
