@@ -12,7 +12,10 @@ export const useBasicInfo = () => {
     email: ''
   });
 
-   // Handler para texto
+  const setValues = (data: Partial<typeof formData>) => {
+    setFormData(prev => ({ ...prev, ...data }));
+  };
+
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field as keyof typeof errors]) {
@@ -20,7 +23,6 @@ export const useBasicInfo = () => {
     }
   };
 
-    // Handler específico para o Switch
   const handleStatusChange = (checked: boolean) => {
     setFormData(prev => ({ ...prev, status: checked }));
   };
@@ -34,7 +36,7 @@ export const useBasicInfo = () => {
     const newErrors = { nome: '', email: '' };
 
     if (!formData.nome.trim()) {
-      newErrors.nome = 'O título é obrigatório.';
+      newErrors.nome = 'O título é obrigatório.'; 
       isValid = false;
     }
 
@@ -56,7 +58,8 @@ export const useBasicInfo = () => {
     errors,
     handleChange,
     handleStatusChange,
-    setFieldError, // Não esqueça de exportar aqui
-    validateStep
+    setFieldError, 
+    validateStep,
+    setValues 
   };
 };

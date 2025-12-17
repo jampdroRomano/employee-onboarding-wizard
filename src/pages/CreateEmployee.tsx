@@ -1,7 +1,7 @@
-import { Box } from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react'; 
 import { AppBreadcrumbs } from '../components/common/AppBreadcrumbs';
 import { OnboardingProgress } from '../components/common/OnboardingProgress';
 import { StepperVertical } from '../components/common/StepperVertical';
@@ -11,13 +11,17 @@ import { ContractInfoForm } from '../components/collaborators/ContractInfoForm';
 import { AppButton } from '../components/common/AppButton';
 import { useBasicInfo } from '../hooks/useBasicInfo';
 import { useProfessionalInfo } from '../hooks/useProfessionalInfo';
-import { createEmployee, checkEmailExists } from '../services/employeeService';
+import { createEmployee, checkEmailExists, employeeService } from '../services/employeeService'; 
 
 export const CreateEmployee = () => {
   const navigate = useNavigate();
+  const { id } = useParams(); 
+  const isEditMode = Boolean(id); 
+
   const [currentStep, setCurrentStep] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
+  const [isFetching, setIsFetching] = useState(isEditMode); 
 
   const steps = [
     "Infos Básicas",
@@ -28,24 +32,63 @@ export const CreateEmployee = () => {
   const basicInfo = useBasicInfo();
   const profInfo = useProfessionalInfo();
 
+  useEffect(() => {
+    if (isEditMode && id) {
+      const loadEmployee = async () => {
+        try {
+          const employee = await employeeService.getById(id);
+          if (employee) {
+            basicInfo.setValues({
+              nome: employee.nome,
+              email: employee.email,
+              status: employee.status === 'Ativo' 
+            });
+
+            // Preenche Hook Info Profissional
+            profInfo.setValues({
+              department: employee.departamento || '',
+              role: employee.role || '',
+              seniority: employee.seniority || '',
+              admissionDate: employee.admissionDate || '',
+              managerId: employee.managerId || '',
+              salary: employee.salary ? String(employee.salary) : ''
+            });
+          } else {
+            alert("Colaborador não encontrado");
+            navigate('/');
+          }
+        } catch (error) {
+          console.error("Erro ao carregar colaborador:", error);
+          alert("Erro ao carregar dados do colaborador.");
+        } finally {
+          setIsFetching(false);
+        }
+      };
+      loadEmployee();
+    } else {
+      setIsFetching(false);
+    }
+  }, [id, isEditMode]);
+
   const handleNext = async () => {
     if (currentStep === 1) {
       const isValid = basicInfo.validateStep();
       if (isValid) {
-        setIsValidating(true);
-        const emailExists = await checkEmailExists(basicInfo.formData.email);
-        setIsValidating(false);
+        if (!isEditMode) {
+            setIsValidating(true);
+            const emailExists = await checkEmailExists(basicInfo.formData.email);
+            setIsValidating(false);
 
-        if (emailExists) {
-          basicInfo.setFieldError('email', 'Este e-mail já está em uso.');
-        } else {
-          setCurrentStep(2);
+            if (emailExists) {
+              basicInfo.setFieldError('email', 'Este e-mail já está em uso.');
+              return;
+            }
         }
+        setCurrentStep(2);
       }
       return;
     }
 
-    // --- LÓGICA DO PASSO 2 ---
     if (currentStep === 2) {
       const isValid = profInfo.validateStep2();
       if (isValid) {
@@ -54,7 +97,7 @@ export const CreateEmployee = () => {
       return;
     }
 
-    // --- LÓGICA DO PASSO 3 (SALVAR) ---
+    // --- SALVAR / ATUALIZAR ---
     if (currentStep === 3) {
       const isValid = profInfo.validateStep3();
 
@@ -68,10 +111,16 @@ export const CreateEmployee = () => {
         };
 
         try {
-          await createEmployee(payload);
+          if (isEditMode && id) {
+            // MODO EDIÇÃO: Atualiza
+            await employeeService.update(id, payload);
+          } else {
+            // MODO CRIAÇÃO: Cria novo
+            await createEmployee(payload);
+          }
           navigate('/');
         } catch (error: any) {
-          console.error("Erro ao salvar funcionário:", error);
+          console.error("Erro ao salvar:", error);
           alert(error.message || "Ocorreu um erro ao salvar.");
         } finally {
           setIsSaving(false);
@@ -83,10 +132,20 @@ export const CreateEmployee = () => {
   const handleBack = () => {
     if (currentStep > 1) {
       setCurrentStep(prev => prev - 1);
+    } else {
+        navigate('/'); 
     }
   };
 
   const progressValue = currentStep === 1 ? 0 : currentStep === 2 ? 50 : 100;
+
+  if (isFetching) {
+      return (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
+              <CircularProgress />
+          </Box>
+      );
+  }
 
   return (
     <Box>
@@ -95,7 +154,8 @@ export const CreateEmployee = () => {
           <AppBreadcrumbs
             items={[
               { label: 'Colaboradores', path: '/' },
-              { label: 'Cadastrar Colaborador' }
+              // Texto dinâmico: Editar ou Cadastrar
+              { label: isEditMode ? 'Editar Colaborador' : 'Cadastrar Colaborador' }
             ]}
           />
         </Box>
@@ -144,7 +204,7 @@ export const CreateEmployee = () => {
                 onClick={handleBack}
                 variant="text"
                 disableRipple
-                disabled={currentStep === 1 || isSaving || isValidating}
+                disabled={isSaving || isValidating}
                 sx={{ width: '64px', height: '48px', minWidth: '64px', boxShadow: 'none', pl: 0, justifyContent: 'flex-start', color: 'text.primary', '&:hover': { backgroundColor: 'transparent', boxShadow: 'none', color: 'text.secondary', }, '&.Mui-disabled': { color: (theme) => alpha(theme.palette.grey[500], 0.8), }, '&:focus': { backgroundColor: 'transparent' }, '&:active': { backgroundColor: 'transparent' } }}
               >
                 Voltar
@@ -155,7 +215,10 @@ export const CreateEmployee = () => {
                 loading={isSaving || isValidating}
                 sx={{ width: '91px', height: '48px', minWidth: '64px', fontWeight: 700, borderRadius: '8px' }}
               >
-                {currentStep === steps.length ? 'Concluir' : 'Próximo'}
+                {currentStep === steps.length 
+                    ? (isEditMode ? 'Salvar' : 'Concluir') 
+                    : 'Próximo'
+                }
               </AppButton>
             </Box>
           </Box>

@@ -1,17 +1,17 @@
 import { useEffect, useState, useMemo, memo } from 'react';
-import { 
-  TableCell, 
-  TableRow, 
-  Typography, 
-  Avatar, 
-  Chip, 
+import {
+  TableCell,
+  TableRow,
+  Typography,
+  Avatar,
+  Chip,
   Stack,
   Box,
   TextField,
   MenuItem,
   IconButton,
   Tooltip,
-  Checkbox, 
+  Checkbox,
   Menu,
   ListItemIcon
 } from '@mui/material';
@@ -31,13 +31,15 @@ import type { Employee, Department } from '../../types';
 
 // Componentes Comuns
 import { GenericTable } from '../common/GenericTable';
-import { TableToolbar } from '../common/TableToolbar'; 
-import { ConfirmDialog } from '../common/ConfirmDialog'; 
+import { TableToolbar } from '../common/TableToolbar';
+import { ConfirmDialog } from '../common/ConfirmDialog';
 import type { TableColumn } from '../common/GenericTable';
 
 // Hooks e Tema
 import { useTableDelete } from '../../hooks/useTableDelete';
 import { CHECKBOX_GREEN } from '../../theme/mainTheme';
+
+import { useNavigate } from 'react-router-dom';
 
 // --- HELPERS ---
 const formatCurrency = (value?: string | number) => {
@@ -58,8 +60,9 @@ const formatDate = (dateString?: string) => {
 };
 
 export const EmployeeTable = memo(() => {
+  const navigate = useNavigate();
   const [rows, setRows] = useState<Employee[]>([]);
-  const [departments, setDepartments] = useState<Department[]>([]); 
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [loadingDepts, setLoadingDepts] = useState(true);
   const [loadingEmps, setLoadingEmps] = useState(true);
 
@@ -75,26 +78,26 @@ export const EmployeeTable = memo(() => {
   const [menuRowId, setMenuRowId] = useState<string | null>(null);
 
   // --- LÓGICA DE EXCLUSÃO (HOOK) ---
-  const { 
-    open: openDeleteDialog, 
-    idsToDelete, 
-    isDeleting, 
-    handleOpenDelete, 
-    handleClose: handleCloseDeleteDialog, 
-    handleConfirmDelete 
+  const {
+    open: openDeleteDialog,
+    idsToDelete,
+    isDeleting,
+    handleOpenDelete,
+    handleClose: handleCloseDeleteDialog,
+    handleConfirmDelete
   } = useTableDelete({
     onDelete: async (ids) => {
       await employeeService.deleteMany(ids);
     },
     onSuccess: () => {
-      setSelected([]); 
+      setSelected([]);
       handleCloseMenu();
     }
   });
 
   // --- HANDLERS DO MENU ---
   const handleOpenMenu = (event: React.MouseEvent<HTMLElement>, id: string) => {
-    event.stopPropagation(); 
+    event.stopPropagation();
     setAnchorEl(event.currentTarget);
     setMenuRowId(id);
   };
@@ -105,29 +108,31 @@ export const EmployeeTable = memo(() => {
   };
 
   const handleEdit = () => {
-    console.log("Editar funcionário ID:", menuRowId);
+    if (menuRowId) {
+      navigate(`/editar/${menuRowId}`);
+    }
     handleCloseMenu();
   };
 
   const handleDeleteFromMenu = () => {
     if (menuRowId) {
-      handleOpenDelete(menuRowId); 
+      handleOpenDelete(menuRowId);
     }
     handleCloseMenu();
   };
 
   const handleDeleteSelected = () => {
-    handleOpenDelete(selected); 
+    handleOpenDelete(selected);
   };
 
   // --- COLUNAS ---
   const columns: TableColumn[] = [
     { id: 'colaborador', label: 'Colaborador', width: '25%' },
     { id: 'ocupacao', label: 'Cargo & Dept.', width: '25%' },
-    { id: 'detalhes', label: 'Nível & Admissão', width: '20%' }, 
-    { id: 'contrato', label: 'Gestão & Salário', width: '20%' }, 
+    { id: 'detalhes', label: 'Nível & Admissão', width: '20%' },
+    { id: 'contrato', label: 'Gestão & Salário', width: '20%' },
     { id: 'status', label: 'Status', align: 'left' },
-    { id: 'actions', label: '', disableSort: true}
+    { id: 'actions', label: '', disableSort: true }
   ];
 
   // --- EFEITOS (CARREGAMENTO DE DADOS) ---
@@ -142,7 +147,7 @@ export const EmployeeTable = memo(() => {
 
     const q = query(collection(db, "employees"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const employees = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()})) as Employee[];
+      const employees = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Employee[];
       setRows(employees);
       setLoadingEmps(false);
     });
@@ -150,8 +155,8 @@ export const EmployeeTable = memo(() => {
   }, []);
 
   // --- MEMOS (MAPAS E FILTROS) ---
-  const departmentsMap = useMemo(() => departments.reduce((acc, d) => ({...acc, [d.id]: d.name}), {} as any), [departments]);
-  const employeesMap = useMemo(() => rows.reduce((acc, e) => ({...acc, [e.id]: e.nome}), {} as any), [rows]);
+  const departmentsMap = useMemo(() => departments.reduce((acc, d) => ({ ...acc, [d.id]: d.name }), {} as any), [departments]);
+  const employeesMap = useMemo(() => rows.reduce((acc, e) => ({ ...acc, [e.id]: e.nome }), {} as any), [rows]);
 
   const filteredRows = useMemo(() => {
     return rows.filter((row) => {
@@ -172,7 +177,7 @@ export const EmployeeTable = memo(() => {
         columns={columns}
         rows={filteredRows}
         isLoading={loadingDepts || loadingEmps}
-        
+
         // Configuração de Seleção
         enableSelection={true}
         selectedIds={selected}
@@ -200,8 +205,8 @@ export const EmployeeTable = memo(() => {
 
             <Tooltip title="Excluir selecionados">
               <span>
-                <IconButton 
-                  onClick={handleDeleteSelected} 
+                <IconButton
+                  onClick={handleDeleteSelected}
                   color="error"
                   disabled={selected.length === 0}
                 >
@@ -209,97 +214,97 @@ export const EmployeeTable = memo(() => {
                 </IconButton>
               </span>
             </Tooltip>
-             {selected.length > 0 && (
-                <Typography variant="caption" color="text.secondary">
-                  {selected.length} selecionado(s)
-                </Typography>
-             )}
+            {selected.length > 0 && (
+              <Typography variant="caption" color="text.secondary">
+                {selected.length} selecionado(s)
+              </Typography>
+            )}
           </TableToolbar>
         }
 
         renderRow={(row, isSelected, toggleSelect) => (
           <TableRow key={row.id} hover selected={isSelected}>
-              {/* Checkbox da Linha */}
-              <TableCell padding="checkbox">
-                <Checkbox
-                  checked={isSelected}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    toggleSelect();
-                  }}
-                  sx={{
-                    '&.Mui-checked': { color: CHECKBOX_GREEN }
-                  }}
-                />
-              </TableCell>
+            {/* Checkbox da Linha */}
+            <TableCell padding="checkbox">
+              <Checkbox
+                checked={isSelected}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  toggleSelect();
+                }}
+                sx={{
+                  '&.Mui-checked': { color: CHECKBOX_GREEN }
+                }}
+              />
+            </TableCell>
 
-              <TableCell onClick={toggleSelect} sx={{ cursor: 'pointer' }}>
-                <Stack direction="row" alignItems="center" spacing={2}>
-                    <Avatar src={row.img} alt={row.nome} />
-                    <Box>
-                      <Typography variant="subtitle2" color="text.primary" noWrap>
-                          {row.nome}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" noWrap sx={{ fontSize: '0.80rem' }}>
-                          {row.email}
-                      </Typography>
-                    </Box>
-                </Stack>
-              </TableCell>
-              
-              <TableCell onClick={toggleSelect} sx={{ cursor: 'pointer' }}>
+            <TableCell onClick={toggleSelect} sx={{ cursor: 'pointer' }}>
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <Avatar src={row.img} alt={row.nome} />
                 <Box>
                   <Typography variant="subtitle2" color="text.primary" noWrap>
-                      {row.role || 'Sem cargo'}
+                    {row.nome}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                      {getDepartmentName(row.departamento)}
+                  <Typography variant="body2" color="text.secondary" noWrap sx={{ fontSize: '0.80rem' }}>
+                    {row.email}
                   </Typography>
                 </Box>
-              </TableCell>
+              </Stack>
+            </TableCell>
 
-              <TableCell onClick={toggleSelect} sx={{ cursor: 'pointer' }}>
-                 <Box>
-                      <Typography variant="subtitle2" sx={{ color: 'text.primary', fontSize: '0.85rem' }}>
-                          {row.seniority || '-'}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                          {formatDate(row.admissionDate)}
-                      </Typography>
-                 </Box>
-              </TableCell>
+            <TableCell onClick={toggleSelect} sx={{ cursor: 'pointer' }}>
+              <Box>
+                <Typography variant="subtitle2" color="text.primary" noWrap>
+                  {row.role || 'Sem cargo'}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                  {getDepartmentName(row.departamento)}
+                </Typography>
+              </Box>
+            </TableCell>
 
-              <TableCell onClick={toggleSelect} sx={{ cursor: 'pointer' }}>
-                  <Box>
-                      <Typography variant="body2" color="text.primary" sx={{ fontSize: '0.875rem' }}>
-                          {getManagerName(row.managerId)}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary" fontWeight={500}>
-                          {formatCurrency(row.salary)}
-                      </Typography>
-                  </Box>
-              </TableCell>
-              
-              <TableCell align="left" onClick={toggleSelect} sx={{ cursor: 'pointer' }}>
-                <Chip 
-                    label={isStatusActive(row.status) ? 'Ativo' : 'Inativo'} 
-                    size="small"
-                    sx={{
-                      fontWeight: 700,
-                      borderRadius: '6px',
-                      height: '24px',
-                      bgcolor: isStatusActive(row.status) ? 'rgba(34, 197, 94, 0.16)' : 'rgba(255, 86, 48, 0.16)',
-                      color: isStatusActive(row.status) ? '#118D57' : '#B71D18',
-                    }}
-                />
-              </TableCell>
+            <TableCell onClick={toggleSelect} sx={{ cursor: 'pointer' }}>
+              <Box>
+                <Typography variant="subtitle2" sx={{ color: 'text.primary', fontSize: '0.85rem' }}>
+                  {row.seniority || '-'}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {formatDate(row.admissionDate)}
+                </Typography>
+              </Box>
+            </TableCell>
 
-              {/* Botão de Menu (3 pontinhos) */}
-              <TableCell align="right">
-                <IconButton onClick={(e) => handleOpenMenu(e, row.id)}>
-                  <MoreVertIcon fontSize="small" />
-                </IconButton>
-              </TableCell>
+            <TableCell onClick={toggleSelect} sx={{ cursor: 'pointer' }}>
+              <Box>
+                <Typography variant="body2" color="text.primary" sx={{ fontSize: '0.875rem' }}>
+                  {getManagerName(row.managerId)}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                  {formatCurrency(row.salary)}
+                </Typography>
+              </Box>
+            </TableCell>
+
+            <TableCell align="left" onClick={toggleSelect} sx={{ cursor: 'pointer' }}>
+              <Chip
+                label={isStatusActive(row.status) ? 'Ativo' : 'Inativo'}
+                size="small"
+                sx={{
+                  fontWeight: 700,
+                  borderRadius: '6px',
+                  height: '24px',
+                  bgcolor: isStatusActive(row.status) ? 'rgba(34, 197, 94, 0.16)' : 'rgba(255, 86, 48, 0.16)',
+                  color: isStatusActive(row.status) ? '#118D57' : '#B71D18',
+                }}
+              />
+            </TableCell>
+
+            {/* Botão de Menu (3 pontinhos) */}
+            <TableCell align="right">
+              <IconButton onClick={(e) => handleOpenMenu(e, row.id)}>
+                <MoreVertIcon fontSize="small" />
+              </IconButton>
+            </TableCell>
           </TableRow>
         )}
       />
@@ -312,8 +317,8 @@ export const EmployeeTable = memo(() => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         PaperProps={{
-          sx: { 
-            boxShadow: '0 0 20px rgba(0,0,0,0.1)', 
+          sx: {
+            boxShadow: '0 0 20px rgba(0,0,0,0.1)',
             minWidth: '140px',
             borderRadius: '8px'
           }
@@ -337,9 +342,9 @@ export const EmployeeTable = memo(() => {
         isLoading={isDeleting}
         title={idsToDelete.length > 1 ? "Excluir Colaboradores" : "Excluir Colaborador"}
         content={
-          idsToDelete.length > 1 
-          ? `Tem certeza que deseja excluir os ${idsToDelete.length} colaboradores selecionados? Esta ação não pode ser desfeita.`
-          : "Tem certeza que deseja excluir este colaborador? Esta ação não pode ser desfeita."
+          idsToDelete.length > 1
+            ? `Tem certeza que deseja excluir os ${idsToDelete.length} colaboradores selecionados? Esta ação não pode ser desfeita.`
+            : "Tem certeza que deseja excluir este colaborador? Esta ação não pode ser desfeita."
         }
       />
     </Box>

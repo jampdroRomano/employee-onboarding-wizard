@@ -1,4 +1,3 @@
-// src/hooks/useProfessionalInfo.ts
 import { useState, useEffect } from 'react';
 import { departmentService } from '../services/departmentService';
 import { getAllEmployees } from '../services/employeeService';
@@ -28,6 +27,10 @@ export const useProfessionalInfo = () => {
   const [isLoading, setIsLoading] = useState(false); 
   const [errors, setErrors] = useState<Partial<ProfessionalData>>({});
 
+  const setValues = (data: Partial<ProfessionalData>) => {
+    setFormData(prev => ({ ...prev, ...data }));
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -55,7 +58,6 @@ export const useProfessionalInfo = () => {
     }
   };
 
-  // Validação do Step 2 (Profissional)
   const validateStep2 = () => {
     const newErrors: Partial<ProfessionalData> = {};
     let isValid = true;
@@ -81,7 +83,6 @@ export const useProfessionalInfo = () => {
     return isValid;
   };
 
-  // Validação do Step 3 (Contratual)
   const validateStep3 = () => {
     const newErrors: Partial<ProfessionalData> = {};
     let isValid = true;
@@ -103,6 +104,7 @@ export const useProfessionalInfo = () => {
     errors,
     handleChange,
     validateStep2,
-    validateStep3
+    validateStep3,
+    setValues 
   };
 };

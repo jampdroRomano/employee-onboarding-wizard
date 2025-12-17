@@ -9,7 +9,9 @@ import {
   getDocs,
   doc,
   deleteDoc,
-  orderBy
+  orderBy,
+  getDoc,    
+  updateDoc 
 } from "firebase/firestore";
 import { AVATARS } from "../utils/constants"; 
 import type { Employee, NewEmployeePayload } from "../types"; 
@@ -81,5 +83,32 @@ export const employeeService = {
   deleteMany: async (ids: string[]) => {
     const deletePromises = ids.map(id => deleteDoc(doc(db, 'employees', id)));
     await Promise.all(deletePromises);
+  },
+
+  getById: async (id: string): Promise<Employee | null> => {
+    const docRef = doc(db, 'employees', id);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() } as Employee;
+    } else {
+      return null;
+    }
+  },
+
+  update: async (id: string, data: Partial<NewEmployeePayload>) => {
+    const docRef = doc(db, 'employees', id);
+
+    const updatePayload: any = { ...data };
+    
+    if (typeof data.status === 'boolean') {
+      updatePayload.status = data.status ? 'Ativo' : 'Inativo';
+    }
+    
+    Object.keys(updatePayload).forEach(key => 
+      updatePayload[key] === undefined && delete updatePayload[key]
+    );
+
+    await updateDoc(docRef, updatePayload);
   }
 };

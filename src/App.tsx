@@ -11,19 +11,15 @@ import { CreateDepartment } from './pages/CreateDepartment';
 
 function App() {
   const { userLoggedIn, currentUser } = useAuth();
-  // Helper para saber se pode ir pro Dashboard
-  // O usuário só entra se estiver logado E com e-mail verificado
   const canAccessDashboard = userLoggedIn && currentUser?.emailVerified;
 
   return (
     <Routes>
-      {/* Rota Pública: Login */}
       <Route
         path="/login"
         element={canAccessDashboard ? <Navigate to="/" replace /> : <AuthPage />}
       />
 
-      {/* Rotas Protegidas */}
       <Route
         path="/"
         element={
@@ -35,8 +31,21 @@ function App() {
         }
       />
 
+      {/* Rota de Criação */}
       <Route
         path="/criar"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <CreateEmployee />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
+      {/* --- NOVA ROTA DE EDIÇÃO --- */}
+      <Route
+        path="/editar/:id"
         element={
           <PrivateRoute>
             <MainLayout>
