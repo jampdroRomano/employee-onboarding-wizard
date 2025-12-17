@@ -34,10 +34,13 @@ import type { TableColumn } from '../common/GenericTable';
 import { useTableDelete } from '../../hooks/useTableDelete';
 import { CHECKBOX_GREEN } from '../../theme/mainTheme';
 
+import { useNavigate } from 'react-router-dom';
+
 export const DepartmentTable = memo(() => {
   const [rows, setRows] = useState<Department[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Filtros
   const [searchTerm, setSearchTerm] = useState('');
@@ -145,7 +148,9 @@ export const DepartmentTable = memo(() => {
   };
 
   const handleEdit = () => {
-    console.log("Editar Departamento (Visual):", menuRowId);
+    if (menuRowId) {
+      navigate(`/departamentos/editar/${menuRowId}`);
+    }
     handleCloseMenu();
   };
 

@@ -9,7 +9,8 @@ import {
   where,
   doc,
   deleteDoc,
-  writeBatch
+  writeBatch,
+  updateDoc
 } from "firebase/firestore";
 import type { Department } from "../types";
 
@@ -53,6 +54,16 @@ export const departmentService = {
     return docRef.id; 
   },
   
+  update: async (id: string, data: Partial<Omit<Department, 'id'>>) => {
+    try {
+      const docRef = doc(db, "departments", id);
+      await updateDoc(docRef, data);
+    } catch (error) {
+      console.error("Erro ao atualizar departamento:", error);
+      throw new Error("Não foi possível atualizar o departamento.");
+    }
+  },
+
   delete: async (id: string) => {
     const employeesRef = collection(db, 'employees');
     const q = query(employeesRef, where('departamento', '==', id));

@@ -66,11 +66,16 @@ export const useDepartmentForm = () => {
     return isValid;
   };
 
+  const setValues = (values: Partial<DepartmentState>) => {
+    setFormData(prev => ({ ...prev, ...values }));
+  };
+
   return {
     formData,
     errors,
     handleChange,
     handleEmployeeSelection,
-    validateStep
+    validateStep,
+    setValues
   };
 };
