@@ -4,6 +4,7 @@ export interface DepartmentState {
   name: string;
   description: string;
   managerId: string | null;
+  employeeIds: string[];
 }
 
 export interface DepartmentErrors {
@@ -16,16 +17,21 @@ export const useDepartmentForm = () => {
   const [formData, setFormData] = useState<DepartmentState>({
     name: '',
     description: '',
-    managerId: null
+    managerId: null,
+    employeeIds: []
   });
 
   const [errors, setErrors] = useState<DepartmentErrors>({});
 
-  const handleChange = (field: keyof DepartmentState, value: string | null) => {
+  const handleChange = (field: 'name' | 'description' | 'managerId', value: string | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
+  };
+
+  const handleEmployeeSelection = (ids: string[]) => {
+    setFormData(prev => ({ ...prev, employeeIds: ids }));
   };
 
   const validateStep = (step: number): boolean => {
@@ -48,7 +54,7 @@ export const useDepartmentForm = () => {
       }
     }
 
-    // Validação do Passo 2: Gestão 
+    // Validação do Passo 2: Gestão
     if (step === 1) {
       // if (!formData.managerId) {
       //   newErrors.managerId = 'Selecione um responsável pelo departamento.';
@@ -64,6 +70,7 @@ export const useDepartmentForm = () => {
     formData,
     errors,
     handleChange,
+    handleEmployeeSelection,
     validateStep
   };
 };

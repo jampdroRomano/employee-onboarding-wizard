@@ -21,7 +21,7 @@ export interface TableColumn {
     label: string;
     width?: string | number;
     align?: 'left' | 'center' | 'right';
-    disableSort?: boolean; // <--- NOVA PROPRIEDADE
+    disableSort?: boolean; 
 }
 
 interface GenericTableProps<T> {
@@ -29,7 +29,8 @@ interface GenericTableProps<T> {
     rows: T[];
     isLoading: boolean;
     emptyMessage?: string;
-    minWidth?: number;
+    minWidth?: string | number;
+    maxHeight?: number;
     filters?: ReactNode;
     enableSelection?: boolean;
     selectedIds?: string[];
@@ -44,7 +45,8 @@ export const GenericTable = <T extends { id: string }>({
     isLoading,
     emptyMessage = "Nenhum registro encontrado.",
     renderRow,
-    minWidth = 900,
+    minWidth = '100%',
+    maxHeight,
     filters,
     enableSelection = false,
     selectedIds = [],
@@ -96,7 +98,8 @@ export const GenericTable = <T extends { id: string }>({
             <TableContainer
                 sx={{
                     border: '2px solid #F4F6F8',
-                    borderRadius: 2
+                    borderRadius: 2,
+                    maxHeight: maxHeight
                 }}
             >
                 {filters && (

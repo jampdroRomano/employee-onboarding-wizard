@@ -1,59 +1,52 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { AppBreadcrumbs } from '../components/common/AppBreadcrumbs';
 import { AppButton } from '../components/common/AppButton';
-import { StepperVertical } from '../components/common/StepperVertical'; 
+import { StepperVertical } from '../components/common/StepperVertical';
 import { OnboardingProgress } from '../components/common/OnboardingProgress';
-
 import { DepartmentForm } from '../components/departments/DepartmentForm';
 import { DepartmentManagerStep } from '../components/departments/DepartmentManagerStep';
 import { departmentService } from '../services/departmentService';
-// CORREÇÃO: Importar apenas a função, sem o tipo antigo
-import { getAllEmployees } from '../services/employeeService'; 
-// CORREÇÃO: Importar Employee do arquivo de types
-import type { Employee } from '../types'; 
-import { useDepartmentForm } from '../hooks/useDepartmentForm'; 
+import { getAllEmployees } from '../services/employeeService';
+import type { Employee } from '../types';
+import { useDepartmentForm } from '../hooks/useDepartmentForm';
+import { EmployeeSelectionStep } from '../components/departments/EmployeeSelectionStep';
 
 export const CreateDepartment = () => {
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = useState(0); 
+  const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(false);
-  
-  // CORREÇÃO: Tipagem correta do estado
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loadingEmployees, setLoadingEmployees] = useState(false);
 
-  const { formData, errors, handleChange, validateStep } = useDepartmentForm();
+  const { formData, errors, handleChange, validateStep, handleEmployeeSelection } =
+    useDepartmentForm();
 
   useEffect(() => {
     const fetchEmployees = async () => {
-        setLoadingEmployees(true);
-        try {
-            const data = await getAllEmployees();
-            setEmployees(data);
-        } catch (error) {
-            console.error("Erro ao buscar funcionários:", error);
-        } finally {
-            setLoadingEmployees(false);
-        }
+      setLoadingEmployees(true);
+      try {
+        const data = await getAllEmployees();
+        setEmployees(data);
+      } catch (error) {
+        console.error('Erro ao buscar funcionários:', error);
+      } finally {
+        setLoadingEmployees(false);
+      }
     };
     fetchEmployees();
   }, []);
 
-  const steps = [
-    'Informações', 
-    'Gestão', 
-    'Colaboradores'
-  ];
+  const steps = ['Informações', 'Gestão', 'Colaboradores'];
 
   const progressValue = activeStep === 0 ? 0 : activeStep === 1 ? 50 : 100;
 
   const handleNext = async () => {
     const isValid = validateStep(activeStep);
 
-    if (!isValid) return; 
+    if (!isValid) return;
 
     if (activeStep === 0) {
       setActiveStep(1);
@@ -71,7 +64,7 @@ export const CreateDepartment = () => {
   };
 
   const handleBack = () => {
-    setActiveStep((prev) => prev - 1);
+    setActiveStep(prev => prev - 1);
   };
 
   const handleSave = async () => {
@@ -81,7 +74,7 @@ export const CreateDepartment = () => {
       navigate('/departamentos');
     } catch (error) {
       console.error(error);
-      alert("Erro ao salvar."); 
+      alert('Erro ao salvar.');
     } finally {
       setLoading(false);
     }
@@ -91,19 +84,19 @@ export const CreateDepartment = () => {
     switch (activeStep) {
       case 0:
         return (
-          <DepartmentForm 
+          <DepartmentForm
             name={formData.name}
             description={formData.description}
-            errors={errors} 
-            onChangeName={(v) => handleChange('name', v)}
-            onChangeDesc={(v) => handleChange('description', v)}
+            errors={errors}
+            onChangeName={v => handleChange('name', v)}
+            onChangeDesc={v => handleChange('description', v)}
           />
         );
       case 1:
         return (
-          <DepartmentManagerStep 
+          <DepartmentManagerStep
             value={formData.managerId}
-            error={errors.managerId} 
+            error={errors.managerId}
             // CORREÇÃO: Tipagem explícita para resolver erro de "implicit any"
             onChange={(id: string | null) => handleChange('managerId', id)}
             employees={employees}
@@ -112,28 +105,10 @@ export const CreateDepartment = () => {
         );
       case 2:
         return (
-            <Box sx={{ width: '100%' }}>
-                <Typography 
-                    component="h2"
-                    variant="h4" 
-                    sx={{ mb: '31px', color: 'text.secondary' }}
-                >
-                    Colaboradores
-                </Typography>
-                <Box 
-                  sx={{ 
-                      p: 4, 
-                      border: '1px dashed #919EAB', 
-                      borderRadius: 2, 
-                      bgcolor: 'background.neutral',
-                      textAlign: 'center' 
-                  }}
-                >
-                    <Typography color="text.secondary">
-                        Lista de seleção de colaboradores será implementada em breve.
-                    </Typography>
-                </Box>
-            </Box>
+          <EmployeeSelectionStep
+            onSelectionChange={handleEmployeeSelection}
+            selectedIds={formData.employeeIds}
+          />
         );
       default:
         return null;
@@ -142,7 +117,14 @@ export const CreateDepartment = () => {
 
   return (
     <Box>
-      <Box sx={{ width: '100%', maxWidth: '100%', mx: 'auto', pr: { xs: 0, lg: '5%' } }}>
+      <Box
+        sx={{
+          width: '100%',
+          maxWidth: '100%',
+          mx: 'auto',
+          pr: { xs: 0, lg: '5%' }
+        }}
+      >
         <Box sx={{ mb: 2 }}>
           <AppBreadcrumbs
             items={[
@@ -154,45 +136,109 @@ export const CreateDepartment = () => {
 
         <OnboardingProgress progress={progressValue} />
 
-        <Box sx={{ mt: '39px', display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: '40px', alignItems: 'flex-start' }}>
+        <Box
+          sx={{
+            mt: '39px',
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            gap: '40px',
+            alignItems: 'flex-start'
+          }}
+        >
           <Box sx={{ width: { xs: '100%', md: '153px' }, flexShrink: 0 }}>
-             <StepperVertical currentStep={activeStep + 1} steps={steps} />
+            <StepperVertical currentStep={activeStep + 1} steps={steps} />
           </Box>
 
-          <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', minHeight: '440px' }}>
-             <Box>{renderStepContent()}</Box>
+          <Box
+            sx={{
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              minHeight: '440px'
+            }}
+          >
+            <Box>{renderStepContent()}</Box>
 
-             <Box sx={{ mt: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '48px', width: '100%', pt: 4 }}>
-                {activeStep > 0 ? (
-                  <AppButton 
-                    onClick={handleBack}
-                    variant="text"
-                    disableRipple
-                    disabled={loading}
-                    sx={{ width: '64px', height: '48px', minWidth: '64px', boxShadow: 'none', pl: 0, justifyContent: 'flex-start', color: 'text.primary', '&:hover': { backgroundColor: 'transparent', boxShadow: 'none', color: 'text.secondary' }, '&.Mui-disabled': { color: (theme) => alpha(theme.palette.grey[500], 0.8) }, '&:focus': { backgroundColor: 'transparent' }, '&:active': { backgroundColor: 'transparent' } }}
-                  >
-                    Voltar
-                  </AppButton>
-                ) : (
-                   <AppButton 
-                    onClick={() => navigate('/departamentos')}
-                    variant="text"
-                    disableRipple
-                    disabled={loading}
-                    sx={{ width: '64px', height: '48px', minWidth: '64px', boxShadow: 'none', pl: 0, justifyContent: 'flex-start', color: 'text.primary', '&:hover': { backgroundColor: 'transparent', boxShadow: 'none', color: 'text.secondary' }, '&:focus': { backgroundColor: 'transparent' }, '&:active': { backgroundColor: 'transparent' } }}
-                  >
-                    Cancelar
-                  </AppButton>
-                )}
-
-                <AppButton 
-                  onClick={handleNext}
-                  loading={loading}
-                  sx={{ width: '91px', height: '48px', minWidth: '64px', fontWeight: 700, borderRadius: '8px' }}
+            <Box
+              sx={{
+                mt: 'auto',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                height: '48px',
+                width: '100%',
+                pt: 4
+              }}
+            >
+              {activeStep > 0 ? (
+                <AppButton
+                  onClick={handleBack}
+                  variant="text"
+                  disableRipple
+                  disabled={loading}
+                  sx={{
+                    width: '64px',
+                    height: '48px',
+                    minWidth: '64px',
+                    boxShadow: 'none',
+                    pl: 0,
+                    justifyContent: 'flex-start',
+                    color: 'text.primary',
+                    '&:hover': {
+                      backgroundColor: 'transparent',
+                      boxShadow: 'none',
+                      color: 'text.secondary'
+                    },
+                    '&.Mui-disabled': {
+                      color: theme => alpha(theme.palette.grey[500], 0.8)
+                    },
+                    '&:focus': { backgroundColor: 'transparent' },
+                    '&:active': { backgroundColor: 'transparent' }
+                  }}
                 >
-                  {activeStep === steps.length - 1 ? 'Salvar' : 'Próximo'}
+                  Voltar
                 </AppButton>
-             </Box>
+              ) : (
+                <AppButton
+                  onClick={() => navigate('/departamentos')}
+                  variant="text"
+                  disableRipple
+                  disabled={loading}
+                  sx={{
+                    width: '64px',
+                    height: '48px',
+                    minWidth: '64px',
+                    boxShadow: 'none',
+                    pl: 0,
+                    justifyContent: 'flex-start',
+                    color: 'text.primary',
+                    '&:hover': {
+                      backgroundColor: 'transparent',
+                      boxShadow: 'none',
+                      color: 'text.secondary'
+                    },
+                    '&:focus': { backgroundColor: 'transparent' },
+                    '&:active': { backgroundColor: 'transparent' }
+                  }}
+                >
+                  Cancelar
+                </AppButton>
+              )}
+
+              <AppButton
+                onClick={handleNext}
+                loading={loading}
+                sx={{
+                  width: '91px',
+                  height: '48px',
+                  minWidth: '64px',
+                  fontWeight: 700,
+                  borderRadius: '8px'
+                }}
+              >
+                {activeStep === steps.length - 1 ? 'Salvar' : 'Próximo'}
+              </AppButton>
+            </Box>
           </Box>
         </Box>
       </Box>
