@@ -133,10 +133,10 @@ export const employeeService = {
   update: async (id: string, data: Partial<NewEmployeePayload>) => {
     const docRef = doc(db, 'employees', id);
     
-    const updateObject: { [key: string]: any } = {}; 
+    const updateObject: Record<string, unknown> = {}; 
 
     for (const key in data) {
-      if (data.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(data, key)) {
         const value = data[key as keyof Partial<NewEmployeePayload>];
         
         if (key === 'status') {

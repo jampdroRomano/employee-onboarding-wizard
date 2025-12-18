@@ -13,6 +13,7 @@ import { useBasicInfo } from '../hooks/useBasicInfo';
 import { useProfessionalInfo } from '../hooks/useProfessionalInfo';
 import { createEmployee, checkEmailExists, employeeService } from '../services/employeeService'; 
 import type { NewEmployeePayload } from '../types';
+import { toast } from 'sonner';
 
 export const CreateEmployee = () => {
   const navigate = useNavigate();
@@ -55,12 +56,12 @@ export const CreateEmployee = () => {
               salary: employee.salary ? String(employee.salary) : ''
             });
           } else {
-            alert("Colaborador não encontrado");
+            toast.error("Colaborador não encontrado");
             navigate('/');
           }
         } catch (error) {
           console.error("Erro ao carregar colaborador:", error);
-          alert("Erro ao carregar dados do colaborador.");
+          toast.error("Erro ao carregar dados do colaborador.");
         } finally {
           setIsFetching(false);
         }
@@ -69,7 +70,8 @@ export const CreateEmployee = () => {
     } else {
       setIsFetching(false);
     }
-  }, [id, isEditMode, basicInfo.setValues, profInfo.setValues, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, isEditMode, navigate]);
 
   const handleNext = async () => {
     if (currentStep === 1) {
@@ -120,9 +122,11 @@ export const CreateEmployee = () => {
           if (isEditMode && id) {
             // MODO EDIÇÃO: Atualiza
             await employeeService.update(id, finalPayload);
+            toast.success('Colaborador atualizado com sucesso!');
           } else {
             // MODO CRIAÇÃO: Cria novo
             await createEmployee(rawPayload as NewEmployeePayload);
+            toast.success('Colaborador criado com sucesso!');
           }
           navigate('/');
         } catch (error) {
@@ -131,7 +135,7 @@ export const CreateEmployee = () => {
           if (error instanceof Error) {
             errorMessage = error.message;
           }
-          alert(errorMessage);
+          toast.error(errorMessage);
         } finally {
           setIsSaving(false);
         }
@@ -215,7 +219,7 @@ export const CreateEmployee = () => {
                 variant="text"
                 disableRipple
                 disabled={isSaving || isValidating}
-                sx={{ width: '64px', height: '48px', minWidth: '64px', boxShadow: 'none', pl: 0, justifyContent: 'flex-start', color: 'text.primary', '&:hover': { backgroundColor: 'transparent', boxShadow: 'none', color: 'text.secondary', }, '&.Mui-disabled': { color: (theme) => alpha(theme.palette.grey[500], 0.8), }, '&:focus': { backgroundColor: 'transparent' }, '&:active': { backgroundColor: 'transparent' } }}
+                sx={{ width: '64px', height: '48px', minWidth: '64px', boxShadow: 'none', pl: 0, justifyContent: 'flex-start', color: 'text.primary', '&:hover': { backgroundColor: 'transparent', boxShadow: 'none', color: 'text.secondary', }, '&.Mui-disabled': { color: (theme) => alpha(theme.palette.grey[500], 0.8), }, '&:focus': { backgroundColor: 'transparent' }, '&:active': { backgroundColor: 'transparent' } } }
               >
                 Voltar
               </AppButton>

@@ -1,17 +1,15 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface UseTableDeleteProps {
   onDelete: (ids: string[]) => Promise<void>;
   onSuccess?: () => void;
-  successMessage?: string;
 }
 
 export const useTableDelete = ({ onDelete, onSuccess }: UseTableDeleteProps) => {
   const [open, setOpen] = useState(false);
   const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  // Abre o modal preparando para deletar (recebe 1 ID ou Vários)
   const handleOpenDelete = (ids: string | string[]) => {
     const idsArray = Array.isArray(ids) ? ids : [ids];
     setIdsToDelete(idsArray);
@@ -27,14 +25,16 @@ export const useTableDelete = ({ onDelete, onSuccess }: UseTableDeleteProps) => 
   const handleConfirmDelete = async () => {
     try {
       setIsDeleting(true);
-      await onDelete(idsToDelete); // Chama a função do Service passada por prop
+      await onDelete(idsToDelete); 
       
+      toast.success('Item(s) excluído(s) com sucesso!');
       if (onSuccess) {
         onSuccess();
       }
       handleClose();
     } catch (error) {
       console.error("Erro ao excluir:", error);
+      toast.error('Erro ao excluir item(s).');
     } finally {
       setIsDeleting(false);
     }

@@ -9,11 +9,11 @@ import { DepartmentForm } from '../components/departments/DepartmentForm';
 import { DepartmentManagerStep } from '../components/departments/DepartmentManagerStep';
 import { EmployeeSelectionStep } from '../components/departments/EmployeeSelectionStep';
 import { DepartmentEditEmployeesStep } from '../components/departments/DepartmentEditEmployeesStep'; 
-
 import { departmentService } from '../services/departmentService';
 import { employeeService, getAllEmployees } from '../services/employeeService';
 import type { Employee } from '../types';
 import { useDepartmentForm } from '../hooks/useDepartmentForm';
+import { toast } from 'sonner';
 
 interface EmployeeChange {
   employeeId: string;
@@ -69,11 +69,12 @@ export const CreateDepartment = () => {
               managerId: dept.managerId
             });
           } else {
-             alert('Departamento não encontrado');
+             toast.error('Departamento não encontrado');
              navigate('/departamentos');
           }
         } catch (error) {
           console.error(error);
+          toast.error('Erro ao carregar departamento.');
         } finally {
           setInitialLoading(false);
         }
@@ -116,6 +117,7 @@ export const CreateDepartment = () => {
           },
           employeeChanges
         );
+        toast.success('Departamento atualizado com sucesso!');
       } else {
         // --- MODO CRIAÇÃO ---
         const newDepartmentId = await departmentService.create(formData);
@@ -126,11 +128,12 @@ export const CreateDepartment = () => {
             newDepartmentId
           );
         }
+        toast.success('Departamento criado com sucesso!');
       }
       navigate('/departamentos');
     } catch (error) {
       console.error(error);
-      alert('Erro ao salvar.');
+      toast.error('Erro ao salvar departamento.');
     } finally {
       setLoading(false);
     }
