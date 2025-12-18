@@ -53,6 +53,12 @@ export const useProfessionalInfo = () => {
 
   const handleChange = useCallback((field: keyof ProfessionalData, value: string) => {
     let finalValue: string | null = value;
+
+    if (field === 'salary') {
+      // Permite apenas dígitos, vírgulas e pontos
+      finalValue = value.replace(/[^0-9,.]/g, ''); 
+    }
+
     if (field === 'managerId' && value === '') {
         finalValue = null;
     }
