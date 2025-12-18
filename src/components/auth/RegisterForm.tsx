@@ -11,6 +11,7 @@ import { auth } from '../../config/firebase';
 import { AppTextField } from '../common/AppTextField';
 import { AppButton } from '../common/AppButton';
 import logoFlugo from '../../assets/flugoLogo.png';
+import { RegistrationSuccessDialog } from './RegistrationSuccessDialog';
 
 // 1. Defini a interface para aceitar a prop 'onSuccess'
 interface RegisterFormProps {
@@ -25,6 +26,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isSuccessDialogOpen, setSuccessDialogOpen] = useState(false);
 
   const handleRegister = async () => {
     setError('');
@@ -57,20 +59,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
       // 4. IMPORTANTE: Desloga imediatamente para impedir acesso sem verificar
       await signOut(auth);
 
-      alert(
-        `✅ Conta criada com sucesso!
-
-Enviamos um link de confirmação para:
-${email}
-
-⚠️ Atenção:
-Se não encontrar na Caixa de Entrada, verifique o SPAM ou Lixo Eletrônico.`
-      );
-
-      // 5. Chama a função para voltar para a aba de login
-      if (onSuccess) {
-        onSuccess();
-      }
+      setSuccessDialogOpen(true);
 
     } catch (err) {
       console.error(err);
@@ -140,6 +129,16 @@ Se não encontrar na Caixa de Entrada, verifique o SPAM ou Lixo Eletrônico.`
       >
         Cadastrar
       </AppButton>
+
+      <RegistrationSuccessDialog
+        open={isSuccessDialogOpen}
+        onClose={() => {
+          setSuccessDialogOpen(false);
+          if (onSuccess) {
+            onSuccess();
+          }
+        }}
+      />
 
     </Stack>
   );
