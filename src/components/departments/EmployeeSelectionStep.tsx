@@ -96,10 +96,10 @@ export const EmployeeSelectionStep = ({ selectedIds, onSelectionChange }: Employ
     const allOnPageSelected = numSelectedOnPage === paginatedData.length;
 
     if (allOnPageSelected) {
-      const pageIds = paginatedData.map(r => r.id);
+      const pageIds = paginatedData.map(row => row.id);
       onSelectionChange(selectedIds.filter(id => !pageIds.includes(id)));
     } else {
-      const newIds = paginatedData.filter(row => !selectedIds.includes(row.id)).map(r => r.id);
+      const newIds = paginatedData.filter(row => !selectedIds.includes(row.id)).map(row => row.id);
       onSelectionChange([...selectedIds, ...newIds]);
     }
   }, [selectedIds, onSelectionChange, paginatedData]);

@@ -9,6 +9,7 @@ import {
   Alert 
 } from '@mui/material';
 import { sendPasswordResetEmail } from 'firebase/auth';
+import { FirebaseError } from 'firebase/app';
 import { auth } from '../../config/firebase';
 import { AppTextField } from '../common/AppTextField';
 
@@ -44,8 +45,8 @@ export const ForgotPasswordDialog = ({ open, onClose }: ForgotPasswordDialogProp
         )
       });
       
-    } catch (error: any) {
-      if (error.code === 'auth/user-not-found') {
+    } catch (error) {
+      if (error instanceof FirebaseError && error.code === 'auth/user-not-found') {
         setMessage({ type: 'error', text: 'Este e-mail não está cadastrado.' });
       } else {
         setMessage({ type: 'error', text: 'Ocorreu um erro ao enviar. Tente novamente.' });

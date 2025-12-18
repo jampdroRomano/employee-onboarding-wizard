@@ -12,6 +12,7 @@ import { AppButton } from '../components/common/AppButton';
 import { useBasicInfo } from '../hooks/useBasicInfo';
 import { useProfessionalInfo } from '../hooks/useProfessionalInfo';
 import { createEmployee, checkEmailExists, employeeService } from '../services/employeeService'; 
+import type { NewEmployeePayload } from '../types';
 
 export const CreateEmployee = () => {
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ export const CreateEmployee = () => {
     } else {
       setIsFetching(false);
     }
-  }, [id, isEditMode]);
+  }, [id, isEditMode, basicInfo.setValues, profInfo.setValues, navigate]);
 
   const handleNext = async () => {
     if (currentStep === 1) {
@@ -104,24 +105,33 @@ export const CreateEmployee = () => {
       if (isValid) {
         setIsSaving(true);
 
-        const payload = {
+        const rawPayload = {
           ...basicInfo.formData,
           ...profInfo.formData,
           departamento: profInfo.formData.department
         };
 
+        // Filtra e remove chaves com valores 'undefined'
+        const finalPayload = Object.fromEntries(
+          Object.entries(rawPayload).filter(([, value]) => value !== undefined)
+        ) as Partial<NewEmployeePayload>;
+
         try {
           if (isEditMode && id) {
             // MODO EDIÇÃO: Atualiza
-            await employeeService.update(id, payload);
+            await employeeService.update(id, finalPayload);
           } else {
             // MODO CRIAÇÃO: Cria novo
-            await createEmployee(payload);
+            await createEmployee(rawPayload as NewEmployeePayload);
           }
           navigate('/');
-        } catch (error: any) {
+        } catch (error) {
           console.error("Erro ao salvar:", error);
-          alert(error.message || "Ocorreu um erro ao salvar.");
+          let errorMessage = "Ocorreu um erro ao salvar.";
+          if (error instanceof Error) {
+            errorMessage = error.message;
+          }
+          alert(errorMessage);
         } finally {
           setIsSaving(false);
         }

@@ -156,8 +156,8 @@ export const EmployeeTable = memo(() => {
   }, []);
 
   // --- MEMOS (MAPAS E FILTROS) ---
-  const departmentsMap = useMemo(() => departments.reduce((acc, d) => ({ ...acc, [d.id]: d.name }), {} as any), [departments]);
-  const employeesMap = useMemo(() => rows.reduce((acc, e) => ({ ...acc, [e.id]: e.nome }), {} as any), [rows]);
+  const departmentsMap = useMemo(() => departments.reduce((acc: Record<string, string>, d) => ({ ...acc, [d.id]: d.name }), {}), [departments]);
+  const employeesMap = useMemo(() => rows.reduce((acc: Record<string, string>, e) => ({ ...acc, [e.id]: e.nome }), {}), [rows]);
 
   const filteredRows = useMemo(() => {
     return rows.filter((row) => {
@@ -213,8 +213,11 @@ export const EmployeeTable = memo(() => {
 
 
   const getDepartmentName = (id: string) => departmentsMap[id] || 'Não atribuído';
-  const getManagerName = (id?: string | null) => (!id ? '-' : employeesMap[id] || 'Não encontrado');
-  const isStatusActive = (s: any) => s === true || s === 'Ativo';
+  const getManagerName = useCallback((id?: string | null) => {
+    if (!id) return '-';
+    return employeesMap[id] || 'Não encontrado';
+  }, [employeesMap]);
+  const isStatusActive = (s: boolean | string) => s === true || s === 'Ativo';
 
   return (
     <Box>

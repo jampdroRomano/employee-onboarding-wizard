@@ -6,6 +6,7 @@ import {
   sendEmailVerification,
   signOut
 } from 'firebase/auth';
+import { FirebaseError } from 'firebase/app';
 import { auth } from '../../config/firebase';
 import { AppTextField } from '../common/AppTextField';
 import { AppButton } from '../common/AppButton';
@@ -71,11 +72,11 @@ Se não encontrar na Caixa de Entrada, verifique o SPAM ou Lixo Eletrônico.`
         onSuccess();
       }
 
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      if (err.code === 'auth/email-already-in-use') {
+      if (err instanceof FirebaseError && err.code === 'auth/email-already-in-use') {
         setError('Este e-mail já está em uso.');
-      } else if (err.code === 'auth/invalid-email') {
+      } else if (err instanceof FirebaseError && err.code === 'auth/invalid-email') {
         setError('E-mail inválido.');
       } else {
         setError('Erro ao criar conta. Tente novamente.');

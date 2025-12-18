@@ -113,10 +113,10 @@ export const DepartmentTable = memo(() => {
   }, [employees]);
 
   // Helper para exibir nome do gestor
-  const getManagerName = (managerId?: string | null) => {
+  const getManagerName = useCallback((managerId?: string | null) => {
     if (!managerId) return null;
     return employeesMap[managerId] || null;
-  };
+  }, [employeesMap]);
 
   // --- FILTRAGEM ---
   const filteredRows = useMemo(() => {
@@ -134,7 +134,7 @@ export const DepartmentTable = memo(() => {
 
       return matchesSearch && matchesDept;
     });
-  }, [rows, searchTerm, filterDeptId, employeesMap]);
+  }, [rows, searchTerm, filterDeptId, getManagerName]);
 
   // --- PAGINAÇÃO ---
   const {

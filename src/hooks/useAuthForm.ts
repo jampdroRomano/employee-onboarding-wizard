@@ -5,6 +5,7 @@ import {
   createUserWithEmailAndPassword, 
   updateProfile 
 } from 'firebase/auth';
+import { FirebaseError } from 'firebase/app';
 import { auth } from '../config/firebase';
 
 export const useAuthForm = () => {
@@ -19,10 +20,10 @@ export const useAuthForm = () => {
     try {
       await signInWithEmailAndPassword(auth, email, pass);
       navigate('/');
-    } catch (err: any) {
-      if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+    } catch (err) {
+      if (err instanceof FirebaseError && (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password')) {
         setError('E-mail ou senha incorretos.');
-      } else if (err.code === 'auth/too-many-requests') {
+      } else if (err instanceof FirebaseError && err.code === 'auth/too-many-requests') {
         setError('Muitas tentativas. Tente novamente mais tarde.');
       } else {
         setError('Ocorreu um erro ao fazer login.');
@@ -51,10 +52,10 @@ export const useAuthForm = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
       await updateProfile(userCredential.user, { displayName: name });
       navigate('/');
-    } catch (err: any) {
-      if (err.code === 'auth/email-already-in-use') {
+    } catch (err) {
+      if (err instanceof FirebaseError && err.code === 'auth/email-already-in-use') {
         setError('Este e-mail já está em uso.');
-      } else if (err.code === 'auth/invalid-email') {
+      } else if (err instanceof FirebaseError && err.code === 'auth/invalid-email') {
         setError('E-mail inválido.');
       } else {
         setError('Erro ao criar conta. Tente novamente.');

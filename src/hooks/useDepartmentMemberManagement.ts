@@ -184,7 +184,6 @@ export const useDepartmentMemberManagement = ({
     isSelectAllIndeterminate,
     applyChanges,
     effectiveDepartmentMap,
-    // Pagination props
     page,
     rowsPerPage,
     count,

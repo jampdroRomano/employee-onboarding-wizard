@@ -7,6 +7,7 @@ import {
   Stack,
   Box
 } from '@mui/material';
+import type { ButtonProps } from '@mui/material';
 
 import { 
   AuthCard, 
@@ -20,7 +21,7 @@ import {
 import { LoginForm } from '../components/auth/LoginForm';
 import { RegisterForm } from '../components/auth/RegisterForm';
 
-const GhostButton = (props: any) => (
+const GhostButton = (props: ButtonProps) => (
   <Button
     variant="outlined"
     sx={{

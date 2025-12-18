@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 export const useBasicInfo = () => {
   const [formData, setFormData] = useState({
@@ -12,26 +12,26 @@ export const useBasicInfo = () => {
     email: ''
   });
 
-  const setValues = (data: Partial<typeof formData>) => {
+  const setValues = useCallback((data: Partial<typeof formData>) => {
     setFormData(prev => ({ ...prev, ...data }));
-  };
+  }, []);
 
-  const handleChange = (field: string, value: string) => {
+  const handleChange = useCallback((field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field as keyof typeof errors]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
-  };
+  }, [errors]);
 
-  const handleStatusChange = (checked: boolean) => {
+  const handleStatusChange = useCallback((checked: boolean) => {
     setFormData(prev => ({ ...prev, status: checked }));
-  };
+  }, []);
 
-  const setFieldError = (field: 'nome' | 'email', message: string) => {
+  const setFieldError = useCallback((field: 'nome' | 'email', message: string) => {
     setErrors(prev => ({ ...prev, [field]: message }));
-  };
+  }, []);
 
-  const validateStep = (): boolean => {
+  const validateStep = useCallback((): boolean => {
     let isValid = true;
     const newErrors = { nome: '', email: '' };
 
@@ -51,7 +51,7 @@ export const useBasicInfo = () => {
 
     setErrors(newErrors);
     return isValid;
-  };
+  }, [formData]);
 
   return {
     formData,
