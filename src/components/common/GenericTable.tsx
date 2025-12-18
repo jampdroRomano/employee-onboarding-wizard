@@ -9,14 +9,17 @@ import {
     Typography,
     CircularProgress,
     Box,
-    Stack,
     Checkbox,
     TablePagination,
     TableFooter,
+    TableSortLabel,
 } from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { Sort as SortIcon } from '@mui/icons-material';
 import type { ReactNode } from 'react';
 import { CHECKBOX_GREEN } from '../../theme/mainTheme';
+
+type Order = 'asc' | 'desc' | false;
 
 export interface TableColumn {
     id: string;
@@ -34,6 +37,11 @@ interface GenericTableProps<T> {
     minWidth?: string | number;
     maxHeight?: number;
     filters?: ReactNode;
+
+    // Sorting
+    sortOrder?: Order;
+    sortOrderBy?: string | false;
+    onRequestSort?: (property: string) => void;
 
     // Selection
     enableSelection?: boolean;
@@ -55,7 +63,7 @@ interface GenericTableProps<T> {
     renderRow: (row: T, isSelected: boolean, toggleSelect: () => void) => ReactNode;
 }
 
-export const GenericTable = <T extends { id: string }>({
+export const GenericTable = <T extends { id: string }> ({
     columns,
     rows,
     isLoading,
@@ -64,6 +72,11 @@ export const GenericTable = <T extends { id: string }>({
     minWidth = '100%',
     maxHeight,
     filters,
+
+    // Sorting
+    sortOrder,
+    sortOrderBy,
+    onRequestSort,
     
     // Selection
     enableSelection = false,
@@ -85,6 +98,12 @@ export const GenericTable = <T extends { id: string }>({
 }: GenericTableProps<T>) => {
 
     const isSelected = (id: string) => selectedIds.indexOf(id) !== -1;
+
+    const createSortHandler = (property: string) => () => {
+        if (!columns.find(col => col.id === property)?.disableSort) {
+            onRequestSort?.(property);
+        }
+    };
 
     if (isLoading) {
         return (
@@ -130,23 +149,31 @@ export const GenericTable = <T extends { id: string }>({
                                 <TableCell
                                     key={col.id}
                                     align={col.align || 'left'}
+                                    sortDirection={sortOrderBy === col.id ? (sortOrder || false) : false}
                                     sx={{
                                         width: col.width || 'auto',
                                         fontWeight: 600,
-                                        color: 'text.secondary'
+                                        color: 'text.secondary',
+                                        cursor: col.disableSort ? 'default' : 'pointer'
                                     }}
+                                    onClick={createSortHandler(col.id)}
                                 >
-                                    <Stack
-                                        direction="row"
-                                        alignItems="center"
-                                        spacing={0.5}
-                                        justifyContent={col.align === 'right' ? 'flex-end' : (col.align === 'center' ? 'center' : 'flex-start')}
-                                    >
-                                        <span>{col.label}</span>
-                                        {!col.disableSort && (
-                                            <ArrowDownwardIcon sx={{ fontSize: 16, opacity: 0.5 }} />
-                                        )}
-                                    </Stack>
+                                    {col.disableSort ? (
+                                        col.label
+                                    ) : (
+                                        <TableSortLabel
+                                            active={sortOrderBy === col.id}
+                                            direction={sortOrder || 'asc'}
+                                            IconComponent={sortOrderBy === col.id ? ArrowDownwardIcon : SortIcon}
+                                            sx={{
+                                                '& .MuiTableSortLabel-icon': {
+                                                    opacity: sortOrderBy === col.id ? 1 : 0.5,
+                                                },
+                                            }}
+                                        >
+                                            {col.label}
+                                        </TableSortLabel>
+                                    )}
                                 </TableCell>
                             ))}
                         </TableRow>
@@ -185,17 +212,14 @@ export const GenericTable = <T extends { id: string }>({
                                   SelectProps={{
                                       native: false,
                                       sx: {
-                                        // Estilo do container do Select
                                         backgroundColor: '#F4F6F8',
                                         borderRadius: 1.5,
                                         mx: 1,
-                                        // Estilo do texto selecionado
                                         '& .MuiSelect-select': {
-                                          padding: '4px 32px 4px 12px', // T R B L
+                                          padding: '4px 32px 4px 12px',
                                           color: 'text.primary',
                                           fontWeight: 600,
                                         },
-                                        // Remove a borda padrão
                                         '.MuiOutlinedInput-notchedOutline': {
                                             border: 'none',
                                         },
@@ -210,7 +234,6 @@ export const GenericTable = <T extends { id: string }>({
                                       }
                                   }}
                                   sx={{
-                                    // Estiliza os outros labels do componente
                                     '.MuiTablePagination-toolbar': {
                                       '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
                                         color: 'text.secondary',

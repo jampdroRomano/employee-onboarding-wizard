@@ -17,6 +17,7 @@ import type { Employee, Department } from '../../types';
 import { GenericTable } from '../common/GenericTable';
 import type { TableColumn } from '../common/GenericTable';
 import { usePagination } from '../../hooks/usePagination';
+import { useTableSort } from '../../hooks/useTableSort';
 import { TableToolbar } from '../common/TableToolbar';
 import { CHECKBOX_GREEN } from '../../theme/mainTheme';
 
@@ -67,6 +68,8 @@ export const EmployeeSelectionStep = ({ selectedIds, onSelectionChange }: Employ
     });
   }, [rows, searchTerm, filterDept]);
 
+  const { sortOrder, sortOrderBy, handleRequestSort, sortedData } = useTableSort(filteredRows);
+  
   const {
     paginatedData,
     page,
@@ -74,7 +77,7 @@ export const EmployeeSelectionStep = ({ selectedIds, onSelectionChange }: Employ
     handleChangePage,
     handleChangeRowsPerPage,
     count,
-  } = usePagination(filteredRows);
+  } = usePagination(sortedData);
 
 
   // --- Lógica para os novos manipuladores de seleção ---
@@ -108,9 +111,9 @@ export const EmployeeSelectionStep = ({ selectedIds, onSelectionChange }: Employ
 
 
   const columns: TableColumn[] = [
-    { id: 'colaborador', label: 'Colaborador', width: '40%' },
-    { id: 'cargo_nivel', label: 'Cargo & Nível', width: '30%' },
-    { id: 'atual_dept', label: 'Departamento Atual', width: '30%' },
+    { id: 'nome', label: 'Colaborador', width: '40%' },
+    { id: 'role', label: 'Cargo & Nível', width: '30%' },
+    { id: 'departamento', label: 'Departamento Atual', width: '30%' },
   ];
 
   return (
@@ -129,6 +132,10 @@ export const EmployeeSelectionStep = ({ selectedIds, onSelectionChange }: Employ
         rows={paginatedData}
         isLoading={loading}
         
+        sortOrder={sortOrder}
+        sortOrderBy={sortOrderBy as string}
+        onRequestSort={handleRequestSort as (property: string) => void}
+
         pagination={true}
         count={count}
         page={page}

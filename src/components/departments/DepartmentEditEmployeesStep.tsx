@@ -64,6 +64,9 @@ export const DepartmentEditEmployeesStep = (props: DepartmentEditEmployeesStepPr
     count,
     handleChangePage,
     handleChangeRowsPerPage,
+    sortOrder,
+    sortOrderBy,
+    handleRequestSort,
   } = useDepartmentMemberManagement(props);
 
   const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
@@ -94,9 +97,9 @@ export const DepartmentEditEmployeesStep = (props: DepartmentEditEmployeesStepPr
   };
 
   const columns: TableColumn[] = [
-    { id: 'colaborador', label: 'Colaborador', width: '40%' },
-    { id: 'cargo_nivel', label: 'Cargo & Nível', width: '30%' },
-    { id: 'atual_dept', label: 'Departamento Atual', width: '30%' },
+    { id: 'nome', label: 'Colaborador', width: '40%' },
+    { id: 'role', label: 'Cargo & Nível', width: '30%' },
+    { id: 'departamento', label: 'Departamento Atual', width: '30%' },
   ];
 
   return (
@@ -115,6 +118,10 @@ export const DepartmentEditEmployeesStep = (props: DepartmentEditEmployeesStepPr
         rows={paginatedData}
         isLoading={loading}
         
+        sortOrder={sortOrder}
+        sortOrderBy={sortOrderBy as string | false}
+        onRequestSort={handleRequestSort as (property: string) => void}
+
         pagination={true}
         count={count}
         page={page}

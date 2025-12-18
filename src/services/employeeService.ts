@@ -20,7 +20,7 @@ import type { Employee, NewEmployeePayload } from "../types";
 export const getAllEmployees = async (): Promise<Employee[]> => {
   try {
     const employeesRef = collection(db, "employees");
-    const q = query(employeesRef, orderBy("nome", "asc")); 
+    const q = query(employeesRef, orderBy("createdAt", "desc")); 
     
     const querySnapshot = await getDocs(q);
     

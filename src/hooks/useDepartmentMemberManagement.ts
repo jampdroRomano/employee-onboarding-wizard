@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { getAllEmployees } from '../services/employeeService';
 import { departmentService } from '../services/departmentService';
 import { usePagination } from './usePagination';
+import { useTableSort } from './useTableSort';
 import type { Employee, Department } from '../types';
 
 interface EmployeeChange {
@@ -82,13 +83,20 @@ export const useDepartmentMemberManagement = ({
   }, [rows, searchTerm, filterDept, effectiveDepartmentMap]);
 
   const {
+    sortOrder,
+    sortOrderBy,
+    handleRequestSort,
+    sortedData,
+  } = useTableSort(filteredRows);
+
+  const {
     paginatedData,
     page,
     rowsPerPage,
     handleChangePage,
     handleChangeRowsPerPage,
     count,
-  } = usePagination(filteredRows);
+  } = usePagination(sortedData);
 
   const isSelectionFromCurrentDept = useMemo(() => {
     if (selectedIds.length === 0) return false;
@@ -197,5 +205,8 @@ export const useDepartmentMemberManagement = ({
     count,
     handleChangePage,
     handleChangeRowsPerPage,
+    sortOrder,
+    sortOrderBy,
+    handleRequestSort,
   };
 };
