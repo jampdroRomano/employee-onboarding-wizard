@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react"; 
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import type { User } from "firebase/auth"; 
 import { auth } from "../config/firebase";
 import { AuthContext } from "./AuthContextDefinition";
@@ -26,10 +26,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return unsubscribe;
   }, []);
 
+  const logout = async () => {
+    await signOut(auth);
+  };
+
   const value = {
     currentUser,
     userLoggedIn,
     loading,
+    logout,
   };
 
   return (
