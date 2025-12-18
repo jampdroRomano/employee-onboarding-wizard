@@ -161,22 +161,19 @@ export const DepartmentTable = memo(() => {
   }, [selected]);
 
   const handleSelectAllToggle = useCallback(() => {
-    const numSelectedOnPage = paginatedData.filter(row => selected.includes(row.id)).length;
-    const allOnPageSelected = numSelectedOnPage === paginatedData.length;
-
-    if (allOnPageSelected) {
-      const pageIds = paginatedData.map(r => r.id);
-      setSelected(prevSelected => prevSelected.filter(id => !pageIds.includes(id)));
+    const allFilteredIds = filteredRows.map(row => row.id);
+    if (selected.length === allFilteredIds.length && allFilteredIds.every(id => selected.includes(id))) {
+      setSelected([]);
     } else {
-      const newIds = paginatedData.filter(row => !selected.includes(row.id)).map(r => r.id);
-      setSelected(prevSelected => [...prevSelected, ...newIds]);
+      setSelected(allFilteredIds);
     }
-  }, [selected, paginatedData]);
+  }, [selected, filteredRows]);
 
   // --- Estados do checkbox do cabeçalho ---
-  const numSelectedOnPage = paginatedData.filter(row => selected.includes(row.id)).length;
-  const isSelectAllOnPageChecked = paginatedData.length > 0 && numSelectedOnPage === paginatedData.length;
-  const isSelectAllOnPageIndeterminate = numSelectedOnPage > 0 && numSelectedOnPage < paginatedData.length;
+  const numSelected = selected.length;
+  const numFilteredRows = filteredRows.length;
+  const isSelectAllChecked = numFilteredRows > 0 && numSelected === numFilteredRows;
+  const isSelectAllIndeterminate = numSelected > 0 && numSelected < numFilteredRows;
 
 
   // --- HANDLERS ---
@@ -237,8 +234,8 @@ export const DepartmentTable = memo(() => {
         selectedIds={selected}
         onRowToggle={handleRowToggle}
         onSelectAllToggle={handleSelectAllToggle}
-        isSelectAllChecked={isSelectAllOnPageChecked}
-        isSelectAllIndeterminate={isSelectAllOnPageIndeterminate}
+        isSelectAllChecked={isSelectAllChecked}
+        isSelectAllIndeterminate={isSelectAllIndeterminate}
 
         filters={
           <TableToolbar

@@ -109,15 +109,35 @@ export const useDepartmentMemberManagement = ({
     setFilterDept(newFilter);
   }, [isSelectionFromCurrentDept]);
 
+  const handleSelectAllToggle = useCallback(() => {
+    const allFilteredIds = filteredRows.map(row => row.id);
+    const selectableIds = filterDept === 'todos'
+      ? allFilteredIds.filter(id => effectiveDepartmentMap.get(id) !== currentDepartmentId)
+      : allFilteredIds;
+
+    const allSelectableAreSelected = selectableIds.length > 0 && selectableIds.every(id => selectedIds.includes(id));
+
+    if (allSelectableAreSelected) {
+      setSelectedIds(prev => prev.filter(id => !selectableIds.includes(id)));
+    } else {
+      setSelectedIds(prev => [...new Set([...prev, ...selectableIds])]);
+    }
+  }, [filteredRows, selectedIds, filterDept, currentDepartmentId, effectiveDepartmentMap]);
+
   // --- Lógica de Seleção Aprimorada ---
   const { isSelectAllChecked, isSelectAllIndeterminate } = useMemo(() => {
-      const pageIds = paginatedData.map(r => r.id);
-      const selectedOnPageCount = pageIds.filter(id => selectedIds.includes(id)).length;
+      const allFilteredIds = filteredRows.map(r => r.id);
+      const selectableIds = filterDept === 'todos'
+          ? allFilteredIds.filter(id => effectiveDepartmentMap.get(id) !== currentDepartmentId)
+          : allFilteredIds;
+      
+      const selectedInScope = selectedIds.filter(id => selectableIds.includes(id));
+
       return {
-          isSelectAllChecked: pageIds.length > 0 && selectedOnPageCount === pageIds.length,
-          isSelectAllIndeterminate: selectedOnPageCount > 0 && selectedOnPageCount < pageIds.length,
+          isSelectAllChecked: selectableIds.length > 0 && selectedInScope.length === selectableIds.length,
+          isSelectAllIndeterminate: selectedInScope.length > 0 && selectedInScope.length < selectableIds.length,
       };
-  }, [selectedIds, paginatedData]);
+  }, [selectedIds, filteredRows, filterDept, currentDepartmentId, effectiveDepartmentMap]);
 
   const handleRowToggle = useCallback((id: string) => {
     const newSelectedIds = [...selectedIds];
@@ -130,18 +150,6 @@ export const useDepartmentMemberManagement = ({
     }
     setSelectedIds(newSelectedIds);
   }, [selectedIds]);
-
-  const handleSelectAllToggle = useCallback(() => {
-    const pageIds = paginatedData.map(r => r.id);
-    const allOnPageSelected = pageIds.every(id => selectedIds.includes(id));
-
-    if (allOnPageSelected) {
-        setSelectedIds(prev => prev.filter(id => !pageIds.includes(id)));
-    } else {
-        const newIds = pageIds.filter(id => !selectedIds.includes(id));
-        setSelectedIds(prev => [...prev, ...newIds]);
-    }
-  }, [paginatedData, selectedIds]);
 
   const applyChanges = (employeeIds: string[], newDeptId: string | null) => {
     setLocalEmployeeChanges(prevChanges => {
