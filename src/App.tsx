@@ -4,7 +4,7 @@ import { Dashboard } from './pages/Dashboard';
 import { CreateEmployee } from './pages/CreateEmployee';
 import { AuthPage } from './pages/AuthPage';
 import { PrivateRoute } from './components/auth/PrivateRoute';
-import { useAuth } from './contexts/AuthContext';
+import { useAuth } from './hooks/useAuth';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { DepartmentsPage } from './pages/DepartmentsPage';
 import { CreateDepartment } from './pages/CreateDepartment';

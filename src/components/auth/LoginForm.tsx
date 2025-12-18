@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Typography, Stack, Box, Link, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { FirebaseError } from 'firebase/app';
 import { auth } from '../../config/firebase';
 import { AppTextField } from '../common/AppTextField';
 import { AppButton } from '../common/AppButton';
@@ -35,11 +36,11 @@ export const LoginForm = () => {
       }
 
       navigate('/'); 
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+      if (err instanceof FirebaseError && (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password')) {
         setError('E-mail ou senha incorretos.');
-      } else if (err.code === 'auth/too-many-requests') {
+      } else if (err instanceof FirebaseError && err.code === 'auth/too-many-requests') {
         setError('Muitas tentativas. Tente novamente mais tarde.');
       } else {
         setError('Ocorreu um erro ao fazer login.');

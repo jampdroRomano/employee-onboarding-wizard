@@ -49,11 +49,13 @@ export const ContractInfoForm = ({
             disabled={isLoading}
             SelectProps={{
                displayEmpty: true,
-               renderValue: (selected: any) => {
+               renderValue: (value: unknown) => {
                   if (isLoading) return <span style={{ color: '#919EAB' }}>Carregando...</span>;
-                  if (!selected) return <span style={{ color: '#919EAB' }}>{managerPlaceholder}</span>;
-                  const selectedEmp = employeesList.find(e => e.id === selected);
-                  return selectedEmp ? selectedEmp.nome : selected;
+                  if (!value || typeof value !== 'string') return <span style={{ color: '#919EAB' }}>{managerPlaceholder}</span>;
+                  
+                  const selectedId = value as string; 
+                  const selectedEmp = employeesList.find(e => e.id === selectedId);
+                  return selectedEmp ? selectedEmp.nome : selectedId;
                },
                MenuProps: {
                  PaperProps: { 

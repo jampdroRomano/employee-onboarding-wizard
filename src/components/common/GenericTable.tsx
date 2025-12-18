@@ -11,11 +11,12 @@ import {
     Box,
     Stack,
     Checkbox,
+    TablePagination,
+    TableFooter,
 } from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import type { ReactNode } from 'react';
 import { CHECKBOX_GREEN } from '../../theme/mainTheme';
-import { TablePaginationActions } from './TablePaginationActions';
 
 export interface TableColumn {
     id: string;
@@ -169,14 +170,57 @@ export const GenericTable = <T extends { id: string }>({
                     </TableBody>
                     
                     {pagination && onPageChange && onRowsPerPageChange && (
-                      <TablePaginationActions
-                        count={count}
-                        page={page}
-                        rowsPerPage={rowsPerPage}
-                        onPageChange={onPageChange}
-                        onRowsPerPageChange={onRowsPerPageChange}
-                        colSpan={columns.length + (enableSelection ? 1 : 0)}
-                      />
+                      <TableFooter>
+                          <TableRow>
+                              <TablePagination
+                                  rowsPerPageOptions={[5, 10, 25, { label: 'Todos', value: -1 }]}
+                                  colSpan={columns.length + (enableSelection ? 1 : 0)}
+                                  count={count}
+                                  rowsPerPage={rowsPerPage}
+                                  page={page}
+                                  onPageChange={onPageChange}
+                                  onRowsPerPageChange={onRowsPerPageChange}
+                                  labelRowsPerPage="Itens por página:"
+                                  labelDisplayedRows={({ from, to, count }) => `${from}-${to} de ${count}`}
+                                  SelectProps={{
+                                      native: false,
+                                      sx: {
+                                        // Estilo do container do Select
+                                        backgroundColor: '#F4F6F8',
+                                        borderRadius: 1.5,
+                                        mx: 1,
+                                        // Estilo do texto selecionado
+                                        '& .MuiSelect-select': {
+                                          padding: '4px 32px 4px 12px', // T R B L
+                                          color: 'text.primary',
+                                          fontWeight: 600,
+                                        },
+                                        // Remove a borda padrão
+                                        '.MuiOutlinedInput-notchedOutline': {
+                                            border: 'none',
+                                        },
+                                      },
+                                      MenuProps: {
+                                        PaperProps: {
+                                          sx: {
+                                            borderRadius: 2,
+                                            boxShadow: '0 0 20px rgba(0,0,0,0.1)',
+                                          }
+                                        }
+                                      }
+                                  }}
+                                  sx={{
+                                    // Estiliza os outros labels do componente
+                                    '.MuiTablePagination-toolbar': {
+                                      '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                                        color: 'text.secondary',
+                                        fontWeight: 500,
+                                      }
+                                    }
+                                  }}
+                              />
+                          </TableRow>
+                      </TableFooter>
                     )}
                 </Table>
             </TableContainer>

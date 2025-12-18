@@ -92,22 +92,19 @@ export const EmployeeSelectionStep = ({ selectedIds, onSelectionChange }: Employ
   }, [selectedIds, onSelectionChange]);
 
   const handleSelectAllToggle = useCallback(() => {
-    const numSelectedOnPage = paginatedData.filter(row => selectedIds.includes(row.id)).length;
-    const allOnPageSelected = numSelectedOnPage === paginatedData.length;
-
-    if (allOnPageSelected) {
-      const pageIds = paginatedData.map(r => r.id);
-      onSelectionChange(selectedIds.filter(id => !pageIds.includes(id)));
+    const allFilteredIds = filteredRows.map(row => row.id);
+    if (selectedIds.length === allFilteredIds.length && allFilteredIds.every(id => selectedIds.includes(id))) {
+      onSelectionChange([]);
     } else {
-      const newIds = paginatedData.filter(row => !selectedIds.includes(row.id)).map(r => r.id);
-      onSelectionChange([...selectedIds, ...newIds]);
+      onSelectionChange(allFilteredIds);
     }
-  }, [selectedIds, onSelectionChange, paginatedData]);
+  }, [selectedIds, onSelectionChange, filteredRows]);
 
   // --- Estados do checkbox do cabeçalho ---
-  const numSelectedOnPage = paginatedData.filter(row => selectedIds.includes(row.id)).length;
-  const isSelectAllOnPageChecked = paginatedData.length > 0 && numSelectedOnPage === paginatedData.length;
-  const isSelectAllOnPageIndeterminate = numSelectedOnPage > 0 && numSelectedOnPage < paginatedData.length;
+  const numSelected = selectedIds.length;
+  const numFilteredRows = filteredRows.length;
+  const isSelectAllChecked = numFilteredRows > 0 && numSelected === numFilteredRows;
+  const isSelectAllIndeterminate = numSelected > 0 && numSelected < numFilteredRows;
 
 
   const columns: TableColumn[] = [
@@ -143,8 +140,8 @@ export const EmployeeSelectionStep = ({ selectedIds, onSelectionChange }: Employ
         selectedIds={selectedIds}
         onRowToggle={handleRowToggle}
         onSelectAllToggle={handleSelectAllToggle}
-        isSelectAllChecked={isSelectAllOnPageChecked}
-        isSelectAllIndeterminate={isSelectAllOnPageIndeterminate}
+        isSelectAllChecked={isSelectAllChecked}
+        isSelectAllIndeterminate={isSelectAllIndeterminate}
         filters={
           <TableToolbar
             searchTerm={searchTerm}

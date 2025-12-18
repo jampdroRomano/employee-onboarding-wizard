@@ -156,8 +156,8 @@ export const EmployeeTable = memo(() => {
   }, []);
 
   // --- MEMOS (MAPAS E FILTROS) ---
-  const departmentsMap = useMemo(() => departments.reduce((acc, d) => ({ ...acc, [d.id]: d.name }), {} as any), [departments]);
-  const employeesMap = useMemo(() => rows.reduce((acc, e) => ({ ...acc, [e.id]: e.nome }), {} as any), [rows]);
+  const departmentsMap = useMemo(() => departments.reduce((acc: Record<string, string>, d) => ({ ...acc, [d.id]: d.name }), {}), [departments]);
+  const employeesMap = useMemo(() => rows.reduce((acc: Record<string, string>, e) => ({ ...acc, [e.id]: e.nome }), {}), [rows]);
 
   const filteredRows = useMemo(() => {
     return rows.filter((row) => {
@@ -192,29 +192,29 @@ export const EmployeeTable = memo(() => {
   }, [selected]);
 
   const handleSelectAllToggle = useCallback(() => {
-    const numSelectedOnPage = paginatedData.filter(row => selected.includes(row.id)).length;
-    const allOnPageSelected = numSelectedOnPage === paginatedData.length;
-
-    if (allOnPageSelected) {
-      // Desseleciona apenas os da página atual
-      const pageIds = paginatedData.map(r => r.id);
-      setSelected(prevSelected => prevSelected.filter(id => !pageIds.includes(id)));
+    const allFilteredIds = filteredRows.map(row => row.id);
+    // Se todos os filtrados já estão selecionados, limpa a seleção.
+    // Senão, seleciona todos os filtrados.
+    if (selected.length === allFilteredIds.length && allFilteredIds.every(id => selected.includes(id))) {
+      setSelected([]);
     } else {
-      // Seleciona os que ainda não estão selecionados na página atual
-      const newIds = paginatedData.filter(row => !selected.includes(row.id)).map(r => r.id);
-      setSelected(prevSelected => [...prevSelected, ...newIds]);
+      setSelected(allFilteredIds);
     }
-  }, [selected, paginatedData]);
+  }, [selected, filteredRows]);
   
   // --- Estados do checkbox do cabeçalho ---
-  const numSelectedOnPage = paginatedData.filter(row => selected.includes(row.id)).length;
-  const isSelectAllOnPageChecked = paginatedData.length > 0 && numSelectedOnPage === paginatedData.length;
-  const isSelectAllOnPageIndeterminate = numSelectedOnPage > 0 && numSelectedOnPage < paginatedData.length;
+  const numSelected = selected.length;
+  const numFilteredRows = filteredRows.length;
+  const isSelectAllChecked = numFilteredRows > 0 && numSelected === numFilteredRows;
+  const isSelectAllIndeterminate = numSelected > 0 && numSelected < numFilteredRows;
 
 
   const getDepartmentName = (id: string) => departmentsMap[id] || 'Não atribuído';
-  const getManagerName = (id?: string | null) => (!id ? '-' : employeesMap[id] || 'Não encontrado');
-  const isStatusActive = (s: any) => s === true || s === 'Ativo';
+  const getManagerName = useCallback((id?: string | null) => {
+    if (!id) return '-';
+    return employeesMap[id] || 'Não encontrado';
+  }, [employeesMap]);
+  const isStatusActive = (s: boolean | string) => s === true || s === 'Ativo';
 
   return (
     <Box>
@@ -236,8 +236,8 @@ export const EmployeeTable = memo(() => {
         selectedIds={selected}
         onRowToggle={handleRowToggle}
         onSelectAllToggle={handleSelectAllToggle}
-        isSelectAllChecked={isSelectAllOnPageChecked}
-        isSelectAllIndeterminate={isSelectAllOnPageIndeterminate}
+        isSelectAllChecked={isSelectAllChecked}
+        isSelectAllIndeterminate={isSelectAllIndeterminate}
 
         // Barra de Ferramentas (Filtros + Botão de Excluir em massa)
         filters={

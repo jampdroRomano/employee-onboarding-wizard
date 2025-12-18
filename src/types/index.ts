@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 // Definição Central de Funcionário
 export interface Employee {
   id: string;
@@ -5,7 +7,7 @@ export interface Employee {
   email: string;
   status: boolean | string; 
   img: string;
-  createdAt?: any; 
+  createdAt?: Timestamp; 
   
   // Dados Profissionais & Contratuais
   departamento: string; 

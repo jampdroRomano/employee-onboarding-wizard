@@ -48,11 +48,13 @@ export const ProfessionalInfoForm = ({
           disabled={isLoading}
           SelectProps={{
             displayEmpty: true,
-            renderValue: (selected: any) => {
+            renderValue: (value: unknown) => {
               if (isLoading) return <span style={{ color: '#919EAB' }}>Carregando...</span>;
-              if (!selected) return <span style={{ color: '#919EAB' }}>Selecione um departamento</span>;
-              const selectedDept = departmentList.find(d => d.id === selected);
-              return selectedDept ? selectedDept.name : selected;
+              if (!value || typeof value !== 'string') return <span style={{ color: '#919EAB' }}>Selecione um departamento</span>;
+              
+              const selectedId = value as string; 
+              const selectedDept = departmentList.find(d => d.id === selectedId);
+              return selectedDept ? selectedDept.name : selectedId;
             },
             MenuProps: {
               disablePortal: true,

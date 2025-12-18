@@ -133,17 +133,29 @@ export const employeeService = {
   update: async (id: string, data: Partial<NewEmployeePayload>) => {
     const docRef = doc(db, 'employees', id);
     
-    const updatePayload: any = { ...data };
-    
-    if (typeof data.status === 'boolean') {
-      updatePayload.status = data.status ? 'Ativo' : 'Inativo';
-    }
-    
-    Object.keys(updatePayload).forEach(key => 
-      updatePayload[key] === undefined && delete updatePayload[key]
-    );
+    const updateObject: { [key: string]: any } = {}; 
 
-    await updateDoc(docRef, updatePayload);
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        const value = data[key as keyof Partial<NewEmployeePayload>];
+        
+        if (key === 'status') {
+          if (typeof value === 'boolean') {
+            updateObject.status = value ? 'Ativo' : 'Inativo';
+          } else if (value !== undefined) { 
+            updateObject.status = value;
+          }
+        } else if (value !== undefined) {
+          if (key === 'managerId' && value === '') {
+            updateObject[key] = null;
+          } else {
+            updateObject[key] = value;
+          }
+        }
+      }
+    }
+
+    await updateDoc(docRef, updateObject);
   },
 
   updateEmployeesDepartment: async (employeeIds: string[], departmentId: string) => {

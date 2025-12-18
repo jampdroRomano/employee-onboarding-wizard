@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { departmentService } from '../services/departmentService';
 import { getAllEmployees } from '../services/employeeService';
 import type { Department, Employee } from '../types';
@@ -8,7 +8,7 @@ export interface ProfessionalData {
   role: string;
   seniority: string;
   admissionDate: string;
-  managerId: string;
+  managerId: string | null;
   salary: string;
 }
 
@@ -18,7 +18,7 @@ export const useProfessionalInfo = () => {
     role: '',
     seniority: '',
     admissionDate: '',
-    managerId: '',
+    managerId: null,
     salary: ''
   });
 
@@ -27,9 +27,9 @@ export const useProfessionalInfo = () => {
   const [isLoading, setIsLoading] = useState(false); 
   const [errors, setErrors] = useState<Partial<ProfessionalData>>({});
 
-  const setValues = (data: Partial<ProfessionalData>) => {
+  const setValues = useCallback((data: Partial<ProfessionalData>) => {
     setFormData(prev => ({ ...prev, ...data }));
-  };
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,14 +51,18 @@ export const useProfessionalInfo = () => {
     fetchData();
   }, []);
 
-  const handleChange = (field: keyof ProfessionalData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleChange = useCallback((field: keyof ProfessionalData, value: string) => {
+    let finalValue: string | null = value;
+    if (field === 'managerId' && value === '') {
+        finalValue = null;
+    }
+    setFormData(prev => ({ ...prev, [field]: finalValue }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
-  };
+  }, [errors]);
 
-  const validateStep2 = () => {
+  const validateStep2 = useCallback(() => {
     const newErrors: Partial<ProfessionalData> = {};
     let isValid = true;
 
@@ -81,9 +85,9 @@ export const useProfessionalInfo = () => {
 
     setErrors(prev => ({ ...prev, ...newErrors }));
     return isValid;
-  };
+  }, [formData]);
 
-  const validateStep3 = () => {
+  const validateStep3 = useCallback(() => {
     const newErrors: Partial<ProfessionalData> = {};
     let isValid = true;
 
@@ -94,7 +98,7 @@ export const useProfessionalInfo = () => {
 
     setErrors(prev => ({ ...prev, ...newErrors }));
     return isValid;
-  };
+  }, [formData]);
 
   return {
     formData,
