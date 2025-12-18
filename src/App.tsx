@@ -9,6 +9,7 @@ import { NotFoundPage } from './pages/NotFoundPage';
 import { DepartmentsPage } from './pages/DepartmentsPage';
 import { CreateDepartment } from './pages/CreateDepartment';
 import { Toaster } from 'sonner';
+import { EditEmployeePage } from './pages/EditEmployeePage';
 
 function App() {
   const { userLoggedIn, currentUser } = useAuth();
@@ -56,7 +57,7 @@ function App() {
           element={
             <PrivateRoute>
               <MainLayout>
-                <CreateEmployee />
+                <EditEmployeePage /> {/* Usando a nova página */}
               </MainLayout>
             </PrivateRoute>
           }
