@@ -24,7 +24,7 @@ export const departmentService = {
   getAll: async (): Promise<Department[]> => {
     try {
       const deptRef = collection(db, "departments");
-      const q = query(deptRef, orderBy("name", "asc"));
+      const q = query(deptRef, orderBy("createdAt", "desc"));
       const querySnapshot = await getDocs(q);
       
       return querySnapshot.docs.map(doc => ({

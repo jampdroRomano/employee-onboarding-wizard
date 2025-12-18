@@ -23,7 +23,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 
 // Firebase e Services
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { collection, query, onSnapshot, orderBy } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { departmentService } from '../../services/departmentService';
 import { employeeService } from '../../services/employeeService';
@@ -38,6 +38,7 @@ import type { TableColumn } from '../common/GenericTable';
 // Hooks e Tema
 import { useTableDelete } from '../../hooks/useTableDelete';
 import { usePagination } from '../../hooks/usePagination';
+import { useTableSort } from '../../hooks/useTableSort';
 import { CHECKBOX_GREEN } from '../../theme/mainTheme';
 
 import { useNavigate } from 'react-router-dom';
@@ -128,10 +129,10 @@ export const EmployeeTable = memo(() => {
 
   // --- COLUNAS ---
   const columns: TableColumn[] = [
-    { id: 'colaborador', label: 'Colaborador', width: '25%' },
-    { id: 'ocupacao', label: 'Cargo & Dept.', width: '25%' },
-    { id: 'detalhes', label: 'Nível & Admissão', width: '20%' },
-    { id: 'contrato', label: 'Gestão & Salário', width: '20%' },
+    { id: 'nome', label: 'Colaborador', width: '25%' },
+    { id: 'role', label: 'Cargo & Dept.', width: '25%' },
+    { id: 'admissionDate', label: 'Nível & Admissão', width: '20%' },
+    { id: 'salary', label: 'Gestão & Salário', width: '20%' },
     { id: 'status', label: 'Status', align: 'left' },
     { id: 'actions', label: '', disableSort: true }
   ];
@@ -167,7 +168,15 @@ export const EmployeeTable = memo(() => {
       return matchText && matchDept;
     });
   }, [rows, searchTerm, filterDept]);
-  
+
+  // --- ORDENAÇÃO (HOOK) ---
+  const {
+    sortOrder,
+    sortOrderBy,
+    handleRequestSort,
+    sortedData
+  } = useTableSort(filteredRows);
+
   // --- PAGINAÇÃO (HOOK) ---
   const {
     paginatedData,
@@ -176,7 +185,7 @@ export const EmployeeTable = memo(() => {
     handleChangePage,
     handleChangeRowsPerPage,
     count,
-  } = usePagination(filteredRows, { initialRowsPerPage: 10 });
+  } = usePagination(sortedData, { initialRowsPerPage: 10 });
 
   // --- Lógica para os novos manipuladores de seleção ---
   const handleRowToggle = useCallback((id: string) => {
@@ -222,6 +231,11 @@ export const EmployeeTable = memo(() => {
         columns={columns}
         rows={paginatedData}
         isLoading={loadingDepts || loadingEmps}
+
+        // Configuração de Ordenação
+        sortOrder={sortOrder}
+        sortOrderBy={sortOrderBy as string | false}
+        onRequestSort={handleRequestSort as (property: string) => void}
 
         // Configuração de Paginação
         pagination={true}

@@ -33,6 +33,7 @@ import type { TableColumn } from '../common/GenericTable';
 // Hooks e Tema
 import { useTableDelete } from '../../hooks/useTableDelete';
 import { usePagination } from '../../hooks/usePagination';
+import { useTableSort } from '../../hooks/useTableSort';
 import { CHECKBOX_GREEN } from '../../theme/mainTheme';
 
 import { useNavigate } from 'react-router-dom';
@@ -136,6 +137,22 @@ export const DepartmentTable = memo(() => {
     });
   }, [rows, searchTerm, filterDeptId, getManagerName]);
 
+  // --- ENRIQUECIMENTO DE DADOS PARA ORDENAÇÃO ---
+  const enrichedFilteredRows = useMemo(() => {
+    return filteredRows.map(dept => ({
+      ...dept,
+      employeeCount: employeeCounts[dept.id] || 0,
+    }));
+  }, [filteredRows, employeeCounts]);
+
+  // --- ORDENAÇÃO ---
+  const {
+    sortOrder,
+    sortOrderBy,
+    handleRequestSort,
+    sortedData,
+  } = useTableSort(enrichedFilteredRows);
+
   // --- PAGINAÇÃO ---
   const {
     paginatedData,
@@ -144,7 +161,7 @@ export const DepartmentTable = memo(() => {
     handleChangePage,
     handleChangeRowsPerPage,
     count,
-  } = usePagination(filteredRows, { initialRowsPerPage: 10 });
+  } = usePagination(sortedData, { initialRowsPerPage: 10 });
 
 
   // --- Lógica para os novos manipuladores de seleção ---
@@ -207,19 +224,24 @@ export const DepartmentTable = memo(() => {
   // --- COLUNAS ---
   const columns: TableColumn[] = [
     { id: 'name', label: 'Departamento', width: '30%' },
-    { id: 'manager', label: 'Gestor Responsável', width: '25%' },
+    { id: 'managerId', label: 'Gestor Responsável', width: '25%' },
     { id: 'description', label: 'Descrição', width: '25%' },
-    { id: 'employees', label: 'Colaboradores', width: '15%', align: 'center' },
+    { id: 'employeeCount', label: 'Colaboradores', width: '15%', align: 'center' },
     { id: 'actions', label: '', width: '48px', align: 'right', disableSort: true }
   ];
 
   return (
     <Box>
-      <GenericTable<Department>
+      <GenericTable<Department & { employeeCount: number }>
         columns={columns}
         rows={paginatedData}
         isLoading={loading}
         emptyMessage="Nenhum departamento encontrado."
+
+        // Ordenação
+        sortOrder={sortOrder}
+        sortOrderBy={sortOrderBy as string | false}
+        onRequestSort={handleRequestSort as (property: string) => void}
         
         // Paginação
         pagination={true}
