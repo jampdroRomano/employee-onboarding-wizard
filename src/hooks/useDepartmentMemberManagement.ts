@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { getAllEmployees } from '../services/employeeService';
 import { departmentService } from '../services/departmentService';
+import { usePagination } from './usePagination';
 import type { Employee, Department } from '../types';
 
 interface EmployeeChange {
@@ -80,6 +81,15 @@ export const useDepartmentMemberManagement = ({
     });
   }, [rows, searchTerm, filterDept, effectiveDepartmentMap]);
 
+  const {
+    paginatedData,
+    page,
+    rowsPerPage,
+    handleChangePage,
+    handleChangeRowsPerPage,
+    count,
+  } = usePagination(filteredRows);
+
   const isSelectionFromCurrentDept = useMemo(() => {
     if (selectedIds.length === 0) return false;
     const firstEmployeeDept = effectiveDepartmentMap.get(selectedIds[0]);
@@ -100,28 +110,14 @@ export const useDepartmentMemberManagement = ({
   }, [isSelectionFromCurrentDept]);
 
   // --- Lógica de Seleção Aprimorada ---
-
-  // Calcula quais IDs são "selecionáveis" na visão atual
-  const allTogglableIds = useMemo(() => {
-    const visibleIds = filteredRows.map(r => r.id);
-    if (filterDept === 'todos') {
-      return visibleIds.filter(id => effectiveDepartmentMap.get(id) !== currentDepartmentId);
-    }
-    return visibleIds;
-  }, [filteredRows, filterDept, currentDepartmentId, effectiveDepartmentMap]);
-
-  // Calcula o estado do checkbox principal
   const { isSelectAllChecked, isSelectAllIndeterminate } = useMemo(() => {
-    if (allTogglableIds.length === 0) {
-      return { isSelectAllChecked: false, isSelectAllIndeterminate: false };
-    }
-    const selectedVisibleCount = allTogglableIds.filter(id => selectedIds.includes(id)).length;
-    
-    return {
-      isSelectAllChecked: selectedVisibleCount === allTogglableIds.length,
-      isSelectAllIndeterminate: selectedVisibleCount > 0 && selectedVisibleCount < allTogglableIds.length,
-    };
-  }, [selectedIds, allTogglableIds]);
+      const pageIds = paginatedData.map(r => r.id);
+      const selectedOnPageCount = pageIds.filter(id => selectedIds.includes(id)).length;
+      return {
+          isSelectAllChecked: pageIds.length > 0 && selectedOnPageCount === pageIds.length,
+          isSelectAllIndeterminate: selectedOnPageCount > 0 && selectedOnPageCount < pageIds.length,
+      };
+  }, [selectedIds, paginatedData]);
 
   const handleRowToggle = useCallback((id: string) => {
     const newSelectedIds = [...selectedIds];
@@ -136,46 +132,16 @@ export const useDepartmentMemberManagement = ({
   }, [selectedIds]);
 
   const handleSelectAllToggle = useCallback(() => {
-    const visibleIds = filteredRows.map(r => r.id);
-    
-    // Define o conjunto de IDs que podem ser selecionados nesta visão
-    let allPossibleToSelect = visibleIds;
-    if (filterDept === 'todos') {
-      allPossibleToSelect = visibleIds.filter(id => effectiveDepartmentMap.get(id) !== currentDepartmentId);
-    }
-    
-    // Verifica se todos os itens "selecionáveis" na visão atual já estão no estado de seleção
-    const areAllPossibleVisibleSelected = allPossibleToSelect.every(id => selectedIds.includes(id)) && allPossibleToSelect.length > 0;
+    const pageIds = paginatedData.map(r => r.id);
+    const allOnPageSelected = pageIds.every(id => selectedIds.includes(id));
 
-    if (areAllPossibleVisibleSelected) {
-      // Ação: Desselecionar todos os itens visíveis e selecionáveis
-      const newSelecteds = selectedIds.filter(id => !allPossibleToSelect.includes(id));
-      setSelectedIds(newSelecteds);
+    if (allOnPageSelected) {
+        setSelectedIds(prev => prev.filter(id => !pageIds.includes(id)));
     } else {
-      // Ação: Selecionar todos os itens visíveis e selecionáveis
-      
-      // Determina o "modo" da nova seleção (será para transferência ou adição?)
-      // Usamos o primeiro item da lista de possíveis para inferir o modo do grupo.
-      const isNewSelectionForTransfer = allPossibleToSelect.length > 0 &&
-        effectiveDepartmentMap.get(allPossibleToSelect[0]) === currentDepartmentId;
-
-      // Se já existe uma seleção e ela é de um modo diferente, descarta a seleção antiga.
-      if (selectedIds.length > 0 && isSelectionFromCurrentDept !== isNewSelectionForTransfer) {
-        setSelectedIds(allPossibleToSelect); // Começa uma nova seleção
-      } else {
-        // Caso contrário, acumula a seleção
-        const newSelecteds = Array.from(new Set([...selectedIds, ...allPossibleToSelect]));
-        setSelectedIds(newSelecteds);
-      }
+        const newIds = pageIds.filter(id => !selectedIds.includes(id));
+        setSelectedIds(prev => [...prev, ...newIds]);
     }
-  }, [
-    filteredRows, 
-    selectedIds, 
-    filterDept, 
-    currentDepartmentId, 
-    effectiveDepartmentMap, 
-    isSelectionFromCurrentDept
-  ]);
+  }, [paginatedData, selectedIds]);
 
   const applyChanges = (employeeIds: string[], newDeptId: string | null) => {
     setLocalEmployeeChanges(prevChanges => {
@@ -201,7 +167,7 @@ export const useDepartmentMemberManagement = ({
 
   return {
     loading,
-    filteredRows,
+    rows: paginatedData,
     departments,
     deptNameMap,
     searchTerm,
@@ -218,5 +184,11 @@ export const useDepartmentMemberManagement = ({
     isSelectAllIndeterminate,
     applyChanges,
     effectiveDepartmentMap,
+    // Pagination props
+    page,
+    rowsPerPage,
+    count,
+    handleChangePage,
+    handleChangeRowsPerPage,
   };
 };

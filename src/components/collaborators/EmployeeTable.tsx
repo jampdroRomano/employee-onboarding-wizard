@@ -37,6 +37,7 @@ import type { TableColumn } from '../common/GenericTable';
 
 // Hooks e Tema
 import { useTableDelete } from '../../hooks/useTableDelete';
+import { usePagination } from '../../hooks/usePagination';
 import { CHECKBOX_GREEN } from '../../theme/mainTheme';
 
 import { useNavigate } from 'react-router-dom';
@@ -166,6 +167,16 @@ export const EmployeeTable = memo(() => {
       return matchText && matchDept;
     });
   }, [rows, searchTerm, filterDept]);
+  
+  // --- PAGINAÇÃO (HOOK) ---
+  const {
+    paginatedData,
+    page,
+    rowsPerPage,
+    handleChangePage,
+    handleChangeRowsPerPage,
+    count,
+  } = usePagination(filteredRows, { initialRowsPerPage: 10 });
 
   // --- Lógica para os novos manipuladores de seleção ---
   const handleRowToggle = useCallback((id: string) => {
@@ -181,23 +192,24 @@ export const EmployeeTable = memo(() => {
   }, [selected]);
 
   const handleSelectAllToggle = useCallback(() => {
-    const numSelectedVisible = filteredRows.filter(row => selected.includes(row.id)).length;
-    const rowCountVisible = filteredRows.length;
-      
-    if (numSelectedVisible === rowCountVisible) {
-        setSelected([]);
+    const numSelectedOnPage = paginatedData.filter(row => selected.includes(row.id)).length;
+    const allOnPageSelected = numSelectedOnPage === paginatedData.length;
+
+    if (allOnPageSelected) {
+      // Desseleciona apenas os da página atual
+      const pageIds = paginatedData.map(r => r.id);
+      setSelected(prevSelected => prevSelected.filter(id => !pageIds.includes(id)));
     } else {
-        const newSelected = filteredRows.map(r => r.id);
-        setSelected(newSelected);
+      // Seleciona os que ainda não estão selecionados na página atual
+      const newIds = paginatedData.filter(row => !selected.includes(row.id)).map(r => r.id);
+      setSelected(prevSelected => [...prevSelected, ...newIds]);
     }
-  }, [selected, filteredRows]);
-
+  }, [selected, paginatedData]);
+  
   // --- Estados do checkbox do cabeçalho ---
-  const numSelectedVisible = filteredRows.filter(row => selected.includes(row.id)).length;
-  const rowCountVisible = filteredRows.length;
-
-  const isSelectAllChecked = rowCountVisible > 0 && numSelectedVisible === rowCountVisible;
-  const isSelectAllIndeterminate = numSelectedVisible > 0 && numSelectedVisible < rowCountVisible;
+  const numSelectedOnPage = paginatedData.filter(row => selected.includes(row.id)).length;
+  const isSelectAllOnPageChecked = paginatedData.length > 0 && numSelectedOnPage === paginatedData.length;
+  const isSelectAllOnPageIndeterminate = numSelectedOnPage > 0 && numSelectedOnPage < paginatedData.length;
 
 
   const getDepartmentName = (id: string) => departmentsMap[id] || 'Não atribuído';
@@ -208,16 +220,24 @@ export const EmployeeTable = memo(() => {
     <Box>
       <GenericTable<Employee>
         columns={columns}
-        rows={filteredRows}
+        rows={paginatedData}
         isLoading={loadingDepts || loadingEmps}
+
+        // Configuração de Paginação
+        pagination={true}
+        count={count}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
 
         // Configuração de Seleção
         enableSelection={true}
         selectedIds={selected}
         onRowToggle={handleRowToggle}
         onSelectAllToggle={handleSelectAllToggle}
-        isSelectAllChecked={isSelectAllChecked}
-        isSelectAllIndeterminate={isSelectAllIndeterminate}
+        isSelectAllChecked={isSelectAllOnPageChecked}
+        isSelectAllIndeterminate={isSelectAllOnPageIndeterminate}
 
         // Barra de Ferramentas (Filtros + Botão de Excluir em massa)
         filters={

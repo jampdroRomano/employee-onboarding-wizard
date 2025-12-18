@@ -10,11 +10,12 @@ import {
     CircularProgress,
     Box,
     Stack,
-    Checkbox
+    Checkbox,
 } from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import type { ReactNode } from 'react';
 import { CHECKBOX_GREEN } from '../../theme/mainTheme';
+import { TablePaginationActions } from './TablePaginationActions';
 
 export interface TableColumn {
     id: string;
@@ -32,6 +33,8 @@ interface GenericTableProps<T> {
     minWidth?: string | number;
     maxHeight?: number;
     filters?: ReactNode;
+
+    // Selection
     enableSelection?: boolean;
     selectedIds?: string[];
     onRowToggle?: (id: string) => void;
@@ -39,6 +42,14 @@ interface GenericTableProps<T> {
     headerCheckboxColor?: string;
     isSelectAllChecked?: boolean;
     isSelectAllIndeterminate?: boolean;
+
+    // Pagination
+    pagination?: boolean;
+    count?: number;
+    page?: number;
+    rowsPerPage?: number;
+    onPageChange?: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
+    onRowsPerPageChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 
     renderRow: (row: T, isSelected: boolean, toggleSelect: () => void) => ReactNode;
 }
@@ -52,6 +63,8 @@ export const GenericTable = <T extends { id: string }>({
     minWidth = '100%',
     maxHeight,
     filters,
+    
+    // Selection
     enableSelection = false,
     selectedIds = [],
     onRowToggle,
@@ -59,6 +72,15 @@ export const GenericTable = <T extends { id: string }>({
     headerCheckboxColor,
     isSelectAllChecked,
     isSelectAllIndeterminate,
+    
+    // Pagination
+    pagination = false,
+    count = 0,
+    page = 0,
+    rowsPerPage = 5,
+    onPageChange,
+    onRowsPerPageChange,
+
 }: GenericTableProps<T>) => {
 
     const isSelected = (id: string) => selectedIds.indexOf(id) !== -1;
@@ -145,6 +167,17 @@ export const GenericTable = <T extends { id: string }>({
                             })
                         )}
                     </TableBody>
+                    
+                    {pagination && onPageChange && onRowsPerPageChange && (
+                      <TablePaginationActions
+                        count={count}
+                        page={page}
+                        rowsPerPage={rowsPerPage}
+                        onPageChange={onPageChange}
+                        onRowsPerPageChange={onRowsPerPageChange}
+                        colSpan={columns.length + (enableSelection ? 1 : 0)}
+                      />
+                    )}
                 </Table>
             </TableContainer>
         </Card>

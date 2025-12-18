@@ -16,7 +16,7 @@ import { departmentService } from '../../services/departmentService';
 import type { Employee, Department } from '../../types';
 import { GenericTable } from '../common/GenericTable';
 import type { TableColumn } from '../common/GenericTable';
-
+import { usePagination } from '../../hooks/usePagination';
 import { TableToolbar } from '../common/TableToolbar';
 import { CHECKBOX_GREEN } from '../../theme/mainTheme';
 
@@ -67,6 +67,16 @@ export const EmployeeSelectionStep = ({ selectedIds, onSelectionChange }: Employ
     });
   }, [rows, searchTerm, filterDept]);
 
+  const {
+    paginatedData,
+    page,
+    rowsPerPage,
+    handleChangePage,
+    handleChangeRowsPerPage,
+    count,
+  } = usePagination(filteredRows);
+
+
   // --- Lógica para os novos manipuladores de seleção ---
 
   const handleRowToggle = useCallback((id: string) => {
@@ -82,24 +92,22 @@ export const EmployeeSelectionStep = ({ selectedIds, onSelectionChange }: Employ
   }, [selectedIds, onSelectionChange]);
 
   const handleSelectAllToggle = useCallback(() => {
-    const numSelectedVisible = filteredRows.filter(row => selectedIds.includes(row.id)).length;
-    const rowCountVisible = filteredRows.length;
-    
-    if (numSelectedVisible === rowCountVisible) { // Todos visíveis selecionados, então desmarca todos os visíveis
-        const newSelected = selectedIds.filter(id => !filteredRows.map(r => r.id).includes(id));
-        onSelectionChange(newSelected);
-    } else { // Alguns ou nenhum visível selecionado, então seleciona todos os visíveis
-        const newSelected = Array.from(new Set([...selectedIds, ...filteredRows.map(r => r.id)]));
-        onSelectionChange(newSelected);
+    const numSelectedOnPage = paginatedData.filter(row => selectedIds.includes(row.id)).length;
+    const allOnPageSelected = numSelectedOnPage === paginatedData.length;
+
+    if (allOnPageSelected) {
+      const pageIds = paginatedData.map(r => r.id);
+      onSelectionChange(selectedIds.filter(id => !pageIds.includes(id)));
+    } else {
+      const newIds = paginatedData.filter(row => !selectedIds.includes(row.id)).map(r => r.id);
+      onSelectionChange([...selectedIds, ...newIds]);
     }
-  }, [selectedIds, filteredRows, onSelectionChange]);
+  }, [selectedIds, onSelectionChange, paginatedData]);
 
   // --- Estados do checkbox do cabeçalho ---
-  const numSelectedVisible = filteredRows.filter(row => selectedIds.includes(row.id)).length;
-  const rowCountVisible = filteredRows.length;
-
-  const isSelectAllChecked = rowCountVisible > 0 && numSelectedVisible === rowCountVisible;
-  const isSelectAllIndeterminate = numSelectedVisible > 0 && numSelectedVisible < rowCountVisible;
+  const numSelectedOnPage = paginatedData.filter(row => selectedIds.includes(row.id)).length;
+  const isSelectAllOnPageChecked = paginatedData.length > 0 && numSelectedOnPage === paginatedData.length;
+  const isSelectAllOnPageIndeterminate = numSelectedOnPage > 0 && numSelectedOnPage < paginatedData.length;
 
 
   const columns: TableColumn[] = [
@@ -121,16 +129,22 @@ export const EmployeeSelectionStep = ({ selectedIds, onSelectionChange }: Employ
 
       <GenericTable<Employee>
         columns={columns}
-        rows={filteredRows}
+        rows={paginatedData}
         isLoading={loading}
-        maxHeight={400} 
+        
+        pagination={true}
+        count={count}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
         
         enableSelection={true}
         selectedIds={selectedIds}
         onRowToggle={handleRowToggle}
         onSelectAllToggle={handleSelectAllToggle}
-        isSelectAllChecked={isSelectAllChecked}
-        isSelectAllIndeterminate={isSelectAllIndeterminate}
+        isSelectAllChecked={isSelectAllOnPageChecked}
+        isSelectAllIndeterminate={isSelectAllOnPageIndeterminate}
         filters={
           <TableToolbar
             searchTerm={searchTerm}

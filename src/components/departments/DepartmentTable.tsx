@@ -32,6 +32,7 @@ import type { TableColumn } from '../common/GenericTable';
 
 // Hooks e Tema
 import { useTableDelete } from '../../hooks/useTableDelete';
+import { usePagination } from '../../hooks/usePagination';
 import { CHECKBOX_GREEN } from '../../theme/mainTheme';
 
 import { useNavigate } from 'react-router-dom';
@@ -135,6 +136,17 @@ export const DepartmentTable = memo(() => {
     });
   }, [rows, searchTerm, filterDeptId, employeesMap]);
 
+  // --- PAGINAÇÃO ---
+  const {
+    paginatedData,
+    page,
+    rowsPerPage,
+    handleChangePage,
+    handleChangeRowsPerPage,
+    count,
+  } = usePagination(filteredRows, { initialRowsPerPage: 10 });
+
+
   // --- Lógica para os novos manipuladores de seleção ---
   const handleRowToggle = useCallback((id: string) => {
     const selectedIndex = selected.indexOf(id);
@@ -149,23 +161,22 @@ export const DepartmentTable = memo(() => {
   }, [selected]);
 
   const handleSelectAllToggle = useCallback(() => {
-      const numSelectedVisible = filteredRows.filter(row => selected.includes(row.id)).length;
-      const rowCountVisible = filteredRows.length;
-      
-      if (numSelectedVisible === rowCountVisible) { // Todos visíveis selecionados, então desmarca tudo
-          setSelected([]); // Limpa tudo
-      } else { // Alguns ou nenhum visível selecionado, então seleciona todos os visíveis
-          const newSelected = filteredRows.map(r => r.id);
-          setSelected(newSelected);
-      }
-  }, [selected, filteredRows]);
+    const numSelectedOnPage = paginatedData.filter(row => selected.includes(row.id)).length;
+    const allOnPageSelected = numSelectedOnPage === paginatedData.length;
+
+    if (allOnPageSelected) {
+      const pageIds = paginatedData.map(r => r.id);
+      setSelected(prevSelected => prevSelected.filter(id => !pageIds.includes(id)));
+    } else {
+      const newIds = paginatedData.filter(row => !selected.includes(row.id)).map(r => r.id);
+      setSelected(prevSelected => [...prevSelected, ...newIds]);
+    }
+  }, [selected, paginatedData]);
 
   // --- Estados do checkbox do cabeçalho ---
-  const numSelectedVisible = filteredRows.filter(row => selected.includes(row.id)).length;
-  const rowCountVisible = filteredRows.length;
-
-  const isSelectAllChecked = rowCountVisible > 0 && numSelectedVisible === rowCountVisible;
-  const isSelectAllIndeterminate = numSelectedVisible > 0 && numSelectedVisible < rowCountVisible;
+  const numSelectedOnPage = paginatedData.filter(row => selected.includes(row.id)).length;
+  const isSelectAllOnPageChecked = paginatedData.length > 0 && numSelectedOnPage === paginatedData.length;
+  const isSelectAllOnPageIndeterminate = numSelectedOnPage > 0 && numSelectedOnPage < paginatedData.length;
 
 
   // --- HANDLERS ---
@@ -209,16 +220,26 @@ export const DepartmentTable = memo(() => {
     <Box>
       <GenericTable<Department>
         columns={columns}
-        rows={filteredRows}
+        rows={paginatedData}
         isLoading={loading}
         emptyMessage="Nenhum departamento encontrado."
         
+        // Paginação
+        pagination={true}
+        count={count}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+
+        // Seleção
         enableSelection={true}
         selectedIds={selected}
         onRowToggle={handleRowToggle}
         onSelectAllToggle={handleSelectAllToggle}
-        isSelectAllChecked={isSelectAllChecked}
-        isSelectAllIndeterminate={isSelectAllIndeterminate}
+        isSelectAllChecked={isSelectAllOnPageChecked}
+        isSelectAllIndeterminate={isSelectAllOnPageIndeterminate}
+
         filters={
           <TableToolbar
             searchTerm={searchTerm}

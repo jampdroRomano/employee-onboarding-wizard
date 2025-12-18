@@ -42,7 +42,7 @@ interface DepartmentEditEmployeesStepProps {
 export const DepartmentEditEmployeesStep = (props: DepartmentEditEmployeesStepProps) => {
   const {
     loading,
-    filteredRows,
+    rows: paginatedData,
     departments,
     deptNameMap,
     searchTerm,
@@ -59,6 +59,11 @@ export const DepartmentEditEmployeesStep = (props: DepartmentEditEmployeesStepPr
     isSelectAllIndeterminate,
     applyChanges,
     effectiveDepartmentMap,
+    page,
+    rowsPerPage,
+    count,
+    handleChangePage,
+    handleChangeRowsPerPage,
   } = useDepartmentMemberManagement(props);
 
   const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
@@ -107,9 +112,16 @@ export const DepartmentEditEmployeesStep = (props: DepartmentEditEmployeesStepPr
 
       <GenericTable<Employee>
         columns={columns}
-        rows={filteredRows}
+        rows={paginatedData}
         isLoading={loading}
-        maxHeight={400}
+        
+        pagination={true}
+        count={count}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+
         enableSelection={true}
         selectedIds={selectedIds}
         onRowToggle={handleRowToggle}
