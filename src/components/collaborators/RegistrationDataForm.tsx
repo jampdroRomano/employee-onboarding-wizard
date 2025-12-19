@@ -176,7 +176,7 @@ export const RegistrationDataForm = ({ employeeId, initialData, onSuccess }: Reg
               '&:hover': { bgcolor: '#009624' }
             }}
           >
-            {isSaving ? <CircularProgress size={24} color="inherit" /> : 'Salvar Alterações'}
+            {isSaving ? <CircularProgress size={24} color="inherit" /> : 'Salvar'}
           </Button>
         </Grid>
 

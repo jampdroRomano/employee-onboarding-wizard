@@ -104,15 +104,11 @@ export const DepartmentEditEmployeesStep = (props: DepartmentEditEmployeesStepPr
 
   return (
     <Box>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h6" sx={{ fontSize: '18px', fontWeight: 700, mb: 1 }}>
-          Gestão de Membros
-        </Typography>
+      <Box sx={{ mb: 2 }}>
         <Typography variant="body2" color="text.secondary">
           Selecione colaboradores para <b>Adicionar</b> a este departamento ou <b>Transferir</b> para outro.
         </Typography>
       </Box>
-
       <GenericTable<Employee>
         columns={columns}
         rows={paginatedData}
