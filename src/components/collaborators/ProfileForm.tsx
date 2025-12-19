@@ -14,19 +14,18 @@ interface ProfileFormProps {
     status: boolean;
     img?: string;
   };
-  onSuccess?: () => void; // Callback para atualizar dados no pai se necessário
+  onSuccess?: () => void;
 }
 
 export const ProfileForm = ({ employeeId, initialData, onSuccess }: ProfileFormProps) => {
   const [formData, setFormData] = useState(initialData);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Atualiza form se initialData mudar (ex: carregamento assíncrono)
   useEffect(() => {
     setFormData(initialData);
   }, [initialData]);
 
-  const handleChange = (field: string, value: any) => {
+  const handleChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -38,7 +37,6 @@ export const ProfileForm = ({ employeeId, initialData, onSuccess }: ProfileFormP
 
     setIsSaving(true);
     try {
-        // Atualiza apenas os campos desta tela
         await employeeService.update(employeeId, {
             nome: formData.nome,
             email: formData.email,
@@ -56,15 +54,8 @@ export const ProfileForm = ({ employeeId, initialData, onSuccess }: ProfileFormP
 
   return (
     <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-        
-
-        {/* Conteúdo Centralizado Verticalmente ou no Topo? Seguindo ordem visual */}
         <Stack spacing={2} sx={{ width: '100%', maxWidth: '100%' }}>
-            
-            {/* Avatar e Infos */}
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                
-        
                 <AppTextField 
                     label="Nome Completo"
                     value={formData.nome}
@@ -88,7 +79,6 @@ export const ProfileForm = ({ employeeId, initialData, onSuccess }: ProfileFormP
                 </Box>
             </Box>
 
-            {/* Botão de Salvar ocupando 100% */}
             <AppButton 
                 onClick={handleSave}
                 loading={isSaving}
@@ -96,7 +86,6 @@ export const ProfileForm = ({ employeeId, initialData, onSuccess }: ProfileFormP
             >
                 Salvar 
             </AppButton>
-
         </Stack>
     </Box>
   );
