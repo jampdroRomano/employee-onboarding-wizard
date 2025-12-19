@@ -101,7 +101,7 @@ export const DepartmentDataTab = ({ departmentId, initialData, onSuccess }: Depa
           loading={loading}
           sx={{ width: '100%', mt: 2 }}
         >
-          Salvar Alterações
+          Salvar 
         </AppButton>
       </Stack>
     </Box>
