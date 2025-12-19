@@ -1,6 +1,6 @@
 # 🪄 Employee Onboarding Wizard
 
-![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
+![Status](https://img.shields.io/badge/status-%20concluido-gree)
 ![Frontend](https://img.shields.io/badge/tecnologia-React-blue)
 ![Backend](https://img.shields.io/badge/persistência-Firebase-red)
 ![UI](https://img.shields.io/badge/UI-Material--UI-purple)
@@ -8,7 +8,7 @@
 ---
 
 ## 📖 Descrição do Projeto
-**Employee Onboarding Wizard** é uma aplicação web desenvolvida em **React** para otimizar e simplificar o processo de cadastro de novos colaboradores. O sistema conta com um dashboard para visualização e gerenciamento de funcionários e um formulário passo a passo (wizard) que guia o usuário no preenchimento das informações básicas e profissionais do novo colaborador. A aplicação utiliza **Firebase** para persistência de dados em tempo real.
+**Employee Onboarding Wizard** é uma aplicação web desenvolvida em **React** para otimizar e simplificar o gerenciamento de recursos humanos. Além do cadastro de novos colaboradores via wizard, o sistema evoluiu para incluir **gestão completa de departamentos**, **edição de registros** e **controle de acesso (autenticação)**. A aplicação utiliza **Firebase** para autenticação e persistência de dados em tempo real.
 
 ---
 
@@ -21,19 +21,21 @@ employee-onboarding-wizard/
 ├─── src/
 │    ├─── assets/              # Logos e imagens da aplicação
 │    ├─── components/          # Componentes React reutilizáveis
-│    │    ├─── common/         # Componentes genéricos (Botão, Input)
+│    │    ├─── auth/           # Componentes de autenticação (Login/Registro)
+│    │    ├─── collaborators/  # Componentes específicos de colaboradores
+│    │    ├─── common/         # Componentes genéricos (Botão, Input, Stepper)
 │    │    ├─── dashboard/      # Componentes do painel principal
-│    │    ├─── layout/         # Estrutura do layout (Header, Sidebar)
-│    │    └─── onboarding/     # Componentes do fluxo de cadastro
+│    │    ├─── departments/    # Componentes de gestão de departamentos
+│    │    └─── layout/         # Estrutura do layout (Header, Sidebar)
 │    ├─── config/              # Configuração de serviços (Firebase)
+│    ├─── contexts/            # Contextos da aplicação (AuthContext)
 │    ├─── hooks/               # Hooks customizados para lógica de estado
-│    ├─── pages/               # Páginas principais da aplicação
+│    ├─── pages/               # Páginas principais (Dashboard, Creates, Edits)
 │    ├─── services/            # Lógica de comunicação com a API/backend
 │    └─── theme/               # Tema customizado do Material-UI
 │
 └─── package.json              # Dependências e scripts do projeto
 ```
-
 ---
 
 ## ⚙ Funcionalidades Principais
@@ -41,8 +43,10 @@ employee-onboarding-wizard/
 |-------|--------------------------|-------------------------------------------------------------|
 | RF01  | Dashboard de Funcionários| Apresenta uma tabela com os funcionários cadastrados, permitindo uma visualização rápida e centralizada. |
 | RF02  | Wizard de Cadastro       | Um formulário multi-passo para cadastrar novos funcionários, coletando informações básicas e profissionais de forma organizada. |
-| RF03  | Navegação Intuitiva      | Layout com menu lateral persistente e breadcrumbs para facilitar a localização do usuário dentro do sistema. |
-| RF04  | Persistência de Dados    | As informações dos funcionários são salvas e lidas do Firebase Firestore, garantindo dados consistentes e em tempo real. |
+| RF03  | Gestão de Departamentos  | Criação e edição de departamentos, incluindo definição de gestores e movimentação em massa de colaboradores entre áreas.        |
+| RF04  | Autenticação e Segurança | Sistema de Login e Registro com rotas protegidas (PrivateRoute), garantindo que apenas usuários autenticados acessem o sistema. |
+| RF05  | Navegação Intuitiva      | Layout com menu lateral, breadcrumbs dinâmicos e feedbacks visuais (Toasts) utilizando a biblioteca Sonner. |
+| RF06  | Persistência de Dados    | As informações dos funcionários são salvas e lidas do Firebase Firestore, garantindo dados consistentes e em tempo real. |
 
 ---
 
@@ -51,7 +55,8 @@ employee-onboarding-wizard/
 - **Build Tool:** Vite
 - **Roteamento:** React Router DOM
 - **UI Framework:** Material-UI (MUI)
-- **Backend e Banco de Dados:** Firebase (Firestore)
+- **Feedback:** Sonner (Toasts)
+- **Backend, Banco de Dados e Autenticação:** Firebase (Firestore & Auth)
 - **Linting:** ESLint
 
 ---

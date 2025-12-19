@@ -12,11 +12,13 @@ export const EditEmployeePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [employee, setEmployee] = useState<Employee | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!!id);
+  
   const [activeTab, setActiveTab] = useState<'profile' | 'registration'>('profile');
 
   useEffect(() => {
     if (id) {
+      
       employeeService.getById(id)
         .then(data => {
           if (data) {
@@ -28,15 +30,15 @@ export const EditEmployeePage: React.FC = () => {
           console.error("Failed to fetch employee", error);
           setLoading(false);
         });
-    } else {
-      setLoading(false);
     }
   }, [id]);
 
   const handleSuccess = () => {
     if (id) {
+      setLoading(true);
       employeeService.getById(id).then(data => {
         if (data) setEmployee(data);
+        setLoading(false);
       });
     }
   };
@@ -80,7 +82,6 @@ export const EditEmployeePage: React.FC = () => {
 
   return (
     <Box>
-      {/* HEADER EXTERNO */}
       <Box sx={{ mb: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
             <IconButton onClick={() => navigate(-1)} size="small" sx={{ mr: 1 }}>
@@ -95,7 +96,6 @@ export const EditEmployeePage: React.FC = () => {
         </Typography>
       </Box>
 
-      {/* CONTAINER BRANCO COM SIDEBAR E FORM */}
       <EditLayoutContainer activeTab={activeTab} onChangeTab={setActiveTab}>
         {renderContent()}
       </EditLayoutContainer>
