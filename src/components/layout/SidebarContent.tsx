@@ -50,7 +50,7 @@ export const SidebarContent = () => {
       <List disablePadding>
         {menuItems.map((item) => {
           const isActive = item.path === '/'
-            ? (location.pathname === '/' || location.pathname === '/criar') 
+            ? (location.pathname === '/' || location.pathname === '/criar' || location.pathname.startsWith('/editar')) 
             : location.pathname.startsWith(item.path); 
 
           return (
