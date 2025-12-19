@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, CircularProgress, Typography, IconButton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -12,18 +12,9 @@ export const EditDepartmentPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [department, setDepartment] = useState<Department | null>(null);
-  const [loading, setLoading] = useState(true);
-  
+  const [loading, setLoading] = useState(!!id);
   const [activeTab, setActiveTab] = useState<'data' | 'members'>('data');
-
-  useEffect(() => {
-    if (id) {
-      loadDepartment(id);
-    }
-  }, [id]);
-
-  const loadDepartment = (deptId: string) => {
-    setLoading(true);
+  const loadDepartment = useCallback((deptId: string) => {
     departmentService.getAll()
       .then(allDepts => {
         const dept = allDepts.find(d => d.id === deptId);
@@ -39,10 +30,19 @@ export const EditDepartmentPage: React.FC = () => {
         console.error("Failed to fetch department", error);
         setLoading(false);
       });
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    if (id) {
+      loadDepartment(id);
+    }
+  }, [id, loadDepartment]);
 
   const handleSuccess = () => {
-    if (id) loadDepartment(id);
+    if (id) {
+      setLoading(true);
+      loadDepartment(id);
+    }
   };
 
   const renderContent = () => {
@@ -99,7 +99,6 @@ export const EditDepartmentPage: React.FC = () => {
 
   return (
     <Box>
-      {/* HEADER EXTERNO */}
       <Box sx={{ mb: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
             <IconButton onClick={() => navigate('/departamentos')} size="small" sx={{ mr: 1 }}>
@@ -114,7 +113,6 @@ export const EditDepartmentPage: React.FC = () => {
         </Typography>
       </Box>
 
-      {/* CONTAINER BRANCO (Replicando estilo do painel) */}
       <Box 
         sx={{ 
             p: 4, 
@@ -125,15 +123,12 @@ export const EditDepartmentPage: React.FC = () => {
         }}
       >
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 2, md: 6 } }}>
-            {/* SIDEBAR (ESQUERDA) */}
             <Box sx={{ width: { xs: '100%', md: '25%' }, display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-                {/* Botão: Dados */}
                 <Box sx={getTabStyle('data')} onClick={() => setActiveTab('data')}>
                     <Typography sx={getTextStyle('data')}>
                         Dados do Departamento
                     </Typography>
                 </Box>
-                {/* Botão: Membros */}
                 <Box sx={getTabStyle('members')} onClick={() => setActiveTab('members')}>
                     <Typography sx={getTextStyle('members')}>
                         Gestão de Membros
@@ -141,7 +136,6 @@ export const EditDepartmentPage: React.FC = () => {
                 </Box>
             </Box>
 
-            {/* CONTEÚDO (DIREITA) */}
             <Box sx={{ width: { xs: '100%', md: '75%' }, pr: { xs: 0, md: 6.25 } }}>
                 <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 4, color: '#333' }}>
                     {activeTab === 'data' ? 'Dados do Departamento' : 'Gestão de Membros'}
@@ -150,7 +144,6 @@ export const EditDepartmentPage: React.FC = () => {
             </Box>
         </Box>
       </Box>
-      
     </Box>
   );
 };

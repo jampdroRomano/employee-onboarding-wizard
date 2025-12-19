@@ -50,8 +50,9 @@ export const RegistrationDataForm = ({ employeeId, initialData, onSuccess }: Reg
 
     setIsSaving(true);
     try {
-      const payload = {
+     const payload = {
         ...formData,
+        departamento: formData.department, 
         managerId: formData.managerId === null ? undefined : formData.managerId,
       };
       await employeeService.update(employeeId, payload);

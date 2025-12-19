@@ -42,7 +42,7 @@ export const DepartmentDataTab = ({ departmentId, initialData, onSuccess }: Depa
     fetchEmployees();
   }, []);
 
-  const handleChange = (field: string, value: any) => {
+  const handleChange = (field: string, value: string | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field as keyof DepartmentErrors]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
@@ -78,7 +78,6 @@ export const DepartmentDataTab = ({ departmentId, initialData, onSuccess }: Depa
 
   return (
     <Box>
-        
       <Stack spacing={4}>
         <DepartmentForm 
           name={formData.name}
@@ -101,7 +100,7 @@ export const DepartmentDataTab = ({ departmentId, initialData, onSuccess }: Depa
           loading={loading}
           sx={{ width: '100%', mt: 2 }}
         >
-          Salvar Alterações
+          Salvar
         </AppButton>
       </Stack>
     </Box>
