@@ -1,6 +1,7 @@
-import { Box, Typography, Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { AppTextField } from '../common/AppTextField';
 import type { DepartmentErrors } from '../../hooks/useDepartmentForm';
+
 interface DepartmentFormProps {
   name: string;
   description: string;
@@ -12,17 +13,6 @@ interface DepartmentFormProps {
 export const DepartmentForm = ({ name, description, errors, onChangeName, onChangeDesc }: DepartmentFormProps) => {
   return (
     <Box sx={{ width: '100%' }}>
-      <Typography 
-        component="h2"
-        variant="h4" 
-        sx={{ 
-          mb: '31px',
-          color: 'text.secondary' 
-        }}
-      >
-        Informações do Departamento
-      </Typography>
-
       <Stack spacing={3}>
         <AppTextField 
           label="Nome do Departamento" 

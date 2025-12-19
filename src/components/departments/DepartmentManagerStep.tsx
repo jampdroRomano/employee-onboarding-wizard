@@ -1,4 +1,4 @@
-import { Box, Typography, Autocomplete, TextField, CircularProgress, Paper } from '@mui/material';
+import { Box, Autocomplete, TextField, CircularProgress, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import type { Employee } from '../../types';
 import { StickyActionMenuItem } from '../common/StickyActionMenuItem';
@@ -26,14 +26,6 @@ export const DepartmentManagerStep = ({
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Typography 
-        component="h2"
-        variant="h4" 
-        sx={{ mb: '31px', color: 'text.secondary' }}
-      >
-        Gestão do Departamento
-      </Typography>
-
       <Box sx={{ width: '100%' }}>
         <Autocomplete
             options={managers}

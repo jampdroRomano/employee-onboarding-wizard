@@ -10,6 +10,7 @@ import { DepartmentsPage } from './pages/DepartmentsPage';
 import { CreateDepartment } from './pages/CreateDepartment';
 import { Toaster } from 'sonner';
 import { EditEmployeePage } from './pages/EditEmployeePage';
+import { EditDepartmentPage } from './pages/EditDepartmentPage'; // Importação Nova
 
 function App() {
   const { userLoggedIn, currentUser } = useAuth();
@@ -39,7 +40,7 @@ function App() {
           }
         />
 
-        {/* Rota de Criação */}
+        {/* Rota de Criação de Colaborador */}
         <Route
           path="/criar"
           element={
@@ -51,13 +52,13 @@ function App() {
           }
         />
 
-        {/* --- NOVA ROTA DE EDIÇÃO --- */}
+        {/* Rota de Edição de Colaborador */}
         <Route
           path="/editar/:id"
           element={
             <PrivateRoute>
               <MainLayout>
-                <EditEmployeePage /> {/* Usando a nova página */}
+                <EditEmployeePage />
               </MainLayout>
             </PrivateRoute>
           }
@@ -85,12 +86,13 @@ function App() {
           }
         />
 
+        {/* --- ROTA DE EDIÇÃO DE DEPARTAMENTO ATUALIZADA --- */}
         <Route
           path="/departamentos/editar/:id"
           element={
             <PrivateRoute>
               <MainLayout>
-                <CreateDepartment />
+                <EditDepartmentPage /> 
               </MainLayout>
             </PrivateRoute>
           }
